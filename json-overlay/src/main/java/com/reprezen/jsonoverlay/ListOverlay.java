@@ -22,7 +22,7 @@ import com.reprezen.jsonoverlay.SerializationOptions.Option;
 public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
 
     private OverlayFactory<V> itemFactory;
-    private List<IJsonOverlay<V>> overlays = Lists.newLinkedList();
+    private List<AbstractJsonOverlay<V>> overlays = Lists.newLinkedList();
 
     public ListOverlay(Collection<V> value, JsonOverlay<?> parent, OverlayFactory<V> itemFactory,
             ReferenceRegistry refReg) {
@@ -76,7 +76,7 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
     }
 
     @Override
-    public IJsonOverlay<?> _find(JsonPointer path) {
+    public AbstractJsonOverlay<?> _find(JsonPointer path) {
         int index = path.getMatchingIndex();
         return overlays.size() > index ? overlays.get(index).find(path.tail()) : null;
     }
@@ -84,18 +84,18 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
     @Override
     public JsonNode toJson(SerializationOptions options) {
         ArrayNode array = jsonArray();
-        for (IJsonOverlay<V> overlay : overlays) {
+        for (AbstractJsonOverlay<V> overlay : overlays) {
             array.add(overlay.toJson(options.plus(Option.KEEP_ONE_EMPTY)));
         }
         return array.size() > 0 || options.isKeepThisEmpty() ? array : jsonMissing();
     }
 
     public V get(int index) {
-        IJsonOverlay<V> overlay = overlays.get(index);
+        AbstractJsonOverlay<V> overlay = overlays.get(index);
         return overlay != null ? overlay.get() : null;
     }
 
-    public IJsonOverlay<V> getOverlay(int index) {
+    public AbstractJsonOverlay<V> getOverlay(int index) {
         return overlays.get(index);
     }
 

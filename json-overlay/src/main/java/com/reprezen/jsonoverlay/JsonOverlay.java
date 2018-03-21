@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
-public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
+public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 
 	protected final static ObjectMapper mapper = new ObjectMapper();
 
@@ -74,14 +74,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	@Override
-	public IJsonOverlay<?> find(JsonPointer path) {
+	/* package */ AbstractJsonOverlay<?> find(JsonPointer path) {
 		return path.matches() ? this : _find(path);
 	}
 
-	abstract protected IJsonOverlay<?> _find(JsonPointer path);
+	abstract protected AbstractJsonOverlay<?> _find(JsonPointer path);
 
 	@Override
-	public IJsonOverlay<?> find(String path) {
+	/* package */ AbstractJsonOverlay<?> find(String path) {
 		return find(JsonPointer.compile(path));
 	}
 
@@ -93,7 +93,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.value = value;
 	}
 
-	public JsonOverlay<?> getParent() {
+	/* package */ JsonOverlay<?> getParent() {
 		return parent;
 	}
 
@@ -140,7 +140,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	protected void elaborate() {
 	}
-	
+
 	private static final SerializationOptions emptyOptions = new SerializationOptions();
 
 	@Override

@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
 public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
-    private Map<String, IJsonOverlay<V>> overlays = Maps.newLinkedHashMap();
+    private Map<String, AbstractJsonOverlay<V>> overlays = Maps.newLinkedHashMap();
     private OverlayFactory<V> valueFactory;
     private Pattern keyPattern;
 
@@ -80,7 +80,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
     }
 
     @Override
-    public IJsonOverlay<?> _find(JsonPointer path) {
+    public AbstractJsonOverlay<?> _find(JsonPointer path) {
         String key = path.getMatchingProperty();
         return overlays.containsKey(key) ? overlays.get(key).find(path.tail()) : null;
     }
@@ -93,7 +93,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
     @Override
     public JsonNode toJson(SerializationOptions options) {
         ObjectNode obj = jsonObject();
-        for (Entry<String, IJsonOverlay<V>> entry : overlays.entrySet()) {
+        for (Entry<String, AbstractJsonOverlay<V>> entry : overlays.entrySet()) {
             obj.set(entry.getKey(), entry.getValue().toJson(options.plus(Option.KEEP_ONE_EMPTY)));
         }
         return obj.size() > 0 || options.isKeepThisEmpty() ? obj : jsonMissing();
@@ -104,11 +104,11 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
     }
 
     public V get(String name) {
-        IJsonOverlay<V> overlay = overlays.get(name);
+        AbstractJsonOverlay<V> overlay = overlays.get(name);
         return overlay != null ? overlay.get() : null;
     }
 
-    protected IJsonOverlay<V> getOverlay(String name) {
+    protected AbstractJsonOverlay<V> getOverlay(String name) {
         return overlays.get(name);
     }
 

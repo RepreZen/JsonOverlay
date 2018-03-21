@@ -23,7 +23,6 @@ import com.reprezen.jsonoverlay.ChildListOverlay
 import com.reprezen.jsonoverlay.ChildMapOverlay
 import com.reprezen.jsonoverlay.ChildOverlay
 import com.reprezen.jsonoverlay.EnumOverlay
-import com.reprezen.jsonoverlay.IJsonOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
@@ -34,6 +33,7 @@ import java.io.File
 import java.util.Collection
 import java.util.Map
 import java.util.stream.Collectors
+import com.reprezen.jsonoverlay.AbstractJsonOverlay
 
 class ImplGenerator extends TypeGenerator {
 
@@ -328,11 +328,11 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getEnumFactoryMember(Type type) {
-		requireTypes(OverlayFactory, IJsonOverlay, JsonOverlay, JsonNode, ReferenceRegistry)
+		requireTypes(OverlayFactory, AbstractJsonOverlay, JsonOverlay, JsonNode, ReferenceRegistry)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>() {
 				@Override
-				protected Class<? extends IJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 				
@@ -357,17 +357,17 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getFactoryMember(Type type) {
-		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, IJsonOverlay)
+		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, AbstractJsonOverlay)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>(){
 				@Override
-				protected Class<? extends IJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 			
 				@Override
 				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					IJsonOverlay<?> overlay;
+					AbstractJsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
 						overlay = new «type.implType»(«type.lcName», parent, refReg);
 					«ELSE»
@@ -381,7 +381,7 @@ class ImplGenerator extends TypeGenerator {
 			
 				@Override
 				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					IJsonOverlay<?> overlay;
+					AbstractJsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
 						overlay = new «type.implType»(json, parent, refReg);
 					«ELSE»

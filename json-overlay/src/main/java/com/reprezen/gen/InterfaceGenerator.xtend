@@ -38,8 +38,10 @@ class InterfaceGenerator extends TypeGenerator {
 		switch (decl) {
 			ClassOrInterfaceDeclaration: {
 				decl.interface = true
-				decl.addExtendedType(type.superType)
-				requireTypes(type.superType)
+				if (type.superType !== null) {
+					decl.addExtendedType(type.superType)
+					requireTypes(type.superType)
+				}
 				if (type.typeData.modelType !== null) {
 					requireTypes("IModelPart")
 					decl.addExtendedType('''IModelPart<«type.typeData.modelType», «type.name»>''')
@@ -47,7 +49,7 @@ class InterfaceGenerator extends TypeGenerator {
 				type.extendInterfaces.forEach[requireTypes(it); decl.addExtendedType(it)]
 			}
 			EnumDeclaration: {
-				for (enumValue: type.enumValues) {
+				for (enumValue : type.enumValues) {
 					decl.addEntry(new EnumConstantDeclaration().setName(enumValue))
 				}
 			}
@@ -56,7 +58,7 @@ class InterfaceGenerator extends TypeGenerator {
 	}
 
 	def private getSuperType(Type type) {
-		type.extensionOf ?: '''IPropertiesOverlay<«type.name»>'''
+		type.extensionOf ?: '''IJsonOverlay<«type.name»>'''
 	}
 
 	override getImports(Type type) {

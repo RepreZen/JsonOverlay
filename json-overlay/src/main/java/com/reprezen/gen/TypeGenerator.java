@@ -49,6 +49,7 @@ import com.google.inject.Inject;
 import com.reprezen.gen.SimpleJavaGenerator.Member;
 import com.reprezen.gen.TypeData.Field;
 import com.reprezen.gen.TypeData.Type;
+import com.reprezen.jsonoverlay.AbstractJsonOverlay;
 import com.reprezen.jsonoverlay.BooleanOverlay;
 import com.reprezen.jsonoverlay.ChildListOverlay;
 import com.reprezen.jsonoverlay.ChildMapOverlay;
@@ -56,7 +57,6 @@ import com.reprezen.jsonoverlay.ChildOverlay;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.jsonoverlay.IModelPart;
-import com.reprezen.jsonoverlay.IPropertiesOverlay;
 import com.reprezen.jsonoverlay.IntegerOverlay;
 import com.reprezen.jsonoverlay.JsonOverlay;
 import com.reprezen.jsonoverlay.ListOverlay;
@@ -188,15 +188,15 @@ public abstract class TypeGenerator {
 				ObjectNode.class, //
 				JsonNodeFactory.class, //
 				JsonPointer.class, //
-				JsonOverlay.class, //
 				IJsonOverlay.class, //
+				JsonOverlay.class, //
+				AbstractJsonOverlay.class, //
+				IModelPart.class, //
 				PropertiesOverlay.class, //
-				IPropertiesOverlay.class, //
 				ChildOverlay.class, //
 				ChildMapOverlay.class, //
 				ChildListOverlay.class, //
 				OverlayFactory.class, //
-				IModelPart.class, //
 				Reference.class, //
 				ReferenceRegistry.class, //
 				Inject.class, //

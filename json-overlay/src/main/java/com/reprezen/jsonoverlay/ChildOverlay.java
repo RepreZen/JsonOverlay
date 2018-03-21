@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
-public class ChildOverlay<V> implements IJsonOverlay<V> {
+public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 
 	private JsonPath path;
 	protected JsonOverlay<V> overlay;
@@ -43,7 +43,7 @@ public class ChildOverlay<V> implements IJsonOverlay<V> {
 			JsonNode resolved = reference.resolve();
 			if (reference.isValid()) {
 				if (refReg.hasOverlay(resolved)) {
-					IJsonOverlay<?> overlay = refReg.getOverlay(resolved);
+					AbstractJsonOverlay<?> overlay = refReg.getOverlay(resolved);
 					if (factory.isCompatible(overlay)) {
 						@SuppressWarnings("unchecked")
 						JsonOverlay<V> castOverlay = (JsonOverlay<V>) overlay;
@@ -94,11 +94,11 @@ public class ChildOverlay<V> implements IJsonOverlay<V> {
 		return overlay.get(complete);
 	}
 
-	public IJsonOverlay<?> find(JsonPointer path) {
+	public AbstractJsonOverlay<?> find(JsonPointer path) {
 		return overlay.find(path);
 	}
 
-	public IJsonOverlay<?> find(String path) {
+	public AbstractJsonOverlay<?> find(String path) {
 		return overlay.find(path);
 	}
 
@@ -106,7 +106,7 @@ public class ChildOverlay<V> implements IJsonOverlay<V> {
 		overlay.set(value);
 	}
 
-	public IJsonOverlay<?> getParent() {
+	public AbstractJsonOverlay<?> getParent() {
 		// Note: here we return the creator of the childnode, which for a reference is
 		// the holder of the reference. This may not be the same as the parent of the
 		// referenced object, which is available via getOverlay().getParent().
@@ -117,7 +117,7 @@ public class ChildOverlay<V> implements IJsonOverlay<V> {
 		return overlay.getPathInParent();
 	}
 
-	public IJsonOverlay<?> getRoot() {
+	public AbstractJsonOverlay<?> getRoot() {
 		return parent != null ? parent.getParent() : overlay.getRoot();
 	}
 

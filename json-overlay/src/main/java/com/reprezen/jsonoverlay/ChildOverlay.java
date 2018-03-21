@@ -82,68 +82,68 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 		return node.isObject() && node.has("$ref");
 	}
 
-	public boolean isPresent() {
-		return overlay.isPresent();
+	public boolean _isPresent() {
+		return overlay._isPresent();
 	}
 
-	public V get() {
-		return overlay.get();
+	public V _get() {
+		return overlay._get();
 	}
 
-	public V get(boolean complete) {
-		return overlay.get(complete);
+	public V _get(boolean complete) {
+		return overlay._get(complete);
 	}
 
-	public AbstractJsonOverlay<?> find(JsonPointer path) {
-		return overlay.find(path);
+	public AbstractJsonOverlay<?> _find(JsonPointer path) {
+		return overlay._find(path);
 	}
 
-	public AbstractJsonOverlay<?> find(String path) {
-		return overlay.find(path);
+	public AbstractJsonOverlay<?> _find(String path) {
+		return overlay._find(path);
 	}
 
-	public void set(V value) {
-		overlay.set(value);
+	public void _set(V value) {
+		overlay._set(value);
 	}
 
-	public AbstractJsonOverlay<?> getParent() {
+	public AbstractJsonOverlay<?> _getParent() {
 		// Note: here we return the creator of the childnode, which for a reference is
 		// the holder of the reference. This may not be the same as the parent of the
 		// referenced object, which is available via getOverlay().getParent().
 		return parent;
 	}
 
-	public String getPathInParent() {
-		return overlay.getPathInParent();
+	public String _getPathInParent() {
+		return overlay._getPathInParent();
 	}
 
-	public AbstractJsonOverlay<?> getRoot() {
-		return parent != null ? parent.getParent() : overlay.getRoot();
+	public AbstractJsonOverlay<?> _getRoot() {
+		return parent != null ? parent._getParent() : overlay._getRoot();
 	}
 
 	private static final SerializationOptions emptyOptions = new SerializationOptions();
 
-	public JsonNode toJson() {
-		return toJson(emptyOptions);
+	public JsonNode _toJson() {
+		return _toJson(emptyOptions);
 	}
 
-	public JsonNode toJson(Option... options) {
-		return toJson(new SerializationOptions(options));
+	public JsonNode _toJson(Option... options) {
+		return _toJson(new SerializationOptions(options));
 	}
 
-	public JsonNode toJson(SerializationOptions options) {
+	public JsonNode _toJson(SerializationOptions options) {
 		if (isReference() && (!options.isFollowRefs() || getReference().isInvalid())) {
 			ObjectNode obj = JsonOverlay.jsonObject();
 			obj.put("$ref", reference.getRefString());
 			return obj;
 		} else {
-			return overlay != null ? overlay.toJson(options) : JsonOverlay.jsonNull();
+			return overlay != null ? overlay._toJsonInternal(options) : JsonOverlay.jsonNull();
 		}
 	}
 
 	@Override
-	public boolean isElaborated() {
-		return overlay.isElaborated();
+	public boolean _isElaborated() {
+		return overlay._isElaborated();
 	}
 
 	public JsonPath getPath() {
@@ -162,12 +162,12 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 		return overlay;
 	}
 
-	public String getPathFromRoot() {
-		return overlay.getPathFromRoot();
+	public String _getPathFromRoot() {
+		return overlay._getPathFromRoot();
 	}
 
-	public URL getJsonReference() {
-		return overlay.getJsonReference();
+	public URL _getJsonReference() {
+		return overlay._getJsonReference();
 	}
 
 	@Override

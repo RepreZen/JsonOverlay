@@ -18,75 +18,75 @@ public class Overlay<V> {
 	}
 
 	public final V get() {
-		return overlay.get();
+		return overlay._get();
 	}
 
 	public static <V> V get(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).get();
+		return ((AbstractJsonOverlay<V>) overlay)._get();
 	}
 
 	public AbstractJsonOverlay<?> find(JsonPointer path) {
-		return overlay.find(path);
+		return overlay._find(path);
 	}
 
 	public static <V> AbstractJsonOverlay<?> find(IJsonOverlay<V> overlay, JsonPointer path) {
-		return ((AbstractJsonOverlay<V>) overlay).find(path);
+		return ((AbstractJsonOverlay<V>) overlay)._find(path);
 	}
 
 	public AbstractJsonOverlay<?> find(String path) {
-		return overlay.find(path);
+		return overlay._find(path);
 	}
 
 	public static <V> AbstractJsonOverlay<?> find(IJsonOverlay<V> overlay, String path) {
-		return ((AbstractJsonOverlay<V>) overlay).find(path);
+		return ((AbstractJsonOverlay<V>) overlay)._find(path);
 	}
 
 	public JsonNode toJson() {
-		return overlay.toJson();
+		return overlay._toJson();
 	}
 
 	public static <V> JsonNode toJson(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).toJson();
+		return ((AbstractJsonOverlay<V>) overlay)._toJson();
 	}
 
 	public JsonNode toJson(SerializationOptions options) {
-		return overlay.toJson(options);
+		return overlay._toJson(options);
 	}
 
 	public static <V> JsonNode toJson(IJsonOverlay<V> overlay, SerializationOptions options) {
-		return ((AbstractJsonOverlay<V>) overlay).toJson(options);
+		return ((AbstractJsonOverlay<V>) overlay)._toJson(options);
 	}
 
 	public JsonNode toJson(SerializationOptions.Option... options) {
-		return overlay.toJson(options);
+		return overlay._toJson(options);
 	}
 
 	public static <V> JsonNode toJson(IJsonOverlay<V> overlay, SerializationOptions.Option... options) {
-		return ((AbstractJsonOverlay<V>) overlay).toJson(options);
+		return ((AbstractJsonOverlay<V>) overlay)._toJson(options);
 	}
 
 	public boolean isPresent() {
-		return overlay.isPresent();
+		return overlay._isPresent();
 	}
 
 	public static <V> boolean isPresent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).isPresent();
+		return ((AbstractJsonOverlay<V>) overlay)._isPresent();
 	}
 
 	public boolean isElaborated() {
-		return overlay.isElaborated();
+		return overlay._isElaborated();
 	}
 
 	public static <V> boolean isElaborated(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).isElaborated();
+		return ((AbstractJsonOverlay<V>) overlay)._isElaborated();
 	}
 
 	public JsonOverlay<?> getParent() {
-		return (JsonOverlay<?>) overlay.getParent();
+		return (JsonOverlay<?>) overlay._getParent();
 	}
 
 	public static <V> IJsonOverlay<?> getParent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).getParent();
+		return ((AbstractJsonOverlay<V>) overlay)._getParent();
 	}
 
 	public PropertiesOverlay<?> getParentPropertiesOverlay() {
@@ -106,26 +106,26 @@ public class Overlay<V> {
 	}
 
 	public String getPathInParent() {
-		return overlay.getPathInParent();
+		return overlay._getPathInParent();
 	}
 
 	public static <V> String getPathInParent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).getPathInParent();
+		return ((AbstractJsonOverlay<V>) overlay)._getPathInParent();
 	}
 
 	public AbstractJsonOverlay<?> getRoot() {
-		return overlay.getRoot();
+		return overlay._getRoot();
 	}
 
 	public static <V> AbstractJsonOverlay<?> getRoot(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay).getRoot();
+		return ((AbstractJsonOverlay<V>) overlay)._getRoot();
 	}
 
 	public <Model> Model getModel() {
-		if (this instanceof IModelPart<?, ?>) {
+		if (overlay instanceof IModelPart<?, ?>) {
 			@SuppressWarnings("unchecked")
-			IModelPart<Model, V> castOverlay = (IModelPart<Model, V>) overlay;
-			return (Model) castOverlay.getModel();
+			Model root = (Model) overlay._getRoot();
+			return root;
 		} else {
 			return null;
 		}
@@ -136,19 +136,18 @@ public class Overlay<V> {
 	}
 
 	public String getPathFromRoot() {
-		return overlay.getPathFromRoot();
+		return overlay._getPathFromRoot();
 	}
 
 	public static <V> String getPathFromFromRoot(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>)overlay).getPathFromRoot();
+		return ((AbstractJsonOverlay<V>) overlay)._getPathFromRoot();
 	}
 
 	public URL getJsonReference() {
-		return overlay.getJsonReference();
+		return overlay._getJsonReference();
 	}
 
 	public static <V> URL getJsonReference(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>)overlay).getJsonReference();
+		return ((AbstractJsonOverlay<V>) overlay)._getJsonReference();
 	}
-
 }

@@ -60,13 +60,13 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
             for (JsonNode itemJson : iterable(json.elements())) {
                 ChildOverlay<V> overlay = new ChildOverlay<>(null, itemJson, this, itemFactory, refReg);
                 overlays.add(overlay);
-                value.add(overlay.get(false));
+                value.add(overlay._get(false));
             }
         }
     }
 
     @Override
-    public Collection<V> get(boolean elaborate) {
+    public Collection<V> _get(boolean elaborate) {
         return value;
     }
 
@@ -76,23 +76,23 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
     }
 
     @Override
-    public AbstractJsonOverlay<?> _find(JsonPointer path) {
+    public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
         int index = path.getMatchingIndex();
-        return overlays.size() > index ? overlays.get(index).find(path.tail()) : null;
+        return overlays.size() > index ? overlays.get(index)._find(path.tail()) : null;
     }
 
     @Override
-    public JsonNode toJson(SerializationOptions options) {
+    public JsonNode _toJsonInternal(SerializationOptions options) {
         ArrayNode array = jsonArray();
         for (AbstractJsonOverlay<V> overlay : overlays) {
-            array.add(overlay.toJson(options.plus(Option.KEEP_ONE_EMPTY)));
+            array.add(overlay._toJson(options.plus(Option.KEEP_ONE_EMPTY)));
         }
         return array.size() > 0 || options.isKeepThisEmpty() ? array : jsonMissing();
     }
 
     public V get(int index) {
         AbstractJsonOverlay<V> overlay = overlays.get(index);
-        return overlay != null ? overlay.get() : null;
+        return overlay != null ? overlay._get() : null;
     }
 
     public AbstractJsonOverlay<V> getOverlay(int index) {

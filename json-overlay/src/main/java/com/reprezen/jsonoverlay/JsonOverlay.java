@@ -56,44 +56,41 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 	}
 
 	@Override
-	public V get() {
-		return get(true);
-	}
-
-	public abstract V get(boolean elaborate);
-
-	@Override
-	public boolean isPresent() {
+	/* protected */boolean _isPresent() {
 		return value != null && !json.isMissingNode();
 	}
 
 	@Override
-	public boolean isElaborated() {
+	/* package */boolean _isElaborated() {
 		// most overlays are complete when constructed
 		return true;
 	}
 
 	@Override
-	/* package */ AbstractJsonOverlay<?> find(JsonPointer path) {
-		return path.matches() ? this : _find(path);
+	/* package */ AbstractJsonOverlay<?> _find(JsonPointer path) {
+		return path.matches() ? this : _findInternal(path);
 	}
 
-	abstract protected AbstractJsonOverlay<?> _find(JsonPointer path);
+	abstract protected AbstractJsonOverlay<?> _findInternal(JsonPointer path);
 
 	@Override
-	/* package */ AbstractJsonOverlay<?> find(String path) {
-		return find(JsonPointer.compile(path));
+	/* package */ AbstractJsonOverlay<?> _find(String path) {
+		return _find(JsonPointer.compile(path));
 	}
 
-	public void set(V value) {
-		set(value, true);
+	/* package */ V _get() {
+		return value;
 	}
 
-	protected void set(V value, boolean invalidate) {
+	/* package */void _set(V value) {
+		_set(value, true);
+	}
+
+	protected void _set(V value, boolean invalidate) {
 		this.value = value;
 	}
 
-	/* package */ JsonOverlay<?> getParent() {
+	/* package */ JsonOverlay<?> _getParent() {
 		return parent;
 	}
 
@@ -105,22 +102,23 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 		this.pathInParent = pathInParent;
 	}
 
-	public String getPathInParent() {
+	/* package */String _getPathInParent() {
 		return pathInParent;
 	}
 
-	public String getPathFromRoot() {
-		return parent != null ? (parent.getParent() != null ? parent.getPathFromRoot() : "") + "/" + pathInParent : "/";
+	/* package */String _getPathFromRoot() {
+		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
+				: "/";
 	}
 
 	@Override
-	public URL getJsonReference() {
+	/* package */URL _getJsonReference() {
 		URL result = null;
 		try {
 			if (reference != null) {
 				result = new URL(reference.getCanonicalRefString());
 			} else {
-				URL parentUrl = parent != null ? parent.getJsonReference() : null;
+				URL parentUrl = parent != null ? parent._getJsonReference() : null;
 				if (parentUrl != null) {
 					JsonPointer ptr = JsonPointer.compile(parentUrl.getRef());
 					ptr = ptr.append(JsonPointer.compile("/" + pathInParent));
@@ -132,8 +130,8 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 		return result;
 	}
 
-	public JsonOverlay<?> getRoot() {
-		return parent != null ? parent.getRoot() : this;
+	/* package */JsonOverlay<?> _getRoot() {
+		return parent != null ? parent._getRoot() : this;
 	}
 
 	protected abstract V fromJson(JsonNode json);
@@ -144,16 +142,21 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 	private static final SerializationOptions emptyOptions = new SerializationOptions();
 
 	@Override
-	public JsonNode toJson() {
-		return toJson(emptyOptions);
+	/* package */JsonNode _toJson() {
+		return _toJsonInternal(emptyOptions);
 	}
 
 	@Override
-	public JsonNode toJson(SerializationOptions.Option... options) {
-		return toJson(new SerializationOptions(options));
+	/* package */JsonNode _toJson(SerializationOptions.Option... options) {
+		return _toJsonInternal(new SerializationOptions(options));
 	}
 
-	public abstract JsonNode toJson(SerializationOptions options);
+	@Override
+	/* package */JsonNode _toJson(SerializationOptions options) {
+		return _toJsonInternal(options);
+	}
+
+	/* package */abstract JsonNode _toJsonInternal(SerializationOptions options);
 
 	// some utility classes for overlays
 
@@ -224,7 +227,7 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 
 	@Override
 	public String toString() {
-		return toJson().toString();
+		return _toJson().toString();
 	}
 
 }

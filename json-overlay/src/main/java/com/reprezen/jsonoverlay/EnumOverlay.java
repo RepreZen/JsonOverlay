@@ -41,7 +41,7 @@ public abstract class EnumOverlay<V extends Enum<V>> extends ScalarOverlay<V> {
 	}
 
 	@Override
-	public JsonNode toJson(SerializationOptions options) {
+	public JsonNode _toJsonInternal(SerializationOptions options) {
 		return value != null ? jsonScalar(value.name()) : jsonMissing();
 	}
 

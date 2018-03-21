@@ -53,15 +53,15 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public boolean isElaborated() {
+	public boolean _isElaborated() {
 		return elaborated;
 	}
 
 	@Override
-	public AbstractJsonOverlay<?> _find(JsonPointer path) {
+	public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
 		for (ChildOverlay<?> child : children) {
 			if (child.matchesPath(path)) {
-				AbstractJsonOverlay<?> found = child.find(child.tailPath(path));
+				AbstractJsonOverlay<?> found = child._find(child.tailPath(path));
 				if (found != null) {
 					return found;
 				}
@@ -81,10 +81,10 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public JsonNode toJson(SerializationOptions options) {
+	public JsonNode _toJsonInternal(SerializationOptions options) {
 		JsonNode obj = jsonMissing();
 		for (ChildOverlay<?> child : children) {
-			JsonNode childJson = child.toJson(options.minus(Option.KEEP_ONE_EMPTY));
+			JsonNode childJson = child._toJson(options.minus(Option.KEEP_ONE_EMPTY));
 			if (!childJson.isMissingNode()) {
 				obj = child.getPath().setInPath(obj, childJson);
 			}
@@ -98,7 +98,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public V get(boolean elaborate) {
+	public V _get(boolean elaborate) {
 		if (elaborate) {
 			ensureElaborated();
 		}
@@ -106,8 +106,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public void set(V value) {
-		super.set(value);
+	public void _set(V value) {
+		super._set(value);
 		elaborateChildren();
 	}
 
@@ -171,12 +171,12 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	public PropertiesOverlay<?> getParentPropertiesObject() {
-		JsonOverlay<?> parent = getParent();
+		JsonOverlay<?> parent = _getParent();
 		while (parent != null) {
 			if (parent instanceof PropertiesOverlay<?>) {
 				return (PropertiesOverlay<?>) parent;
 			}
-			parent = parent.getParent();
+			parent = parent._getParent();
 		}
 		return null;
 	}

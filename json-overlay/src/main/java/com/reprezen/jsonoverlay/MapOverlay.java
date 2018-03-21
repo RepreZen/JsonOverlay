@@ -68,21 +68,21 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
                     ChildOverlay<V> overlay = new ChildOverlay<V>(key, json.get(key), this, valueFactory, refReg);
                     overlay.getOverlay().setPathInParent(key);
                     overlays.put(key, overlay);
-                    value.put(key, overlay.get(false));
+                    value.put(key, overlay._get(false));
                 }
             }
         }
     }
 
     @Override
-    public Map<String, V> get(boolean elaborate) {
+    public Map<String, V> _get(boolean elaborate) {
         return value;
     }
 
     @Override
-    public AbstractJsonOverlay<?> _find(JsonPointer path) {
+    public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
         String key = path.getMatchingProperty();
-        return overlays.containsKey(key) ? overlays.get(key).find(path.tail()) : null;
+        return overlays.containsKey(key) ? overlays.get(key)._find(path.tail()) : null;
     }
 
     @Override
@@ -91,10 +91,10 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
     }
 
     @Override
-    public JsonNode toJson(SerializationOptions options) {
+    public JsonNode _toJsonInternal(SerializationOptions options) {
         ObjectNode obj = jsonObject();
         for (Entry<String, AbstractJsonOverlay<V>> entry : overlays.entrySet()) {
-            obj.set(entry.getKey(), entry.getValue().toJson(options.plus(Option.KEEP_ONE_EMPTY)));
+            obj.set(entry.getKey(), entry.getValue()._toJson(options.plus(Option.KEEP_ONE_EMPTY)));
         }
         return obj.size() > 0 || options.isKeepThisEmpty() ? obj : jsonMissing();
     }
@@ -105,7 +105,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
     public V get(String name) {
         AbstractJsonOverlay<V> overlay = overlays.get(name);
-        return overlay != null ? overlay.get() : null;
+        return overlay != null ? overlay._get() : null;
     }
 
     protected AbstractJsonOverlay<V> getOverlay(String name) {

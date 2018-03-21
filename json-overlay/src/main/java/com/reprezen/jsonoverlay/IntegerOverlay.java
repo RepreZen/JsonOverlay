@@ -28,7 +28,7 @@ public class IntegerOverlay extends ScalarOverlay<Integer> {
 	}
 
 	@Override
-	public JsonNode toJson(SerializationOptions options) {
+	public JsonNode _toJsonInternal(SerializationOptions options) {
 		return value != null ? jsonScalar(value) : jsonMissing();
 	}
 

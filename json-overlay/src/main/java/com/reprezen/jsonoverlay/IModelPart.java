@@ -11,10 +11,4 @@
 package com.reprezen.jsonoverlay;
 
 public interface IModelPart<Model,V> extends IJsonOverlay<V> {
-
-    /* package */ default Model getModel() {
-        @SuppressWarnings("unchecked")
-        Model castRoot = (Model) ((JsonOverlay<?>) this).getRoot();
-        return castRoot;
-    }
 }

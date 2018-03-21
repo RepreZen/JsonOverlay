@@ -17,33 +17,33 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class AbstractJsonOverlay<V> implements IJsonOverlay<V> {
 
-	abstract V get();
+	/* package */ abstract V _get();
 
-	/* package */ abstract V get(boolean elaborate);
+	/* package */ abstract V _get(boolean elaborate);
 
-	/* package */ abstract void set(V value);
+	/* package */ abstract void _set(V value);
 
-	/* package */ abstract AbstractJsonOverlay<?> find(JsonPointer path);
+	/* package */ abstract AbstractJsonOverlay<?> _find(JsonPointer path);
 
-	/* package */ abstract AbstractJsonOverlay<?> find(String path);
+	/* package */ abstract AbstractJsonOverlay<?> _find(String path);
 
-	/* package */ abstract JsonNode toJson();
+	/* package */ abstract JsonNode _toJson();
 
-	/* package */ abstract JsonNode toJson(SerializationOptions options);
+	/* package */ abstract JsonNode _toJson(SerializationOptions options);
 
-	/* package */ abstract JsonNode toJson(SerializationOptions.Option... options);
+	/* package */ abstract JsonNode _toJson(SerializationOptions.Option... options);
 
-	/* package */ abstract boolean isPresent();
+	/* package */ abstract boolean _isPresent();
 
-	/* package */ abstract boolean isElaborated();
+	/* package */ abstract boolean _isElaborated();
 
-	/* package */ abstract AbstractJsonOverlay<?> getParent();
+	/* package */ abstract AbstractJsonOverlay<?> _getParent();
 
-	/* package */ abstract String getPathInParent();
+	/* package */ abstract String _getPathInParent();
 
-	/* package */ abstract AbstractJsonOverlay<?> getRoot();
+	/* package */ abstract AbstractJsonOverlay<?> _getRoot();
 
-	/* package */ abstract String getPathFromRoot();
+	/* package */ abstract String _getPathFromRoot();
 
-	/* package */ abstract URL getJsonReference();
+	/* package */ abstract URL _getJsonReference();
 }

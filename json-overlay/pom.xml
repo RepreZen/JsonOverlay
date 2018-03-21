@@ -167,6 +167,35 @@
 	<build>
 		<plugins>
 			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.6.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>xtend-gen</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+				<version>2.13.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/xtend-gen/main</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>

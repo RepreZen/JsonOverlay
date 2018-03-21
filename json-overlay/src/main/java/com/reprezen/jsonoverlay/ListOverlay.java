@@ -69,6 +69,10 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
     public Collection<V> _get(boolean elaborate) {
         return value;
     }
+    
+    /* package */ AbstractJsonOverlay<V> _get(int index) {
+    	return overlays.get(index);
+    }
 
     @Override
     protected Collection<V> fromJson(JsonNode json) {

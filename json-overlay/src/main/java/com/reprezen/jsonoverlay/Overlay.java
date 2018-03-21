@@ -17,8 +17,77 @@ public class Overlay<V> {
 		return new Overlay<V>(overlay);
 	}
 
+	public Overlay(MapOverlay<V> map, String key) {
+		this.overlay = map._get(key);
+	}
+
+	public static <V> Overlay<V> of(MapOverlay<V> map, String key) {
+		return new Overlay<V>(map, key);
+	}
+
+	public Overlay(ListOverlay<V> list, int index) {
+		this.overlay = list._get(index);
+	}
+
+	public static <V> Overlay<V> of(ListOverlay<V> list, int index) {
+		return new Overlay<V>(list, index);
+	}
+
+	public Overlay(PropertiesOverlay<?> props, String fieldName, Class<? extends V> type) {
+		AbstractJsonOverlay<?> overlay = props._get(fieldName);
+		Object value = overlay != null ? overlay._get() : null;
+		if (value == null || type.isAssignableFrom(value.getClass())) {
+			@SuppressWarnings("unchecked")
+			IJsonOverlay<V> castOverlay1 = (IJsonOverlay<V>) overlay;
+			if (castOverlay1 instanceof ChildOverlay) {
+				@SuppressWarnings("unchecked")
+				AbstractJsonOverlay<V> castOverlay2 = (AbstractJsonOverlay<V>) ((ChildOverlay<?>) castOverlay1)
+						.getOverlay();
+				this.overlay = castOverlay2;
+			} else {
+				this.overlay = (AbstractJsonOverlay<V>) castOverlay1;
+			}
+		} else {
+			this.overlay = null;
+		}
+	}
+
+	public static <V> Overlay<V> of(Object props, String fieldName, Class<? extends V> type) {
+		if (props instanceof PropertiesOverlay) {
+			PropertiesOverlay<?> castProps = (PropertiesOverlay<?>) props;
+			return new Overlay<V>(castProps, fieldName, type);
+		} else {
+			return null;
+		}
+
+	}
+
 	public final V get() {
 		return overlay._get();
+	}
+
+	public final AbstractJsonOverlay<V> getOverlay() {
+		return overlay;
+	}
+
+	public final MapOverlay<V> getMapOverlay() {
+		if (overlay instanceof MapOverlay) {
+			@SuppressWarnings("unchecked")
+			MapOverlay<V> castOverlay = (MapOverlay<V>) overlay;
+			return castOverlay;
+		} else {
+			return null;
+		}
+	}
+
+	public final ListOverlay<V> getListOverlay() {
+		if (overlay instanceof ListOverlay) {
+			@SuppressWarnings("unchecked")
+			ListOverlay<V> castOverlay = (ListOverlay<V>) overlay;
+			return castOverlay;
+		} else {
+			return null;
+		}
 	}
 
 	public static <V> V get(IJsonOverlay<V> overlay) {

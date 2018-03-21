@@ -10,8 +10,11 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -103,6 +106,20 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 			ensureElaborated();
 		}
 		return value;
+	}
+
+	/* package */ AbstractJsonOverlay<?> _get(String fieldName) {
+		Optional<Field> field = Stream.of(this.getClass().getDeclaredFields())
+				.filter(f -> f.getName().equals(fieldName)).findFirst();
+		if (field.isPresent()) {
+			try {
+				field.get().setAccessible(true);
+				AbstractJsonOverlay<?> overlay = (AbstractJsonOverlay<?>) field.get().get(this);
+				return field.isPresent() ? overlay : null;
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+			}
+		}
+		return null;
 	}
 
 	@Override

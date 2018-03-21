@@ -78,6 +78,10 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
     public Map<String, V> _get(boolean elaborate) {
         return value;
     }
+    
+    /*package*/ AbstractJsonOverlay<V> _get(String key) {
+    	return overlays.get(key);
+    }
 
     @Override
     public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {

@@ -8,10 +8,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.reprezen.jsonoverlay</groupId>
 	<artifactId>jsonoverlay</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>${json-overlay-version}</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JsonOverlay Framework</description>
-	<url>https://github.com/RepreZen/KaiZen-OpenAPI-Parser</url>
+	<url>https://github.com/RepreZen/JsonOverlay</url>
 	<licenses>
 		<license>
 			<name>Eclipse Public License - Version 1.0</name>
@@ -39,9 +39,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:git://github.com/RepreZen/KaiZen-OpenAPI-Parser.git</connection>
-		<developerConnection>scm:git:ssh://github.com:RepreZen/KaiZen-OpenAPI-Parser.git</developerConnection>
-		<url>https://github.com/RepreZen/KaiZen-OpenAPI-Parser/tree/master</url>
+		<connection>scm:git:git://github.com/RepreZen/JsonOverlay.git</connection>
+		<developerConnection>scm:git:ssh://github.com:RepreZen/JsonOverlay.git</developerConnection>
+		<url>https://github.com/RepreZen/JsonOverlay/tree/master</url>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -106,7 +106,115 @@
 			<version>2.11.0</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>sign</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.6.0</version>
+						<executions>
+							<execution>
+								<id>remote-sign</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>bash</executable>
+									<arguments>
+										<argument>${sign.content.script}</argument>
+										<argument>--endpoint</argument>
+										<argument>${code.sign.endpoint}</argument>
+										<argument>--exclude</argument>
+										<argument>*-sources.jar</argument>
+										<argument>--exclude</argument>
+										<argument>*-javadoc.jar</argument>
+										<argument>--exclude</argument>
+										<argument>surefire*.jar</argument>
+										<argument>${project.build.directory}</argument>
+									</arguments>
+								</configuration>
+								<phase>package</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>gpg</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>${nexus.autorelease}</autoReleaseAfterClose>
+					<autoDropAfterRelease>${nexus.autodrop}</autoDropAfterRelease>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<properties>
+		<json-overlay-version>0.0.1-SNAPSHOT</json-overlay-version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

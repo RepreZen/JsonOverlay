@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JsonOverlay Framework
+Bundle-SymbolicName: com.reprezen.jsonoverlay
+Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
+Bundle-Version: 0.0.1.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.reprezen.jsonoverlay
+ com.reprezen.jsonoverlay.gen,

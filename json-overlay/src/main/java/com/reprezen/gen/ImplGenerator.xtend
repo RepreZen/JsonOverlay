@@ -19,16 +19,15 @@ import com.google.common.collect.Sets
 import com.reprezen.gen.SimpleJavaGenerator.Member
 import com.reprezen.gen.TypeData.Field
 import com.reprezen.gen.TypeData.Type
+import com.reprezen.jsonoverlay.AbstractJsonOverlay
 import com.reprezen.jsonoverlay.ChildListOverlay
 import com.reprezen.jsonoverlay.ChildMapOverlay
 import com.reprezen.jsonoverlay.ChildOverlay
 import com.reprezen.jsonoverlay.EnumOverlay
-import com.reprezen.jsonoverlay.IJsonOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
 import com.reprezen.jsonoverlay.OverlayFactory
-import com.reprezen.jsonoverlay.Reference
 import com.reprezen.jsonoverlay.ReferenceRegistry
 import java.io.File
 import java.util.Collection
@@ -136,9 +135,6 @@ class ImplGenerator extends TypeGenerator {
 	override Members getFieldMethods(Field field) {
 		val methods = new Members
 		var first = true
-		if (field.refable) {
-			requireTypes(Reference)
-		}
 		switch (field.getStructure()) {
 			case scalar:
 				for (Member method : getScalarMethods(field)) {
@@ -163,38 +159,26 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public «f.type» get«f.name»() {
-				return «f.propertyName».get();	
+				return «f.propertyName»._get();	
 			}
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(boolean elaborate) {
-				return «f.propertyName».get(elaborate);
+				return «f.propertyName»._get(elaborate);
 			}
 		''')
 		if (f.isBoolean) {
 			methods.addMember('''
 				public boolean is«f.name»() {
-					return «f.propertyName».get() != null ? «f.propertyName».get() : «f.boolDefault»;
+					return «f.propertyName»._get() != null ? «f.propertyName»._get() : «f.boolDefault»;
 				}
 			''')
 		}
 		methods.addMember('''
 			public void set«f.name»(«f.type» «f.lcName») {
-				this.«f.lcName».set(«f.lcName»);
+				this.«f.lcName»._set(«f.lcName»);
 			}
 		''')
-		if (f.refable) {
-			methods.addMember('''
-				public boolean is«f.name»Reference() {
-					return «f.propertyName» != null ? «f.propertyName».isReference() : false;
-				}
-			''')
-			methods.addMember('''
-				public Reference get«f.name»Reference() {
-					return «f.propertyName» != null ? «f.propertyName».getReference() : null;
-				}
-			''')
-		}
 		return methods
 	}
 
@@ -202,62 +186,50 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public Collection<«f.type»> get«f.plural»() {
-					return «f.propertyName».get();
+					return «f.propertyName»._get();
 				}
 		''')
 		methods.addMember('''
 			public Collection<«f.type»> get«f.plural»(boolean elaborate) {
-				return «f.propertyName».get(elaborate);
+				return «f.propertyName»._get(elaborate);
 			}
 		''')
 		methods.addMember('''
 			public boolean has«f.plural»() {
-				return «f.propertyName».isPresent();
+				return «f.propertyName»._isPresent();
 			}
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(int index) {
-				return «f.propertyName».get(index);
+				return «f.propertyName»._get(index);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.plural»(Collection<«f.type»> «f.lcPlural») {
-				this.«f.propertyName».set(«f.lcPlural»);
+				this.«f.propertyName»._set(«f.lcPlural»);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(int index, «f.type» «f.lcName») {
-				«f.propertyName».set(index, «f.lcName»);
+				«f.propertyName»._set(index, «f.lcName»);
 			}
 		''')
 		methods.addMember('''
 			public void add«f.name»(«f.type» «f.lcName») {
-				«f.propertyName».add(«f.lcName»);
+				«f.propertyName»._add(«f.lcName»);
 			}
 		''')
 		methods.addMember('''
 			public void insert«f.name»(int index, «f.type» «f.lcName») {
-				«f.propertyName».insert(index, «f.lcName»);
+				«f.propertyName»._insert(index, «f.lcName»);
 			}
 		''')
 
 		methods.addMember('''
 			public void remove«f.name»(int index) {
-				«f.propertyName».remove(index);
+				«f.propertyName»._remove(index);
 			}
 		''')
-		if (f.refable) {
-			methods.addMember('''
-				public boolean is«f.name»Reference(int index) {
-					return «f.propertyName».getChild(index).isReference();
-				}
-			''')
-			methods.addMember('''
-				public Reference get«f.name»Reference(int index) {
-					return «f.propertyName».getChild(index).getReference();
-				}
-			''')
-		}
 		return methods
 	}
 
@@ -265,12 +237,12 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»() {
-				return «f.propertyName».get();
+				return «f.propertyName»._get();
 			}
 		''')
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»(boolean elaborate) {
-				return «f.propertyName».get(elaborate);
+				return «f.propertyName»._get(elaborate);
 			}
 		''')
 		methods.addMember('''
@@ -280,38 +252,24 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(String «f.keyName») {
-				return «f.propertyName».get(«f.keyName»);
+				return «f.propertyName»._get(«f.keyName»);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.plural»(Map<String, «f.type»> «f.lcPlural») {
-				this.«f.propertyName».set(«f.lcPlural»);
+				this.«f.propertyName»._set(«f.lcPlural»);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(String «f.keyName», «f.type» «f.lcName») {
-				«f.propertyName».set(«f.keyName», «f.lcName»);
+				«f.propertyName»._set(«f.keyName», «f.lcName»);
 			}
 		''')
 		methods.addMember('''
 			public void remove«f.name»(String «f.keyName») {
-				«f.propertyName».remove(«f.keyName»);
+				«f.propertyName»._remove(«f.keyName»);
 			}
 		''')
-		if (f.refable) {
-			methods.addMember('''
-				public boolean is«f.name»Reference(String «f.keyName») {
-					ChildOverlay<«f.type»> child = «f.propertyName».getChild(«f.keyName»);
-					return child != null ? child.isReference() : false;
-				}
-			''')
-			methods.addMember('''
-				public Reference get«f.name»Reference(String «f.keyName») {
-					ChildOverlay<«f.type»> child = «f.propertyName».getChild(«f.keyName»);
-					return child != null ? child.getReference() : null;
-				}
-			''')
-		}
 		return methods
 	}
 
@@ -321,18 +279,17 @@ class ImplGenerator extends TypeGenerator {
 				super.elaborateChildren();
 				«FOR f : type.fields.values.filter[!it.noImpl]»
 					«f.propertyName» = «f.propertyNew»;
-					«IF f.refable»refables.put("«f.parentPath»", «f.propertyName»);«ENDIF»
 				«ENDFOR»
 			}
 		''').override
 	}
 
 	def private Member getEnumFactoryMember(Type type) {
-		requireTypes(OverlayFactory, IJsonOverlay, JsonOverlay, JsonNode, ReferenceRegistry)
+		requireTypes(OverlayFactory, AbstractJsonOverlay, JsonOverlay, JsonNode, ReferenceRegistry)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>() {
 				@Override
-				protected Class<? extends IJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 				
@@ -357,17 +314,17 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getFactoryMember(Type type) {
-		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, IJsonOverlay)
+		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, AbstractJsonOverlay)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>(){
 				@Override
-				protected Class<? extends IJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 			
 				@Override
 				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					IJsonOverlay<?> overlay;
+					AbstractJsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
 						overlay = new «type.implType»(«type.lcName», parent, refReg);
 					«ELSE»
@@ -381,7 +338,7 @@ class ImplGenerator extends TypeGenerator {
 			
 				@Override
 				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					IJsonOverlay<?> overlay;
+					AbstractJsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
 						overlay = new «type.implType»(json, parent, refReg);
 					«ELSE»

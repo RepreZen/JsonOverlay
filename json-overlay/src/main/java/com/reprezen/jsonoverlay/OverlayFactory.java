@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class OverlayFactory<V> {
 
-    private final Class<? extends IJsonOverlay<? super V>> overlayClass = getOverlayClass();
+    private final Class<? extends AbstractJsonOverlay<? super V>> overlayClass = getOverlayClass();
 
     public JsonOverlay<V> create(V value, JsonOverlay<?> parent, ReferenceRegistry refReg, Reference ref) {
         JsonOverlay<V> overlay = _create(value, parent, refReg);
@@ -22,13 +22,13 @@ public abstract class OverlayFactory<V> {
         return overlay;
     }
 
-    public IJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg, Reference ref) {
+    public AbstractJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg, Reference ref) {
         JsonOverlay<V> overlay = (JsonOverlay<V>) create(json, parent, false, refReg);
         overlay.setReference(ref);
         return overlay;
     }
 
-    protected IJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, boolean partial, ReferenceRegistry refReg) {
+    protected AbstractJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, boolean partial, ReferenceRegistry refReg) {
         if (!partial && refReg.hasOverlay(json) && isCompatible(refReg.getOverlay(json))) {
             @SuppressWarnings("unchecked")
             JsonOverlay<V> overlay = (JsonOverlay<V>) refReg.getOverlay(json);
@@ -46,11 +46,11 @@ public abstract class OverlayFactory<V> {
         }
     }
 
-    public boolean isCompatible(IJsonOverlay<?> overlay) {
+    public boolean isCompatible(AbstractJsonOverlay<?> overlay) {
         return overlayClass.isAssignableFrom(overlay.getClass());
     }
 
-    protected abstract Class<? extends IJsonOverlay<? super V>> getOverlayClass();
+    protected abstract Class<? extends AbstractJsonOverlay<? super V>> getOverlayClass();
 
     protected abstract JsonOverlay<V> _create(V value, JsonOverlay<?> parent, ReferenceRegistry refReg);
 

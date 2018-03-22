@@ -16,7 +16,6 @@ import com.github.javaparser.ast.body.EnumDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.reprezen.gen.TypeData.Field
 import com.reprezen.gen.TypeData.Type
-import com.reprezen.jsonoverlay.Reference
 import java.io.File
 import java.util.Collection
 import java.util.Map
@@ -38,8 +37,10 @@ class InterfaceGenerator extends TypeGenerator {
 		switch (decl) {
 			ClassOrInterfaceDeclaration: {
 				decl.interface = true
-				decl.addExtendedType(type.superType)
-				requireTypes(type.superType)
+				if (type.superType !== null) {
+					decl.addExtendedType(type.superType)
+					requireTypes(type.superType)
+				}
 				if (type.typeData.modelType !== null) {
 					requireTypes("IModelPart")
 					decl.addExtendedType('''IModelPart<«type.typeData.modelType», «type.name»>''')
@@ -47,7 +48,7 @@ class InterfaceGenerator extends TypeGenerator {
 				type.extendInterfaces.forEach[requireTypes(it); decl.addExtendedType(it)]
 			}
 			EnumDeclaration: {
-				for (enumValue: type.enumValues) {
+				for (enumValue : type.enumValues) {
 					decl.addEntry(new EnumConstantDeclaration().setName(enumValue))
 				}
 			}
@@ -56,7 +57,7 @@ class InterfaceGenerator extends TypeGenerator {
 	}
 
 	def private getSuperType(Type type) {
-		type.extensionOf ?: '''IPropertiesOverlay<«type.name»>'''
+		type.extensionOf ?: '''IJsonOverlay<«type.name»>'''
 	}
 
 	override getImports(Type type) {
@@ -67,9 +68,6 @@ class InterfaceGenerator extends TypeGenerator {
 		val methods = new Members
 		requireTypes(field.type)
 		var first = true
-		if (field.isRefable) {
-			requireTypes(Reference)
-		}
 		switch (field.structure) {
 			case scalar: {
 				for (method : field.scalarMethods) {
@@ -102,10 +100,6 @@ class InterfaceGenerator extends TypeGenerator {
 			methods.addMember('''boolean is«f.name»();''')
 		}
 		methods.addMember('''void set«f.name»(«f.type» «f.lcName»);''')
-		if (f.refable) {
-			methods.addMember('''boolean is«f.name»Reference();''')
-			methods.addMember('''Reference get«f.name»Reference();''')
-		}
 		return methods
 	}
 
@@ -121,10 +115,6 @@ class InterfaceGenerator extends TypeGenerator {
 		methods.addMember('''void add«f.name»(«f.type» «f.lcName»);''')
 		methods.addMember('''void insert«f.name»(int index, «f.type» «f.lcName»);''')
 		methods.addMember('''void remove«f.name»(int index);''')
-		if (f.refable) {
-			methods.addMember('''boolean is«f.name»Reference(int index);''')
-			methods.addMember('''Reference get«f.name»Reference(int index);''')
-		}
 		return methods
 	}
 
@@ -138,10 +128,6 @@ class InterfaceGenerator extends TypeGenerator {
 		methods.addMember('''void set«f.plural»(Map<String, «f.type»> «f.lcPlural»);''')
 		methods.addMember('''void set«f.name»(String «f.keyName», «f.type» «f.lcName»);''')
 		methods.addMember('''void remove«f.name»(String «f.keyName»);''')
-		if (f.refable) {
-			methods.addMember('''boolean is«f.name»Reference(String «f.keyName»);''')
-			methods.addMember('''Reference get«f.name»Reference(String «f.keyName»);''')
-		}
 		return methods
 	}
 }

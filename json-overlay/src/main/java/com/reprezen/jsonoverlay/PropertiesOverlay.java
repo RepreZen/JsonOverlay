@@ -10,8 +10,11 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,172 +22,187 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
-public abstract class PropertiesOverlay<V extends IPropertiesOverlay<V>> extends JsonOverlay<V>
-        implements IPropertiesOverlay<V> {
+public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
-    private List<ChildOverlay<?>> children = Lists.newArrayList();
-    protected Map<String, ChildOverlay<?>> refables = Maps.newLinkedHashMap();
-    private boolean elaborated = false;
-    private boolean deferElaboration = false;
+	private List<ChildOverlay<?>> children = Lists.newArrayList();
+	private static Map<Class<?>, List<String>> propertyNames = Maps.newHashMap();
+	private boolean elaborated = false;
+	private boolean deferElaboration = false;
 
-    protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(json, parent, refReg);
-        deferElaboration = json.isMissingNode();
-    }
+	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+		super(json, parent, refReg);
+		deferElaboration = json.isMissingNode();
+		gatherPropertyNames();
+	}
 
-    public PropertiesOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(value, parent, refReg);
-        elaborated = true;
-    }
+	public PropertiesOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+		super(value, parent, refReg);
+		elaborated = true;
+		gatherPropertyNames();
+	}
 
-    protected void maybeElaborateChildrenAtCreation() {
-        if (!deferElaboration) {
-            ensureElaborated();
-        }
-    }
+	private void gatherPropertyNames() {
+		if (!propertyNames.containsKey(getClass())) {
+			List<String> names = Lists.newArrayList();
+			for (Field field : getClass().getDeclaredFields()) {
+				if (IJsonOverlay.class.isAssignableFrom(field.getType())) {
+					names.add(field.getName());
+				}
+			}
+			propertyNames.put(getClass(), names);
+		}
+	}
 
-    protected void ensureElaborated() {
-        if (!elaborated) {
-            elaborateChildren();
-            elaborated = true;
-        }
-    }
+	/* package */ List<String> getPropertyNames() {
+		return propertyNames.get(getClass());
+	}
 
-    protected void elaborateChildren() {
-    }
+	protected void maybeElaborateChildrenAtCreation() {
+		if (!deferElaboration) {
+			ensureElaborated();
+		}
+	}
 
-    @Override
-    public boolean isElaborated() {
-        return elaborated;
-    }
+	protected void ensureElaborated() {
+		if (!elaborated) {
+			elaborateChildren();
+			elaborated = true;
+		}
+	}
 
-    @Override
-    public IJsonOverlay<?> _find(JsonPointer path) {
-        for (ChildOverlay<?> child : children) {
-            if (child.matchesPath(path)) {
-                IJsonOverlay<?> found = child.find(child.tailPath(path));
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    }
+	protected void elaborateChildren() {
+	}
 
-    @Override
-    public V fromJson(JsonNode json) {
-        // parsing of the json node is expected to be done in the constructor of the
-        // subclass, so nothing is done here. But we do establish this object as its own
-        // value.
-        @SuppressWarnings("unchecked")
-        V result = (V) this;
-        return result;
-    }
+	@Override
+	public boolean _isElaborated() {
+		return elaborated;
+	}
 
-    @Override
-    public JsonNode toJson(SerializationOptions options) {
-        JsonNode obj = jsonMissing();
-        for (ChildOverlay<?> child : children) {
-            JsonNode childJson = child.toJson(options.minus(Option.KEEP_ONE_EMPTY));
-            if (!childJson.isMissingNode()) {
-                obj = child.getPath().setInPath(obj, childJson);
-            }
-        }
-        JsonNode result = fixJson(obj);
-        return result.size() > 0 || options.isKeepThisEmpty() ? result : jsonMissing();
-    }
+	@Override
+	public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
+		for (ChildOverlay<?> child : children) {
+			if (child.matchesPath(path)) {
+				AbstractJsonOverlay<?> found = child._find(child.tailPath(path));
+				if (found != null) {
+					return found;
+				}
+			}
+		}
+		return null;
+	}
 
-    protected JsonNode fixJson(JsonNode json) {
-        return json;
-    }
+	@Override
+	public V fromJson(JsonNode json) {
+		// parsing of the json node is expected to be done in the constructor of the
+		// subclass, so nothing is done here. But we do establish this object as its own
+		// value.
+		@SuppressWarnings("unchecked")
+		V result = (V) this;
+		return result;
+	}
 
-    @Override
-    public V get(boolean elaborate) {
-        if (elaborate) {
-            ensureElaborated();
-        }
-        return value;
-    }
+	@Override
+	public JsonNode _toJsonInternal(SerializationOptions options) {
+		JsonNode obj = jsonMissing();
+		for (ChildOverlay<?> child : children) {
+			JsonNode childJson = child._toJson(options.minus(Option.KEEP_ONE_EMPTY));
+			if (!childJson.isMissingNode()) {
+				obj = child.getPath().setInPath(obj, childJson);
+			}
+		}
+		JsonNode result = fixJson(obj);
+		return result.size() > 0 || options.isKeepThisEmpty() ? result : jsonMissing();
+	}
 
-    @Override
-    public void set(V value) {
-        super.set(value);
-        elaborateChildren();
-    }
+	protected JsonNode fixJson(JsonNode json) {
+		return json;
+	}
 
-    protected <T> ChildOverlay<T> createChild(boolean create, String path, JsonOverlay<?> parent,
-            OverlayFactory<T> factory) {
-        return create ? createChild(path, parent, factory) : null;
-    }
+	@Override
+	public V _get(boolean elaborate) {
+		if (elaborate) {
+			ensureElaborated();
+		}
+		return _get();
+	}
 
-    protected <T> ChildOverlay<T> createChild(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
-        ChildOverlay<T> child = new ChildOverlay<>(path, json.at("/" + path), parent, factory, refReg);
-        if (child.getOverlay() != null) {
-            child.getOverlay().setPathInParent(path);
-        }
-        children.add(child);
-        return child;
-    }
+	/* package */ AbstractJsonOverlay<?> _get(String fieldName) {
+		Optional<Field> field = Stream.of(this.getClass().getDeclaredFields())
+				.filter(f -> f.getName().equals(fieldName)).findFirst();
+		if (field.isPresent()) {
+			try {
+				field.get().setAccessible(true);
+				return (AbstractJsonOverlay<?>) field.get().get(this);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+			}
+		}
+		return null;
+	}
 
-    protected <T> ChildMapOverlay<T> createChildMap(boolean create, String path, JsonOverlay<?> parent,
-            OverlayFactory<T> factory, String keyPattern) {
-        return create ? createChildMap(path, parent, factory, keyPattern) : null;
-    }
+	@Override
+	public void _set(V value) {
+		super._set(value);
+		elaborateChildren();
+	}
 
-    protected <T> ChildMapOverlay<T> createChildMap(String path, JsonOverlay<?> parent, OverlayFactory<T> factory,
-            String keyPattern) {
-        ChildMapOverlay<T> child = new ChildMapOverlay<T>(path, json.at(pathPointer(path)), parent,
-                MapOverlay.getFactory(factory, keyPattern), refReg);
-        child.getOverlay().setPathInParent(path);
-        children.add(child);
-        return child;
-    }
+	protected <T> ChildOverlay<T> createChild(boolean create, String path, JsonOverlay<?> parent,
+			OverlayFactory<T> factory) {
+		return create ? createChild(path, parent, factory) : null;
+	}
 
-    protected <T> ChildListOverlay<T> createChildList(boolean create, String path, JsonOverlay<?> parent,
-            OverlayFactory<T> factory) {
-        return create ? createChildList(path, parent, factory) : null;
-    }
+	protected <T> ChildOverlay<T> createChild(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
+		ChildOverlay<T> child = new ChildOverlay<>(path, json.at("/" + path), parent, factory, refReg);
+		if (child.getOverlay() != null) {
+			child.getOverlay().setPathInParent(path);
+		}
+		children.add(child);
+		return child;
+	}
 
-    protected <T> ChildListOverlay<T> createChildList(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
-        ChildListOverlay<T> child = new ChildListOverlay<T>(path, json.at(pathPointer(path)), parent,
-                ListOverlay.getFactory(factory), refReg);
-        child.getOverlay().setPathInParent(path);
-        children.add(child);
-        return child;
-    }
+	protected <T> ChildMapOverlay<T> createChildMap(boolean create, String path, JsonOverlay<?> parent,
+			OverlayFactory<T> factory, String keyPattern) {
+		return create ? createChildMap(path, parent, factory, keyPattern) : null;
+	}
 
-    public Iterable<String> getRefablePaths() {
-        return refables.keySet();
-    }
+	protected <T> ChildMapOverlay<T> createChildMap(String path, JsonOverlay<?> parent, OverlayFactory<T> factory,
+			String keyPattern) {
+		ChildMapOverlay<T> child = new ChildMapOverlay<T>(path, json.at(pathPointer(path)), parent,
+				MapOverlay.getFactory(factory, keyPattern), refReg);
+		child.getOverlay().setPathInParent(path);
+		children.add(child);
+		return child;
+	}
 
-    public boolean isReference(String path) {
-        ChildOverlay<?> child = (ChildOverlay<?>) refables.get(path);
-        return child != null ? child.isReference() : false;
-    }
+	protected <T> ChildListOverlay<T> createChildList(boolean create, String path, JsonOverlay<?> parent,
+			OverlayFactory<T> factory) {
+		return create ? createChildList(path, parent, factory) : null;
+	}
 
-    public Reference getReference(String path) {
-        ChildOverlay<?> child = (ChildOverlay<?>) refables.get(path);
-        return child != null ? child.getReference() : null;
-    }
+	protected <T> ChildListOverlay<T> createChildList(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
+		ChildListOverlay<T> child = new ChildListOverlay<T>(path, json.at(pathPointer(path)), parent,
+				ListOverlay.getFactory(factory), refReg);
+		child.getOverlay().setPathInParent(path);
+		children.add(child);
+		return child;
+	}
 
-    private JsonPointer pathPointer(String path) {
-        return (path == null || path.isEmpty()) ? JsonPointer.compile("") : JsonPointer.compile("/" + path);
-    }
-
-    @Override
-    public IPropertiesOverlay<?> getParentPropertiesObject() {
-        IJsonOverlay<?> parent = getParent();
-        while (parent != null) {
-            if (parent instanceof IPropertiesOverlay<?>) {
-                return (IPropertiesOverlay<?>) parent;
-            }
-            parent = parent.getParent();
-        }
-        return null;
-    }
+	private JsonPointer pathPointer(String path) {
+		return (path == null || path.isEmpty()) ? JsonPointer.compile("") : JsonPointer.compile("/" + path);
+	}
 
 	@Override
 	protected void elaborate() {
 		maybeElaborateChildrenAtCreation();
 	}
+
+	/* package */ boolean isReference(String name) {
+		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
+		return childOverlay.isReference();
+	}
+
+	/* package */ Reference getReference(String name) {
+		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
+		return childOverlay.getReference();
+	}
+
 }

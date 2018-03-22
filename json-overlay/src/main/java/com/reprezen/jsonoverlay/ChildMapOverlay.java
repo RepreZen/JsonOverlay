@@ -52,23 +52,23 @@ public class ChildMapOverlay<V> extends ChildOverlay<Map<String, V>> {
         return mapOverlay.containsKey(name);
     }
 
-    public V get(String name) {
+    public V _get(String name) {
         return mapOverlay.get(name);
     }
 
-    public void set(String name, V value) {
+    public void _set(String name, V value) {
         mapOverlay.set(name, value);
     }
 
-    public void remove(String name) {
+    public void _remove(String name) {
         mapOverlay.remove(name);
     }
 
-    public int size() {
+    public int _size() {
         return mapOverlay.size();
     }
 
-    public ChildOverlay<V> getChild(String key) {
+    public ChildOverlay<V> _getChild(String key) {
         return (ChildOverlay<V>) mapOverlay.getOverlay(key);
     }
 }

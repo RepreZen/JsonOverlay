@@ -45,31 +45,31 @@ public class ChildListOverlay<V> extends ChildOverlay<Collection<V>> {
         }
     }
 
-    public V get(int index) {
+    public V _get(int index) {
         return listOverlay.get(index);
     }
 
-    public void set(int index, V value) {
+    public void _set(int index, V value) {
         listOverlay.set(index, value);
     }
 
-    public void add(V value) {
+    public void _add(V value) {
         listOverlay.add(value);
     }
 
-    public void insert(int index, V value) {
+    public void _insert(int index, V value) {
         listOverlay.insert(index, value);
     }
 
-    public void remove(int index) {
+    public void _remove(int index) {
         listOverlay.remove(index);
     }
 
-    public int size() {
+    public int _size() {
         return listOverlay.size();
     }
 
-    public ChildOverlay<V> getChild(int index) {
+    public ChildOverlay<V> _getChild(int index) {
         return (ChildOverlay<V>) listOverlay.getOverlay(index);
     }
 }

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
-public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
+public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 
 	protected final static ObjectMapper mapper = new ObjectMapper();
 
@@ -56,44 +56,41 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	@Override
-	public V get() {
-		return get(true);
-	}
-
-	public abstract V get(boolean elaborate);
-
-	@Override
-	public boolean isPresent() {
+	/* protected */boolean _isPresent() {
 		return value != null && !json.isMissingNode();
 	}
 
 	@Override
-	public boolean isElaborated() {
+	/* package */boolean _isElaborated() {
 		// most overlays are complete when constructed
 		return true;
 	}
 
 	@Override
-	public IJsonOverlay<?> find(JsonPointer path) {
-		return path.matches() ? this : _find(path);
+	/* package */ AbstractJsonOverlay<?> _find(JsonPointer path) {
+		return path.matches() ? this : _findInternal(path);
 	}
 
-	abstract protected IJsonOverlay<?> _find(JsonPointer path);
+	abstract protected AbstractJsonOverlay<?> _findInternal(JsonPointer path);
 
 	@Override
-	public IJsonOverlay<?> find(String path) {
-		return find(JsonPointer.compile(path));
+	/* package */ AbstractJsonOverlay<?> _find(String path) {
+		return _find(JsonPointer.compile(path));
 	}
 
-	public void set(V value) {
-		set(value, true);
+	/* package */ V _get() {
+		return value;
 	}
 
-	protected void set(V value, boolean invalidate) {
+	/* package */void _set(V value) {
+		_set(value, true);
+	}
+
+	protected void _set(V value, boolean invalidate) {
 		this.value = value;
 	}
 
-	public JsonOverlay<?> getParent() {
+	/* package */ JsonOverlay<?> _getParent() {
 		return parent;
 	}
 
@@ -105,22 +102,23 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.pathInParent = pathInParent;
 	}
 
-	public String getPathInParent() {
+	/* package */String _getPathInParent() {
 		return pathInParent;
 	}
 
-	public String getPathFromRoot() {
-		return parent != null ? (parent.getParent() != null ? parent.getPathFromRoot() : "") + "/" + pathInParent : "/";
+	/* package */String _getPathFromRoot() {
+		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
+				: "/";
 	}
 
 	@Override
-	public URL getJsonReference() {
+	/* package */URL _getJsonReference() {
 		URL result = null;
 		try {
 			if (reference != null) {
 				result = new URL(reference.getCanonicalRefString());
 			} else {
-				URL parentUrl = parent != null ? parent.getJsonReference() : null;
+				URL parentUrl = parent != null ? parent._getJsonReference() : null;
 				if (parentUrl != null) {
 					JsonPointer ptr = JsonPointer.compile(parentUrl.getRef());
 					ptr = ptr.append(JsonPointer.compile("/" + pathInParent));
@@ -132,28 +130,33 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return result;
 	}
 
-	public JsonOverlay<?> getRoot() {
-		return parent != null ? parent.getRoot() : this;
+	/* package */JsonOverlay<?> _getRoot() {
+		return parent != null ? parent._getRoot() : this;
 	}
 
 	protected abstract V fromJson(JsonNode json);
 
 	protected void elaborate() {
 	}
-	
+
 	private static final SerializationOptions emptyOptions = new SerializationOptions();
 
 	@Override
-	public JsonNode toJson() {
-		return toJson(emptyOptions);
+	/* package */JsonNode _toJson() {
+		return _toJsonInternal(emptyOptions);
 	}
 
 	@Override
-	public JsonNode toJson(SerializationOptions.Option... options) {
-		return toJson(new SerializationOptions(options));
+	/* package */JsonNode _toJson(SerializationOptions.Option... options) {
+		return _toJsonInternal(new SerializationOptions(options));
 	}
 
-	public abstract JsonNode toJson(SerializationOptions options);
+	@Override
+	/* package */JsonNode _toJson(SerializationOptions options) {
+		return _toJsonInternal(options);
+	}
+
+	/* package */abstract JsonNode _toJsonInternal(SerializationOptions options);
 
 	// some utility classes for overlays
 
@@ -224,7 +227,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	@Override
 	public String toString() {
-		return toJson().toString();
+		return _toJson().toString();
 	}
 
 }

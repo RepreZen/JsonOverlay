@@ -8,9 +8,9 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen;
+package com.reprezen.jsonoverlay.gen;
 
-import static com.reprezen.gen.Template.t;
+import static com.reprezen.jsonoverlay.gen.Template.t;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,9 +46,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.reprezen.gen.SimpleJavaGenerator.Member;
-import com.reprezen.gen.TypeData.Field;
-import com.reprezen.gen.TypeData.Type;
 import com.reprezen.jsonoverlay.AbstractJsonOverlay;
 import com.reprezen.jsonoverlay.BooleanOverlay;
 import com.reprezen.jsonoverlay.ChildListOverlay;
@@ -69,6 +66,9 @@ import com.reprezen.jsonoverlay.PrimitiveOverlay;
 import com.reprezen.jsonoverlay.PropertiesOverlay;
 import com.reprezen.jsonoverlay.ReferenceRegistry;
 import com.reprezen.jsonoverlay.StringOverlay;
+import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member;
+import com.reprezen.jsonoverlay.gen.TypeData.Field;
+import com.reprezen.jsonoverlay.gen.TypeData.Type;
 
 public abstract class TypeGenerator {
 

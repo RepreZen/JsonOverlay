@@ -8,9 +8,9 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen;
+package com.reprezen.jsonoverlay.gen;
 
-import static com.reprezen.gen.Template.t;
+import static com.reprezen.jsonoverlay.gen.Template.t;
 
 import java.util.Collection;
 import java.util.List;

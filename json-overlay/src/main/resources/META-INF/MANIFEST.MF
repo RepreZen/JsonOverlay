@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.reprezen.jsonoverlay
 Bundle-Vendor: ModelSolv, Inc. d.b.a. RepreZen
 Bundle-Version: 0.0.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0",
+Require-Bundle: com.google.guava;bundle-version="[15.0.0,16.0.0)",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0",
  com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;bundle-version="2.5.0",
  com.modelsolv.reprezen.bundles,

@@ -8,14 +8,14 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen
+package com.reprezen.jsonoverlay.gen
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.EnumConstantDeclaration
 import com.github.javaparser.ast.body.EnumDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
-import com.reprezen.gen.TypeData.Field
-import com.reprezen.gen.TypeData.Type
+import com.reprezen.jsonoverlay.gen.TypeData.Field
+import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
 import java.util.Collection
 import java.util.Map

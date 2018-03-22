@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen;
+package com.reprezen.jsonoverlay.gen;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import com.reprezen.gen.TypeData.Field;
-import com.reprezen.gen.TypeData.Type;
+import com.reprezen.jsonoverlay.gen.TypeData.Field;
+import com.reprezen.jsonoverlay.gen.TypeData.Type;
 
 public class Template {
 

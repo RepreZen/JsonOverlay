@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen
+package com.reprezen.jsonoverlay.gen
 
 import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
@@ -16,9 +16,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.google.common.collect.Queues
 import com.google.common.collect.Sets
-import com.reprezen.gen.SimpleJavaGenerator.Member
-import com.reprezen.gen.TypeData.Field
-import com.reprezen.gen.TypeData.Type
 import com.reprezen.jsonoverlay.AbstractJsonOverlay
 import com.reprezen.jsonoverlay.ChildListOverlay
 import com.reprezen.jsonoverlay.ChildMapOverlay
@@ -29,6 +26,9 @@ import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
 import com.reprezen.jsonoverlay.OverlayFactory
 import com.reprezen.jsonoverlay.ReferenceRegistry
+import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member
+import com.reprezen.jsonoverlay.gen.TypeData.Field
+import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
 import java.util.Collection
 import java.util.Map

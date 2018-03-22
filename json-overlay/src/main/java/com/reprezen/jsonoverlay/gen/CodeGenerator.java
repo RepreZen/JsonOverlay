@@ -8,7 +8,7 @@
  *  Contributors:
  *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package com.reprezen.gen;
+package com.reprezen.jsonoverlay.gen;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.reprezen.gen.TypeData.Type;
+import com.reprezen.jsonoverlay.gen.TypeData.Type;
 
 public class CodeGenerator {
 

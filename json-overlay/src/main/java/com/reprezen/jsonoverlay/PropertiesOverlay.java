@@ -25,18 +25,36 @@ import com.reprezen.jsonoverlay.SerializationOptions.Option;
 public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	private List<ChildOverlay<?>> children = Lists.newArrayList();
-	protected Map<String, ChildOverlay<?>> refables = Maps.newLinkedHashMap();
+	private static Map<Class<?>, List<String>> propertyNames = Maps.newHashMap();
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
 
 	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(json, parent, refReg);
 		deferElaboration = json.isMissingNode();
+		gatherPropertyNames();
 	}
 
 	public PropertiesOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(value, parent, refReg);
 		elaborated = true;
+		gatherPropertyNames();
+	}
+
+	private void gatherPropertyNames() {
+		if (!propertyNames.containsKey(getClass())) {
+			List<String> names = Lists.newArrayList();
+			for (Field field : getClass().getDeclaredFields()) {
+				if (IJsonOverlay.class.isAssignableFrom(field.getType())) {
+					names.add(field.getName());
+				}
+			}
+			propertyNames.put(getClass(), names);
+		}
+	}
+
+	/* package */ List<String> getPropertyNames() {
+		return propertyNames.get(getClass());
 	}
 
 	protected void maybeElaborateChildrenAtCreation() {
@@ -105,7 +123,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		if (elaborate) {
 			ensureElaborated();
 		}
-		return value;
+		return _get();
 	}
 
 	/* package */ AbstractJsonOverlay<?> _get(String fieldName) {
@@ -114,8 +132,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		if (field.isPresent()) {
 			try {
 				field.get().setAccessible(true);
-				AbstractJsonOverlay<?> overlay = (AbstractJsonOverlay<?>) field.get().get(this);
-				return field.isPresent() ? overlay : null;
+				return (AbstractJsonOverlay<?>) field.get().get(this);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 			}
 		}
@@ -169,37 +186,23 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return child;
 	}
 
-	public Iterable<String> getRefablePaths() {
-		return refables.keySet();
-	}
-
-	public boolean isReference(String path) {
-		ChildOverlay<?> child = (ChildOverlay<?>) refables.get(path);
-		return child != null ? child.isReference() : false;
-	}
-
-	public Reference getReference(String path) {
-		ChildOverlay<?> child = (ChildOverlay<?>) refables.get(path);
-		return child != null ? child.getReference() : null;
-	}
-
 	private JsonPointer pathPointer(String path) {
 		return (path == null || path.isEmpty()) ? JsonPointer.compile("") : JsonPointer.compile("/" + path);
-	}
-
-	public PropertiesOverlay<?> getParentPropertiesObject() {
-		JsonOverlay<?> parent = _getParent();
-		while (parent != null) {
-			if (parent instanceof PropertiesOverlay<?>) {
-				return (PropertiesOverlay<?>) parent;
-			}
-			parent = parent._getParent();
-		}
-		return null;
 	}
 
 	@Override
 	protected void elaborate() {
 		maybeElaborateChildrenAtCreation();
 	}
+
+	/* package */ boolean isReference(String name) {
+		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
+		return childOverlay.isReference();
+	}
+
+	/* package */ Reference getReference(String name) {
+		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
+		return childOverlay.getReference();
+	}
+
 }

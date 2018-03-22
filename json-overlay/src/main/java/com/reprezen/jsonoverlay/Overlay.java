@@ -1,9 +1,14 @@
 package com.reprezen.jsonoverlay;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.jsonoverlay.ListOverlay.WrappedCollection;
+import com.reprezen.jsonoverlay.MapOverlay.WrappedMap;
 
 public class Overlay<V> {
 
@@ -15,6 +20,32 @@ public class Overlay<V> {
 
 	public static <V> Overlay<V> of(IJsonOverlay<V> overlay) {
 		return new Overlay<V>(overlay);
+	}
+
+	public static <X> Overlay<Map<String, X>> of(MapOverlay<X> overlay) {
+		return new Overlay<Map<String, X>>((IJsonOverlay<Map<String, X>>) overlay);
+	}
+
+	public static <V> Overlay<Map<String, V>> of(Map<String, V> map) {
+		if (map instanceof WrappedMap) {
+			MapOverlay<V> mapOverlay = ((WrappedMap<V>) map).getOverlay();
+			return Overlay.of(mapOverlay);
+		} else {
+			return null;
+		}
+	}
+
+	public static <X> Overlay<Collection<X>> of(ListOverlay<X> overlay) {
+		return new Overlay<Collection<X>>((IJsonOverlay<Collection<X>>) overlay);
+	}
+
+	public static <V> Overlay<Collection<V>> of(Collection<V> list) {
+		if (list instanceof WrappedCollection) {
+			ListOverlay<V> listOverlay = ((WrappedCollection<V>) list).getOverlay();
+			return Overlay.of(listOverlay);
+		} else {
+			return null;
+		}
 	}
 
 	public Overlay(MapOverlay<V> map, String key) {
@@ -66,7 +97,7 @@ public class Overlay<V> {
 		return overlay._get();
 	}
 
-	public final AbstractJsonOverlay<V> getOverlay() {
+	public final IJsonOverlay<V> getOverlay() {
 		return overlay;
 	}
 
@@ -218,5 +249,76 @@ public class Overlay<V> {
 
 	public static <V> URL getJsonReference(IJsonOverlay<V> overlay) {
 		return ((AbstractJsonOverlay<V>) overlay)._getJsonReference();
+	}
+
+	public List<String> getPropertyNames() {
+		if (overlay instanceof PropertiesOverlay) {
+			return ((PropertiesOverlay<?>) overlay).getPropertyNames();
+		} else {
+			return null;
+		}
+	}
+
+	public static <V> List<String> getPropertyNames(IJsonOverlay<V> overlay) {
+		return new Overlay<V>(overlay).getPropertyNames();
+	}
+
+	public boolean isReference(String key) {
+		return getReference(key) != null;
+	}
+
+	public static <V> boolean isReference(IJsonOverlay<V> overlay, String key) {
+		return new Overlay<V>(overlay).isReference(key);
+	}
+
+	public boolean isReference(int index) {
+		return getReference(index) != null;
+	}
+
+	public static <V> boolean isReference(IJsonOverlay<V> overlay, int index) {
+		return new Overlay<V>(overlay).getReference(index) != null;
+	}
+
+	public Reference getReference(String key) {
+		if (overlay instanceof PropertiesOverlay) {
+			return getPropertyReference(key);
+		} else if (overlay instanceof MapOverlay) {
+			return getMapReference(key);
+		} else {
+			return null;
+		}
+	}
+
+	public static <V> Reference getReference(IJsonOverlay<V> overlay, String key) {
+		return new Overlay<V>(overlay).getReference(key);
+	}
+
+	public Reference getReference(int index) {
+		if (overlay instanceof ListOverlay) {
+			return getListReference(index);
+		} else {
+			return null;
+		}
+	}
+
+	public static <V> Reference getReference(IJsonOverlay<V> overlay, int index) {
+		return new Overlay<V>(overlay).getReference(index);
+	}
+
+	private Reference getPropertyReference(String name) {
+		PropertiesOverlay<V> propsOverlay = (PropertiesOverlay<V>) overlay;
+		return propsOverlay.getReference(name);
+	}
+
+	private Reference getMapReference(String key) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<V> mapOverlay = (MapOverlay<V>) overlay;
+		return mapOverlay.getReference(key);
+	}
+
+	private Reference getListReference(int index) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<V> listOverlay = (ListOverlay<V>) overlay;
+		return listOverlay.getReference(index);
 	}
 }

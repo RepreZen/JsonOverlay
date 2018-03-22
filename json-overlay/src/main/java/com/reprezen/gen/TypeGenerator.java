@@ -67,7 +67,6 @@ import com.reprezen.jsonoverlay.OverlayFactory;
 import com.reprezen.jsonoverlay.Primitive;
 import com.reprezen.jsonoverlay.PrimitiveOverlay;
 import com.reprezen.jsonoverlay.PropertiesOverlay;
-import com.reprezen.jsonoverlay.Reference;
 import com.reprezen.jsonoverlay.ReferenceRegistry;
 import com.reprezen.jsonoverlay.StringOverlay;
 
@@ -197,7 +196,6 @@ public abstract class TypeGenerator {
 				ChildMapOverlay.class, //
 				ChildListOverlay.class, //
 				OverlayFactory.class, //
-				Reference.class, //
 				ReferenceRegistry.class, //
 				Inject.class, //
 				StringOverlay.class, //

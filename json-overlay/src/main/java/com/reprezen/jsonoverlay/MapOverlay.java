@@ -84,11 +84,6 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		return wrap(value);
 	}
 
-	@Override
-	Map<String, V> _get(boolean elaborate) {
-		return _get();
-	}
-
 	private Map<String, V> wrap(Map<String, V> map) {
 		return map instanceof WrappedMap ? map : new WrappedMap<V>(map, this);
 	}

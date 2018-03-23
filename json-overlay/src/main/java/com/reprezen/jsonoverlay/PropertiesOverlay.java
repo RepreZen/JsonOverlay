@@ -118,12 +118,16 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return json;
 	}
 
+
+	
 	@Override
+	V _get() {
+		ensureElaborated();
+		return super._get();
+	}
+
 	public V _get(boolean elaborate) {
-		if (elaborate) {
-			ensureElaborated();
-		}
-		return _get();
+		return elaborate ? _get() : super._get();
 	}
 
 	/* package */ AbstractJsonOverlay<?> _get(String fieldName) {

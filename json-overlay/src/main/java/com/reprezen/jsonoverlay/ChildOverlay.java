@@ -91,7 +91,11 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 	}
 
 	public V _get(boolean complete) {
-		return overlay._get(complete);
+		if (overlay instanceof PropertiesOverlay) {
+			return ((PropertiesOverlay<V>) overlay)._get(complete);
+		} else {
+			return overlay._get();
+		}
 	}
 
 	public AbstractJsonOverlay<?> _find(JsonPointer path) {

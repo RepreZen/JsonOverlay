@@ -28,6 +28,7 @@ import com.reprezen.jsonoverlay.OverlayFactory
 import com.reprezen.jsonoverlay.ReferenceRegistry
 import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member
 import com.reprezen.jsonoverlay.gen.TypeData.Field
+import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
 import java.util.Collection
@@ -162,11 +163,13 @@ class ImplGenerator extends TypeGenerator {
 				return «f.propertyName»._get();	
 			}
 		''')
-		methods.addMember('''
-			public «f.type» get«f.name»(boolean elaborate) {
-				return «f.propertyName»._get(elaborate);
-			}
-		''')
+		if (f.structure == Structure.scalar && !f.isScalarType) {
+			methods.addMember('''
+				public «f.type» get«f.name»(boolean elaborate) {
+					return «f.propertyName»._get(elaborate);
+				}
+			''')
+		}
 		if (f.isBoolean) {
 			methods.addMember('''
 				public boolean is«f.name»() {
@@ -188,11 +191,6 @@ class ImplGenerator extends TypeGenerator {
 			public Collection<«f.type»> get«f.plural»() {
 					return «f.propertyName»._get();
 				}
-		''')
-		methods.addMember('''
-			public Collection<«f.type»> get«f.plural»(boolean elaborate) {
-				return «f.propertyName»._get(elaborate);
-			}
 		''')
 		methods.addMember('''
 			public boolean has«f.plural»() {
@@ -238,11 +236,6 @@ class ImplGenerator extends TypeGenerator {
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»() {
 				return «f.propertyName»._get();
-			}
-		''')
-		methods.addMember('''
-			public Map<String, «f.type»> get«f.plural»(boolean elaborate) {
-				return «f.propertyName»._get(elaborate);
 			}
 		''')
 		methods.addMember('''

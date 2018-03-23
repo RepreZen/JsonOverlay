@@ -26,9 +26,4 @@ public abstract class ScalarOverlay<V> extends JsonOverlay<V> {
 	public JsonOverlay<?> _findInternal(JsonPointer path) {
 		return null;
 	}
-
-	@Override
-	public V _get(boolean elaborate) {
-		return value;
-	}
 }

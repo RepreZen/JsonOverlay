@@ -75,11 +75,6 @@ public class ListOverlay<V> extends JsonOverlay<Collection<V>> {
 		return wrap(value);
 	}
 
-	@Override
-	public Collection<V> _get(boolean elaborate) {
-		return _get();
-	}
-
 	private Collection<V> wrap(Collection<V> list) {
 		if (list instanceof WrappedCollection) {
 			return list;

@@ -15,6 +15,7 @@ import com.github.javaparser.ast.body.EnumConstantDeclaration
 import com.github.javaparser.ast.body.EnumDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.reprezen.jsonoverlay.gen.TypeData.Field
+import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
 import java.util.Collection
@@ -95,7 +96,9 @@ class InterfaceGenerator extends TypeGenerator {
 	def private getScalarMethods(Field f) {
 		val methods = new Members
 		methods.addMember('''«f.type» get«f.name»();''')
-		methods.addMember('''«f.type» get«f.name»(boolean elaborate);''')
+		if (f.structure === Structure.scalar && !f.isScalarType) {
+			methods.addMember('''«f.type» get«f.name»(boolean elaborate);''')
+		}
 		if (f.type == "Boolean") {
 			methods.addMember('''boolean is«f.name»();''')
 		}
@@ -107,7 +110,6 @@ class InterfaceGenerator extends TypeGenerator {
 		val methods = new Members
 		requireTypes(Collection)
 		methods.addMember('''Collection<«f.type»> get«f.plural»();''')
-		methods.addMember('''Collection<«f.type»> get«f.plural»(boolean elaborate);''')
 		methods.addMember('''boolean has«f.plural»();''')
 		methods.addMember('''«f.type» get«f.name»(int index);''')
 		methods.addMember('''void set«f.plural»(Collection<«f.type»> «f.lcPlural»);''')
@@ -122,7 +124,6 @@ class InterfaceGenerator extends TypeGenerator {
 		requireTypes(Map)
 		val methods = new Members
 		methods.addMember('''Map<String, «f.type»> get«f.plural»();''')
-		methods.addMember('''Map<String, «f.type»> get«f.plural»(boolean elaborate);''')
 		methods.addMember('''boolean has«f.name»(String «f.keyName»);''')
 		methods.addMember('''«f.type» get«f.name»(String «f.keyName»);''')
 		methods.addMember('''void set«f.plural»(Map<String, «f.type»> «f.lcPlural»);''')

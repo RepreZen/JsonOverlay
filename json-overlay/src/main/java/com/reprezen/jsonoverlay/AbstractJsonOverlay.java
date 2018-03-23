@@ -19,8 +19,6 @@ public abstract class AbstractJsonOverlay<V> implements IJsonOverlay<V> {
 
 	/* package */ abstract V _get();
 
-	/* package */ abstract V _get(boolean elaborate);
-
 	/* package */ abstract void _set(V value);
 
 	/* package */ abstract AbstractJsonOverlay<?> _find(JsonPointer path);

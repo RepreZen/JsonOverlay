@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.reprezen.jsonoverlay</groupId>
 	<artifactId>jsonoverlay</artifactId>
-	<version>${json-overlay-version}</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JsonOverlay Framework</description>
 	<url>https://github.com/RepreZen/JsonOverlay</url>
@@ -48,6 +48,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -243,7 +244,6 @@
 		</plugins>
 	</build>
 	<properties>
-		<json-overlay-version>0.0.1-SNAPSHOT</json-overlay-version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

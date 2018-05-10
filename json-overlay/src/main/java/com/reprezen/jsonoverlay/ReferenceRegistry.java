@@ -51,7 +51,7 @@ public class ReferenceRegistry {
 		} else {
 			String badRefString = refStringNode.toString();
 			Reference ref = new Reference(badRefString, base,
-					new ResolutionException("Non-text $ref property value in JSON reference node"));
+					new ResolutionException("Non-text $ref property value in JSON reference node"), this);
 			String key = ref.getKey();
 			if (!references.containsKey(key)) {
 				references.put(key, ref);
@@ -67,15 +67,15 @@ public class ReferenceRegistry {
 			}
 			String comprehendedRef = base.comprehend(refString);
 			if (!references.containsKey(comprehendedRef)) {
-				references.put(comprehendedRef, new Reference(refString, comprehendedRef, base));
+				references.put(comprehendedRef, new Reference(refString, comprehendedRef, base, this));
 			}
 			Reference ref = references.get(comprehendedRef);
 			if (resolve) {
-				ref.resolve();
+				ref.resolve(false);
 			}
 			return ref;
 		} catch (ResolutionException e) {
-			Reference ref = new Reference(refString, base, e);
+			Reference ref = new Reference(refString, base, e, this);
 			references.put(refString, ref);
 			return ref;
 		}

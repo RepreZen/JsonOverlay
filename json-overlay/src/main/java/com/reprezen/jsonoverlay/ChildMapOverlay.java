@@ -23,7 +23,7 @@ public class ChildMapOverlay<V> extends ChildOverlay<Map<String, V>> {
 
     public ChildMapOverlay(String path, JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
             ReferenceRegistry refReg) {
-        super(path, json, parent, factory, refReg);
+        super(path, json, parent, factory, refReg, ((MapOverlayFactory<V>) factory).getKeyPattern() == null);
         this.mapOverlay = (MapOverlay<V>) overlay;
     }
 

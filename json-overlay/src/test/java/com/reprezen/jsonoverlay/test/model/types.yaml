@@ -1,0 +1,20 @@
+---
+modelType: TestModel
+types:
+  - name: TestModel
+    fields:
+      description: {}
+      stringVal: {}
+      intVal:
+        type: Integer
+      testObj: {}
+      map:
+        structure: map
+        type: TestObj
+      list:
+        structure: collection
+        type: TestObj
+  - name: TestObj
+    fields:
+      x: {}
+      y: {}

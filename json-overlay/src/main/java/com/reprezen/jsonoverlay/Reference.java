@@ -169,7 +169,7 @@ public class Reference {
 					return json;
 				}
 			}
-			if (!isReferenceNode(json)) {
+			if (!isReferenceNode(json) && isValid == null) {
 				isValid = true;
 			}
 			seen.remove(this);

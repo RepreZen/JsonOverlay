@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -78,7 +77,7 @@ public class ResolutionBase {
 			try {
 				json = resolutionBaseRegistry.getJsonLoader().load(new URL(urlString));
 				isValid = true;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				isValid = false;
 				error = new ResolutionException(String.format("Failed to load document from '%s'", urlString), e);
 				throw error;

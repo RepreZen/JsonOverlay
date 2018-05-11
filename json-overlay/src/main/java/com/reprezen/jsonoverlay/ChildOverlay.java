@@ -35,14 +35,19 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 
 	public ChildOverlay(String path, JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory,
 			ReferenceRegistry refReg) {
+		this(path, json, parent, factory, refReg, true);
+	}
+
+	public ChildOverlay(String path, JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory,
+			ReferenceRegistry refReg, boolean sharedOk) {
 		this.path = new JsonPath(path);
 		this.parent = parent;
 		this.factory = factory;
-		if (isReferenceNode(json)) {
+		if (Reference.isReferenceNode(json)) {
 			this.reference = refReg.getRef(json);
 			JsonNode resolved = reference.resolve();
 			if (reference.isValid()) {
-				if (refReg.hasOverlay(resolved)) {
+				if (sharedOk && refReg.hasOverlay(resolved)) {
 					AbstractJsonOverlay<?> overlay = refReg.getOverlay(resolved);
 					if (factory.isCompatible(overlay)) {
 						@SuppressWarnings("unchecked")
@@ -55,11 +60,22 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 				} else {
 					// note - since this is a reference, we don't set parent. If there's a way to
 					// navigate to the object directly, that will determine its parent
-					this.overlay = (JsonOverlay<V>) factory.create(resolved, null, refReg, reference);
-					refReg.setOverlay(resolved, overlay);
+					if (factory instanceof MapOverlay.MapOverlayFactory<?>) {
+						@SuppressWarnings("unchecked")
+						MapOverlay.MapOverlayFactory<V> mapFactory = (MapOverlay.MapOverlayFactory<V>) factory;
+						@SuppressWarnings("unchecked")
+						JsonOverlay<V> castOverlay = (JsonOverlay<V>) mapFactory.create(resolved, null, !sharedOk, refReg, reference);
+						this.overlay = castOverlay;
+
+					} else {
+						this.overlay = (JsonOverlay<V>) factory.create(resolved, null, refReg, reference);
+					}
+					if (sharedOk) {
+						refReg.setOverlay(resolved, overlay);
+					}
 				}
 			} else {
-				this.overlay = null;
+				this.overlay = new NoOverlay<V>(json, parent, refReg);
 			}
 		} else {
 			this.overlay = (JsonOverlay<V>) factory.create(json, parent, isPartial(), refReg);
@@ -76,10 +92,6 @@ public class ChildOverlay<V> extends AbstractJsonOverlay<V> {
 
 	protected JsonPointer tailPath(JsonPointer path) {
 		return this.path.tailPath(path);
-	}
-
-	private boolean isReferenceNode(JsonNode node) {
-		return node.isObject() && node.has("$ref");
 	}
 
 	public boolean _isPresent() {

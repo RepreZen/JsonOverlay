@@ -101,10 +101,9 @@ public class Overlay<V> {
 		return overlay;
 	}
 
-	public final MapOverlay<V> getMapOverlay() {
+	public final MapOverlay<?> getMapOverlay() {
 		if (overlay instanceof MapOverlay) {
-			@SuppressWarnings("unchecked")
-			MapOverlay<V> castOverlay = (MapOverlay<V>) overlay;
+			MapOverlay<?> castOverlay = (MapOverlay<?>) overlay;
 			return castOverlay;
 		} else {
 			return null;

@@ -34,4 +34,20 @@ public class ResolutionException extends RuntimeException {
 		super(cause);
 	}
 
+	public static class ReferenceCycleException extends ResolutionException {
+
+		private static final long serialVersionUID = 1L;
+
+		private Reference detectedAt;
+
+		public ReferenceCycleException(Reference detectedAt) {
+			super("This reference participates in a reference cycle");
+			this.detectedAt = detectedAt;
+		}
+
+		public Reference getDetectedAt() {
+			return detectedAt;
+		}
+
+	}
 }

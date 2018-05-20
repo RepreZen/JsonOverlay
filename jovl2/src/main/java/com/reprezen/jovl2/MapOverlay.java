@@ -32,7 +32,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	@Override
-	protected Map<String, V> fromJson(JsonNode json) {
+	protected Map<String, V> _fromJson(JsonNode json) {
 		return new LinkedHashMap<String, V>() {
 			private static final long serialVersionUID = 1L;
 
@@ -44,16 +44,16 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
-		ObjectNode obj = jsonObject();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		ObjectNode obj = _jsonObject();
 		for (Entry<String, JsonOverlay<V>> entry : overlays.entrySet()) {
-			obj.set(entry.getKey(), entry.getValue().toJson());
+			obj.set(entry.getKey(), entry.getValue()._toJson());
 		}
 		return obj.size() > 0 ? obj : MissingNode.getInstance();
 	}
 
 	@Override
-	protected void elaborate() {
+	protected void _elaborate() {
 		if (json != null) {
 			fillWithJson();
 		} else {
@@ -70,7 +70,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 				JsonOverlay<V> valOverlay = valueFactory.create(entry.getValue(), this, refReg);
 				overlays.put(entry.getKey(), valOverlay);
 				valOverlay._setPathInParent(entry.getKey());
-				value.put(entry.getKey(), valOverlay.get(false));
+				value.put(entry.getKey(), valOverlay._get(false));
 			}
 		}
 	}
@@ -89,7 +89,7 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	public V get(String key) {
-		return overlays.get(key).get();
+		return overlays.get(key)._get();
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(String key) {

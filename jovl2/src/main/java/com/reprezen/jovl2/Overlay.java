@@ -75,7 +75,7 @@ public class Overlay<V> {
 	}
 
 	public final V get() {
-		return overlay.get();
+		return overlay._get();
 	}
 
 	public final JsonOverlay<V> getOverlay() {
@@ -102,7 +102,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> V get(JsonOverlay<V> overlay) {
-		return ((JsonOverlay<V>) overlay).get();
+		return ((JsonOverlay<V>) overlay)._get();
 	}
 
 	// public JsonOverlay<?> find(JsonPointer path) {
@@ -123,11 +123,11 @@ public class Overlay<V> {
 	// }
 
 	public JsonNode toJson() {
-		return overlay.toJson();
+		return overlay._toJson();
 	}
 
 	public static <V> JsonNode toJson(JsonOverlay<V> overlay) {
-		return ((JsonOverlay<V>) overlay).toJson();
+		return ((JsonOverlay<V>) overlay)._toJson();
 	}
 
 	// public JsonNode toJson(SerializationOptions options) {
@@ -148,13 +148,13 @@ public class Overlay<V> {
 	// return ((JsonOverlay<V>) overlay)._toJson(options);
 	// }
 
-	// public boolean isPresent() {
-	// return overlay._isPresent();
-	// }
+	public boolean isPresent() {
+		return overlay._isPresent();
+	}
 
-	// public static <V> boolean isPresent(JsonOverlay<V> overlay) {
-	// return ((JsonOverlay<V>) overlay)._isPresent();
-	// }
+	public static <V> boolean isPresent(JsonOverlay<V> overlay) {
+		return ((JsonOverlay<V>) overlay)._isPresent();
+	}
 
 	public boolean isElaborated() {
 		return overlay._isElaborated();

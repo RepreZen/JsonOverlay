@@ -90,7 +90,7 @@ public class PropertiesTests extends Assert {
 	}
 
 	private void checkPropertyNames(Foo foo, String... expected) {
-		assertArrayEquals(expected, Iterators.toArray(foo.toJson().fieldNames(), String.class));
+		assertArrayEquals(expected, Iterators.toArray(foo._toJson().fieldNames(), String.class));
 	}
 
 	private Foo createFooWithJson(Object... values) {
@@ -149,40 +149,40 @@ public class PropertiesTests extends Assert {
 		}
 
 		@Override
-		protected void elaborateChildren() {
-			createScalar("stringField", "string", StringOverlay.factory);
-			createScalar("numField", "num", IntegerOverlay.factory);
-			createList("listField", "list", IntegerOverlay.factory);
-			createMap("mapField", "map", IntegerOverlay.factory, null);
-			createMap("rootMap", "", IntegerOverlay.factory, "x-.*");
+		protected void _elaborateChildren() {
+			_createScalar("stringField", "string", StringOverlay.factory);
+			_createScalar("numField", "num", IntegerOverlay.factory);
+			_createList("listField", "list", IntegerOverlay.factory);
+			_createMap("mapField", "map", IntegerOverlay.factory, null);
+			_createMap("rootMap", "", IntegerOverlay.factory, "x-.*");
 		}
 
 		public String getStringField() {
-			return (String) get("stringField", String.class);
+			return (String) _get("stringField", String.class);
 		}
 
 		public void setStringField(String value) {
-			set("stringField", value, String.class);
+			_set("stringField", value, String.class);
 		}
 
 		public Integer getNumField() {
-			return (Integer) get("numField", Integer.class);
+			return (Integer) _get("numField", Integer.class);
 		}
 
 		public void setNumField(Integer value) {
-			set("numField", value, Integer.class);
+			_set("numField", value, Integer.class);
 		}
 
 		public List<Integer> getListField() {
-			return getList("listField", Integer.class);
+			return _getList("listField", Integer.class);
 		}
 
 		public Map<String, Integer> getMapField() {
-			return getMap("mapField", Integer.class);
+			return _getMap("mapField", Integer.class);
 		}
 
 		public Map<String, Integer> getRootMap() {
-			return getMap("rootMap", Integer.class);
+			return _getMap("rootMap", Integer.class);
 		}
 
 		public static OverlayFactory<Foo> factory = new OverlayFactory<Foo>() {

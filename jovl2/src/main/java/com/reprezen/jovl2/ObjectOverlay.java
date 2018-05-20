@@ -23,13 +23,13 @@ public class ObjectOverlay extends ScalarOverlay<Object> {
 	}
 
 	@Override
-	protected Object fromJson(JsonNode json) {
+	protected Object _fromJson(JsonNode json) {
 		return json.isMissingNode() ? null : mapper.convertValue(json, Object.class);
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
-		return value != null ? mapper.convertValue(value, JsonNode.class) : jsonMissing();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? mapper.convertValue(value, JsonNode.class) : _jsonMissing();
 	}
 
 	public static OverlayFactory<Object> factory = new OverlayFactory<Object>() {

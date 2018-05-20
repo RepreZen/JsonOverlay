@@ -27,19 +27,19 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public String getTitle() {
-        return (String) get("title", String.class);
+        return (String) _get("title", String.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setTitle(String title) {
-        set("title", title, String.class);
+        _set("title", title, String.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
-    protected void elaborateChildren() {
-        createScalar("title", "title", StringOverlay.factory);
+    protected void _elaborateChildren() {
+        _createScalar("title", "title", StringOverlay.factory);
     }
 
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")

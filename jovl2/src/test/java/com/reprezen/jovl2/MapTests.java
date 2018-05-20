@@ -56,9 +56,9 @@ public class MapTests extends Assert {
 
 	private void checkKeys(MapOverlay<Integer> overlay, String... keys) {
 		int i = 0;
-		for (String key : overlay.get().keySet()) {
+		for (String key : overlay._get().keySet()) {
 			assertEquals(keys[i++], key);
-			assertEquals(Integer.valueOf(key.charAt(0) - a), overlay.get().get(key));
+			assertEquals(Integer.valueOf(key.charAt(0) - a), overlay._get().get(key));
 		}
 	}
 }

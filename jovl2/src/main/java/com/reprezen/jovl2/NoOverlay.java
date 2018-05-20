@@ -14,12 +14,12 @@ public class NoOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	protected V fromJson(JsonNode json) {
+	protected V _fromJson(JsonNode json) {
 		return null;
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		return MissingNode.getInstance();
 	}
 

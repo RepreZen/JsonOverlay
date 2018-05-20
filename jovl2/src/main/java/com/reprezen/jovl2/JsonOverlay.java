@@ -34,53 +34,61 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	protected final ReferenceRegistry refReg;
 	protected List<Integer> jsonPositions = null;
 	private String pathInParent = null;
+	private boolean present;
 
 	protected JsonOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		this.json = null;
 		this.value = value;
 		this.parent = parent;
 		this.refReg = refReg;
+		this.present = !json.isMissingNode();
 	}
 
 	protected JsonOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		this.json = json;
-		this.value = fromJson(json);
+		this.value = _fromJson(json);
 		this.parent = parent;
 		this.refReg = refReg;
+		this.present = value != null;
 	}
 
-	/* package */ V get() {
-		return get(true);
+	/* package */ V _get() {
+		return _get(true);
 	}
 
-	/* package */ V get(boolean elaborate) {
+	/* package */ V _get(boolean elaborate) {
 		if (elaborate) {
-			ensureElaborated();
+			_ensureElaborated();
 		}
 		return value;
 	}
 
-	/* package */ void set(V value) {
+	/* package */ void _set(V value) {
 		this.value = value;
+		this.present = value != null;
 	}
 
+	/* packkage */ boolean _isPresent() {
+		return present;
+	}
+	
 	/* package */ JsonOverlay<?> _getParent() {
 		return parent;
 	}
 
-	protected abstract V fromJson(JsonNode json);
+	protected abstract V _fromJson(JsonNode json);
 
 	protected void _setParent(JsonOverlay<?> parent) {
 		this.parent = parent;
 	}
 
-	/* package */ JsonNode toJson() {
-		return toJsonInternal(SerializationOptions.EMPTY);
+	/* package */ JsonNode _toJson() {
+		return _toJsonInternal(SerializationOptions.EMPTY);
 	}
 
-	protected abstract JsonNode toJsonInternal(SerializationOptions options);
+	protected abstract JsonNode _toJsonInternal(SerializationOptions options);
 
-	protected void elaborate() {
+	protected void _elaborate() {
 		// most types of overlay don't need to do any elaboration
 	}
 
@@ -88,9 +96,9 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return true;
 	}
 
-	protected void ensureElaborated() {
+	protected void _ensureElaborated() {
 		if (!_isElaborated()) {
-			elaborate();
+			_elaborate();
 		}
 	}
 
@@ -103,64 +111,64 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	public String toString() {
-		return toJson().toString();
+		return _toJson().toString();
 	}
 
 	// some utility classes for overlays
 
-	protected static ObjectNode jsonObject() {
+	protected static ObjectNode _jsonObject() {
 		return JsonNodeFactory.instance.objectNode();
 	}
 
-	protected static ArrayNode jsonArray() {
+	protected static ArrayNode _jsonArray() {
 		return JsonNodeFactory.instance.arrayNode();
 	}
 
-	protected static TextNode jsonScalar(String s) {
+	protected static TextNode _jsonScalar(String s) {
 		return JsonNodeFactory.instance.textNode(s);
 	}
 
-	protected static ValueNode jsonScalar(int n) {
+	protected static ValueNode _jsonScalar(int n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(long n) {
+	protected static ValueNode _jsonScalar(long n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(short n) {
+	protected static ValueNode _jsonScalar(short n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(byte n) {
+	protected static ValueNode _jsonScalar(byte n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(double n) {
+	protected static ValueNode _jsonScalar(double n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(float n) {
+	protected static ValueNode _jsonScalar(float n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(BigInteger n) {
+	protected static ValueNode _jsonScalar(BigInteger n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonScalar(BigDecimal n) {
+	protected static ValueNode _jsonScalar(BigDecimal n) {
 		return JsonNodeFactory.instance.numberNode(n);
 	}
 
-	protected static ValueNode jsonBoolean(boolean b) {
+	protected static ValueNode _jsonBoolean(boolean b) {
 		return JsonNodeFactory.instance.booleanNode(b);
 	}
 
-	protected static MissingNode jsonMissing() {
+	protected static MissingNode _jsonMissing() {
 		return MissingNode.getInstance();
 	}
 
-	protected static NullNode jsonNull() {
+	protected static NullNode _jsonNull() {
 		return JsonNodeFactory.instance.nullNode();
 	}
 }

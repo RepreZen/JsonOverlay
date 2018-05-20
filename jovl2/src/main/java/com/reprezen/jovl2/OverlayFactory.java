@@ -18,13 +18,13 @@ public abstract class OverlayFactory<V> {
 
 	public JsonOverlay<V> create(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		JsonOverlay<V> overlay = _create(value, parent, refReg);
-		overlay.elaborate();
+		overlay._elaborate();
 		return overlay;
 	}
 
 	public JsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		JsonOverlay<V> overlay = _create(json, parent, refReg);
-		overlay.elaborate();
+		overlay._elaborate();
 		return overlay;
 	}
 

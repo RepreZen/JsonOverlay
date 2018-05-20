@@ -23,13 +23,13 @@ public class BooleanOverlay extends ScalarOverlay<Boolean> {
 	}
 
 	@Override
-	protected Boolean fromJson(JsonNode json) {
+	protected Boolean _fromJson(JsonNode json) {
 		return json.isBoolean() ? json.booleanValue() : null;
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
-		return value != null ? jsonBoolean(value) : jsonMissing();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonBoolean(value) : _jsonMissing();
 	}
 
 	public static OverlayFactory<Boolean> factory = new OverlayFactory<Boolean>() {

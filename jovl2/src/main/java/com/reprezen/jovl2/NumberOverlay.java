@@ -28,7 +28,7 @@ public class NumberOverlay extends ScalarOverlay<Number> {
 	}
 
 	@Override
-	protected Number fromJson(JsonNode json) {
+	protected Number _fromJson(JsonNode json) {
 		if (json.isBigDecimal()) {
 			return json.decimalValue();
 		} else if (json.isBigInteger()) {
@@ -52,9 +52,9 @@ public class NumberOverlay extends ScalarOverlay<Number> {
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		if (value == null) {
-			return jsonMissing();
+			return _jsonMissing();
 		}
 		NumberType type = NumberType.of(value);
 		if (type == null) {
@@ -63,23 +63,23 @@ public class NumberOverlay extends ScalarOverlay<Number> {
 		} else {
 			switch (type) {
 			case BigDecimal:
-				return jsonScalar((BigDecimal) value);
+				return _jsonScalar((BigDecimal) value);
 			case BigInteger:
-				return jsonScalar((BigInteger) value);
+				return _jsonScalar((BigInteger) value);
 			case Byte:
-				return jsonScalar((Byte) value);
+				return _jsonScalar((Byte) value);
 			case Double:
-				return jsonScalar((Double) value);
+				return _jsonScalar((Double) value);
 			case Float:
-				return jsonScalar((Float) value);
+				return _jsonScalar((Float) value);
 			case Integer:
-				return jsonScalar((Integer) value);
+				return _jsonScalar((Integer) value);
 			case Long:
-				return jsonScalar((Long) value);
+				return _jsonScalar((Long) value);
 			case Short:
-				return jsonScalar((Short) value);
+				return _jsonScalar((Short) value);
 			default:
-				return jsonMissing();
+				return _jsonMissing();
 			}
 		}
 	}

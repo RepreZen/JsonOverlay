@@ -16,7 +16,7 @@ public class Primitive {
 	// there's no way to splice Primitive into the Java type hierarchy). This is
 	// listed as an "auto" import type in the type generator, which prevents an
 	// import from being attempted for it.
-	public static boolean isPrimitive(Object o) {
+	public static boolean _isPrimitive(Object o) {
 		return o == null || o instanceof Number || o instanceof String;
 	}
 }

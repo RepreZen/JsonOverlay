@@ -23,13 +23,13 @@ public class StringOverlay extends ScalarOverlay<String> {
     }
 
     @Override
-    protected String fromJson(JsonNode json) {
+    protected String _fromJson(JsonNode json) {
         return json.isTextual() ? json.textValue() : null;
     }
 
     @Override
-    protected JsonNode toJsonInternal(SerializationOptions options) {
-        return value != null ? jsonScalar(value) : jsonMissing();
+    protected JsonNode _toJsonInternal(SerializationOptions options) {
+        return value != null ? _jsonScalar(value) : _jsonMissing();
     }
 
     public static OverlayFactory<String> factory = new OverlayFactory<String>() {

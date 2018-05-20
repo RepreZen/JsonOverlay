@@ -26,7 +26,7 @@ public class PrimitiveOverlay extends ScalarOverlay<Object> {
 	}
 
 	@Override
-	protected Object fromJson(JsonNode json) {
+	protected Object _fromJson(JsonNode json) {
 		if (json.isTextual()) {
 			return json.textValue();
 		} else if (json.isNumber()) {
@@ -39,27 +39,27 @@ public class PrimitiveOverlay extends ScalarOverlay<Object> {
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		if (value == null) {
-			return jsonMissing();
+			return _jsonMissing();
 		} else if (value instanceof String) {
-			return jsonScalar((String) value);
+			return _jsonScalar((String) value);
 		} else if (value instanceof BigDecimal) {
-			return jsonScalar((BigDecimal) value);
+			return _jsonScalar((BigDecimal) value);
 		} else if (value instanceof BigInteger) {
-			return jsonScalar((BigInteger) value);
+			return _jsonScalar((BigInteger) value);
 		} else if (value instanceof Byte) {
-			return jsonScalar((Byte) value);
+			return _jsonScalar((Byte) value);
 		} else if (value instanceof Double) {
-			return jsonScalar((Double) value);
+			return _jsonScalar((Double) value);
 		} else if (value instanceof Float) {
-			return jsonScalar((Float) value);
+			return _jsonScalar((Float) value);
 		} else if (value instanceof Integer) {
-			return jsonScalar((Integer) value);
+			return _jsonScalar((Integer) value);
 		} else if (value instanceof Long) {
-			return jsonScalar((Long) value);
+			return _jsonScalar((Long) value);
 		} else if (value instanceof Short) {
-			return jsonScalar((Short) value);
+			return _jsonScalar((Short) value);
 		} else {
 			return null;
 		}

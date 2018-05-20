@@ -35,7 +35,7 @@ public class NoOverlayTests extends Assert {
 	@Test
 	public void testAlwasyNullFromValue() {
 		NoOverlay<?> overlay = (NoOverlay<?>) factory.create(value, null, refReg);
-		assertNull(overlay.get());
+		assertNull(overlay._get());
 	}
 
 	private static ObjectMapper mapper = new ObjectMapper();
@@ -44,7 +44,7 @@ public class NoOverlayTests extends Assert {
 	public void testAlwaysNullFromJson() {
 		JsonNode json = value != null ? mapper.convertValue(value, JsonNode.class) : NullNode.instance;
 		NoOverlay<?> overlay = (NoOverlay<?>) factory.create(json,  null,  refReg);
-		assertNull(overlay.get());
+		assertNull(overlay._get());
 	}
 
 }

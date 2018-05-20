@@ -23,13 +23,13 @@ public class IntegerOverlay extends ScalarOverlay<Integer> {
 	}
 
 	@Override
-	protected Integer fromJson(JsonNode json) {
+	protected Integer _fromJson(JsonNode json) {
 		return json.isInt() ? json.intValue() : null;
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
-		return value != null ? jsonScalar(value) : jsonMissing();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonScalar(value) : _jsonMissing();
 	}
 
 	public static OverlayFactory<Integer> factory = new OverlayFactory<Integer>() {

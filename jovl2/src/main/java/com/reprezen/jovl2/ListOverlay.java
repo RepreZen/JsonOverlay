@@ -25,7 +25,7 @@ public class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	@Override
-	protected List<V> fromJson(JsonNode json) {
+	protected List<V> _fromJson(JsonNode json) {
 		return new ArrayList<V>() {
 			private static final long serialVersionUID = 1L;
 
@@ -37,16 +37,16 @@ public class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	@Override
-	protected JsonNode toJsonInternal(SerializationOptions options) {
-		ArrayNode array = jsonArray();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		ArrayNode array = _jsonArray();
 		for (JsonOverlay<V> itemOverlay : overlays) {
-			array.add(itemOverlay.toJson());
+			array.add(itemOverlay._toJson());
 		}
 		return array.size() > 0 ? array : MissingNode.getInstance();
 	}
 
 	@Override
-	protected void elaborate() {
+	protected void _elaborate() {
 		if (json != null) {
 			fillWithJson();
 		} else {
@@ -60,7 +60,7 @@ public class ListOverlay<V> extends JsonOverlay<List<V>> {
 		for (Iterator<JsonNode> iter = json.elements(); iter.hasNext();) {
 			JsonOverlay<V> itemOverlay = itemFactory.create(iter.next(), this, refReg);
 			overlays.add(itemOverlay);
-			value.add(itemOverlay.get(false));
+			value.add(itemOverlay._get(false));
 		}
 	}
 
@@ -76,7 +76,7 @@ public class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	public V get(int index) {
-		return overlays.get(index).get();
+		return overlays.get(index)._get();
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(int index) {

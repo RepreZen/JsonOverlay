@@ -34,52 +34,52 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public String getDescription() {
-        return (String) get("description", String.class);
+        return (String) _get("description", String.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setDescription(String description) {
-        set("description", description, String.class);
+        _set("description", description, String.class);
     }
 
     // Width
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Integer getWidth() {
-        return (Integer) get("width", Integer.class);
+        return (Integer) _get("width", Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setWidth(Integer width) {
-        set("width", width, Integer.class);
+        _set("width", width, Integer.class);
     }
 
     // Height
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Integer getHeight() {
-        return (Integer) get("height", Integer.class);
+        return (Integer) _get("height", Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setHeight(Integer height) {
-        set("height", height, Integer.class);
+        _set("height", height, Integer.class);
     }
 
     // Entry
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Map<String, Entry> getEntries() {
-        return getMap("entries", Entry.class);
+        return _getMap("entries", Entry.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Map<String, Entry> getEntries(boolean elaborate) {
-        return getMap("entries", elaborate, Entry.class);
+        return _getMap("entries", elaborate, Entry.class);
     }
 
     @Override
@@ -91,44 +91,44 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public boolean hasEntry(String name) {
-        return getMap("entries", Entry.class).containsKey(name);
+        return _getMap("entries", Entry.class).containsKey(name);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Entry getEntry(String name) {
-        return get("entries", name, Entry.class);
+        return _get("entries", name, Entry.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setEntries(Map<String, Entry> entries) {
-        set("entries", entries, Entry.class);
+        _set("entries", entries, Entry.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setEntry(String name, Entry entry) {
-        set("entries", name, entry, Entry.class);
+        _set("entries", name, entry, Entry.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void removeEntry(String name) {
-        remove("entries", name, Entry.class);
+        _remove("entries", name, Entry.class);
     }
 
     // Item
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public List<Item> getItems() {
-        return getList("items", Item.class);
+        return _getList("items", Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public List<Item> getItems(boolean elaborate) {
-        return getList("items", elaborate, Item.class);
+        return _getList("items", elaborate, Item.class);
     }
 
     @Override
@@ -140,50 +140,50 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Item getItem(int index) {
-        return get("items", index, Item.class);
+        return _get("items", index, Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setItems(List<Item> items) {
-        set("items", items, Item.class);
+        _set("items", items, Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setItem(int index, Item item) {
-        set("items", index, item, Item.class);
+        _set("items", index, item, Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void addItem(Item item) {
-        add("items", item, Item.class);
+        _add("items", item, Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void insertItem(int index, Item item) {
-        insert("items", index, item, Item.class);
+        _insert("items", index, item, Item.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void removeItem(int index) {
-        remove("items", index, Item.class);
+        _remove("items", index, Item.class);
     }
 
     // Integer
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public List<Integer> getIntegers() {
-        return getList("integers", Integer.class);
+        return _getList("integers", Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public List<Integer> getIntegers(boolean elaborate) {
-        return getList("integers", elaborate, Integer.class);
+        return _getList("integers", elaborate, Integer.class);
     }
 
     @Override
@@ -195,50 +195,50 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Integer getInteger(int index) {
-        return get("integers", index, Integer.class);
+        return _get("integers", index, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setIntegers(List<Integer> integers) {
-        set("integers", integers, Integer.class);
+        _set("integers", integers, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setInteger(int index, Integer integer) {
-        set("integers", index, integer, Integer.class);
+        _set("integers", index, integer, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void addInteger(Integer integer) {
-        add("integers", integer, Integer.class);
+        _add("integers", integer, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void insertInteger(int index, Integer integer) {
-        insert("integers", index, integer, Integer.class);
+        _insert("integers", index, integer, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void removeInteger(int index) {
-        remove("integers", index, Integer.class);
+        _remove("integers", index, Integer.class);
     }
 
     // NamedInteger
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Map<String, Integer> getNamedIntegers() {
-        return getMap("namedIntegers", Integer.class);
+        return _getMap("namedIntegers", Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Map<String, Integer> getNamedIntegers(boolean elaborate) {
-        return getMap("namedIntegers", elaborate, Integer.class);
+        return _getMap("namedIntegers", elaborate, Integer.class);
     }
 
     @Override
@@ -250,43 +250,43 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public boolean hasNamedInteger(String name) {
-        return getMap("namedIntegers", Integer.class).containsKey(name);
+        return _getMap("namedIntegers", Integer.class).containsKey(name);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public Integer getNamedInteger(String name) {
-        return get("namedIntegers", name, Integer.class);
+        return _get("namedIntegers", name, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setNamedIntegers(Map<String, Integer> namedIntegers) {
-        set("namedIntegers", namedIntegers, Integer.class);
+        _set("namedIntegers", namedIntegers, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void setNamedInteger(String name, Integer namedInteger) {
-        set("namedIntegers", name, namedInteger, Integer.class);
+        _set("namedIntegers", name, namedInteger, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
     public void removeNamedInteger(String name) {
-        remove("namedIntegers", name, Integer.class);
+        _remove("namedIntegers", name, Integer.class);
     }
 
     @Override
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")
-    protected void elaborateChildren() {
-        createScalar("description", "description", StringOverlay.factory);
-        createScalar("width", "width", IntegerOverlay.factory);
-        createScalar("height", "height", IntegerOverlay.factory);
-        createMap("entries", "entries", EntryImpl.factory, null);
-        createList("items", "items", ItemImpl.factory);
-        createList("integers", "integers", IntegerOverlay.factory);
-        createMap("namedIntegers", "namedIntegers", IntegerOverlay.factory, null);
+    protected void _elaborateChildren() {
+        _createScalar("description", "description", StringOverlay.factory);
+        _createScalar("width", "width", IntegerOverlay.factory);
+        _createScalar("height", "height", IntegerOverlay.factory);
+        _createMap("entries", "entries", EntryImpl.factory, null);
+        _createList("items", "items", ItemImpl.factory);
+        _createList("integers", "integers", IntegerOverlay.factory);
+        _createMap("namedIntegers", "namedIntegers", IntegerOverlay.factory, null);
     }
 
     @Generated("com.reprezen.jovl2.gen.CodeGenerator")

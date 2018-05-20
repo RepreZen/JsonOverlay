@@ -17,7 +17,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 
-public class NumberOverlay extends ScalarOverlay<Number> {
+public final class NumberOverlay extends ScalarOverlay<Number> {
 
 	private NumberOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(json, parent, refReg);

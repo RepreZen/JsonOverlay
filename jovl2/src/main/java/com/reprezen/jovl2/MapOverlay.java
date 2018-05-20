@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 
-public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
+public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	private final OverlayFactory<V> valueFactory;
 	private final Pattern keyPattern;

@@ -12,7 +12,7 @@ package com.reprezen.jovl2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class BooleanOverlay extends ScalarOverlay<Boolean> {
+public final class BooleanOverlay extends ScalarOverlay<Boolean> {
 
 	private BooleanOverlay(Boolean value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(value, parent, refReg);

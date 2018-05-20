@@ -41,7 +41,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.value = value;
 		this.parent = parent;
 		this.refReg = refReg;
-		this.present = !json.isMissingNode();
+		this.present = value != null;
 	}
 
 	protected JsonOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
@@ -49,7 +49,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.value = _fromJson(json);
 		this.parent = parent;
 		this.refReg = refReg;
-		this.present = value != null;
+		this.present = !json.isMissingNode();
 	}
 
 	/* package */ V _get() {

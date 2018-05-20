@@ -3,7 +3,7 @@ package com.reprezen.jovl2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
-public class NoOverlay<V> extends JsonOverlay<V> {
+public final class NoOverlay<V> extends JsonOverlay<V> {
 
 	private NoOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(MissingNode.getInstance(), parent, refReg);

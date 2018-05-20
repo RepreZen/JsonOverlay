@@ -15,7 +15,7 @@ import java.math.BigInteger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class PrimitiveOverlay extends ScalarOverlay<Object> {
+public final class PrimitiveOverlay extends ScalarOverlay<Object> {
 
 	private PrimitiveOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(json, parent, refReg);

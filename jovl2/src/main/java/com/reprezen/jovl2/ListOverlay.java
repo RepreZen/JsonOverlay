@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.collect.Lists;
 
-public class ListOverlay<V> extends JsonOverlay<List<V>> {
+public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	private final OverlayFactory<V> itemFactory;
 	private List<JsonOverlay<V>> overlays = Lists.newArrayList();

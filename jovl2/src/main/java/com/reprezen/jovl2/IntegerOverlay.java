@@ -12,7 +12,7 @@ package com.reprezen.jovl2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class IntegerOverlay extends ScalarOverlay<Integer> {
+public final class IntegerOverlay extends ScalarOverlay<Integer> {
 
 	private IntegerOverlay(Integer value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
 		super(value, parent, refReg);

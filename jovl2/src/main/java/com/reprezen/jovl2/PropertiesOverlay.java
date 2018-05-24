@@ -20,13 +20,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
 
-	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
+		super(json, parent, factory, refReg);
 		this.deferElaboration = json.isMissingNode();
 	}
 
-	protected PropertiesOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+	protected PropertiesOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
+		super(value, parent, factory, refReg);
 		elaborated = true;
 	}
 

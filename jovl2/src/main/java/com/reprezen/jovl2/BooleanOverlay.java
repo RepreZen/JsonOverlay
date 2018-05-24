@@ -15,11 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 public final class BooleanOverlay extends ScalarOverlay<Boolean> {
 
 	private BooleanOverlay(Boolean value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+		super(value, parent, factory, refReg);
 	}
 
 	private BooleanOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+		super(json, parent, factory, refReg);
 	}
 
 	@Override

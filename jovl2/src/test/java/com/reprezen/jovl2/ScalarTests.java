@@ -223,11 +223,11 @@ public class ScalarTests {
 		public static class XEnumOverlay extends EnumOverlay<XEnum> {
 
 			public XEnumOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(json, parent, refReg);
+				super(json, parent, factory, refReg);
 			}
 
 			public XEnumOverlay(XEnum value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(value, parent, refReg);
+				super(value, parent, factory, refReg);
 			}
 
 			@Override

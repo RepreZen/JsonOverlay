@@ -15,11 +15,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 public final class IntegerOverlay extends ScalarOverlay<Integer> {
 
 	private IntegerOverlay(Integer value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+		super(value, parent, factory, refReg);
 	}
 
 	private IntegerOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+		super(json, parent, factory, refReg);
 	}
 
 	@Override

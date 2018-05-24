@@ -100,12 +100,12 @@ class ImplGenerator extends TypeGenerator {
 		requireTypes(JsonNode, JsonOverlay)
 		members.addMember('''
 			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(json, parent, refReg);
+				super(json, parent, factory, refReg);
 			}
 		''')
 		members.addMember('''
 			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(«type.lcName», parent, refReg);
+				super(«type.lcName», parent, factory, refReg);
 			}
 		''')
 		return members
@@ -142,27 +142,27 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public «f.type» get«f.name»() {
-				return («f.type») get("«f.propertyName»", «f.type».class);
+				return («f.type») _get("«f.propertyName»", «f.type».class);
 			}
 		''')
 		if (f.structure == Structure.scalar && !f.isScalarType) {
 			methods.addMember('''
 				public «f.type» get«f.name»(boolean elaborate) {
-					return («f.type») get("«f.propertyName»", elaborate, «f.type».class);
+					return («f.type») _get("«f.propertyName»", elaborate, «f.type».class);
 				}
 			''')
 		}
 		if (f.isBoolean) {
 			methods.addMember('''
 				public boolean is«f.name»() {
-					Boolean bool = get("«f.propertyName»", Boolean.class);
+					Boolean bool = _get("«f.propertyName»", Boolean.class);
 					return bool != null ? bool : «f.boolDefault»;
 				}
 			''')
 		}
 		methods.addMember('''
 			public void set«f.name»(«f.type» «f.lcName») {
-				set("«f.propertyName»", «f.lcName», «f.type».class);
+				_set("«f.propertyName»", «f.lcName», «f.type».class);
 			}
 		''')
 		return methods
@@ -173,12 +173,12 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public List<«f.type»> get«f.plural»() {
-				return getList("«f.propertyName»", «f.type».class);
+				return _getList("«f.propertyName»", «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public List<«f.type»> get«f.plural»(boolean elaborate) {
-				return getList("«f.propertyName»", elaborate, «f.type».class);
+				return _getList("«f.propertyName»", elaborate, «f.type».class);
 			}
 		''')
 		methods.addMember('''
@@ -188,33 +188,33 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(int index) {
-				return get("«f.propertyName»", index, «f.type».class);
+				return _get("«f.propertyName»", index, «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.plural»(List<«f.type»> «f.lcPlural») {
-				set("«f.propertyName»", «f.lcPlural», «f.type».class);
+				_set("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(int index, «f.type» «f.lcName») {
-				set("«f.propertyName»", index, «f.lcName», «f.type».class);
+				_set("«f.propertyName»", index, «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void add«f.name»(«f.type» «f.lcName») {
-				add("«f.propertyName»", «f.lcName», «f.type».class);
+				_add("«f.propertyName»", «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void insert«f.name»(int index, «f.type» «f.lcName») {
-				insert("«f.propertyName»", index, «f.lcName», «f.type».class);
+				_insert("«f.propertyName»", index, «f.lcName», «f.type».class);
 			}
 		''')
 
 		methods.addMember('''
 			public void remove«f.name»(int index) {
-				remove("«f.propertyName»", index, «f.type».class);
+				_remove("«f.propertyName»", index, «f.type».class);
 			}
 		''')
 		return methods
@@ -225,12 +225,12 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»() {
-				return getMap("«f.propertyName»", «f.type».class);
+				return _getMap("«f.propertyName»", «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»(boolean elaborate) {
-				return getMap("«f.propertyName»", elaborate, «f.type».class);
+				return _getMap("«f.propertyName»", elaborate, «f.type».class);
 			}
 		''')
 
@@ -241,27 +241,27 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		methods.addMember('''
 			public boolean has«f.name»(String «f.keyName») {
-				return getMap("«f.propertyName»", «f.type».class).containsKey(«f.keyName»);
+				return _getMap("«f.propertyName»", «f.type».class).containsKey(«f.keyName»);
 			}
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(String «f.keyName») {
-				return get("«f.propertyName»", «f.keyName», «f.type».class);
+				return _get("«f.propertyName»", «f.keyName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.plural»(Map<String, «f.type»> «f.lcPlural») {
-				set("«f.propertyName»", «f.lcPlural», «f.type».class);
+				_set("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(String «f.keyName», «f.type» «f.lcName») {
-				set("«f.propertyName»", «f.keyName», «f.lcName», «f.type».class);
+				_set("«f.propertyName»", «f.keyName», «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void remove«f.name»(String «f.keyName») {
-				remove("«f.propertyName»", «f.keyName», «f.type».class);
+				_remove("«f.propertyName»", «f.keyName», «f.type».class);
 			}
 		''')
 		return methods
@@ -269,7 +269,7 @@ class ImplGenerator extends TypeGenerator {
 
 	def private Member getElaborateChildrenMethod(Type type) {
 		return new Member('''
-			protected void elaborateChildren() {
+			protected void _elaborateChildren() {
 				«FOR f : type.fields.values.filter[!it.noImpl]»
 					«f.elaborateStatement»
 				«ENDFOR»
@@ -280,11 +280,11 @@ class ImplGenerator extends TypeGenerator {
 	def private String getElaborateStatement(Field f) {
 		requireTypes(f.implType)
 		return switch (f.structure) {
-			case scalar: '''createScalar("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
-			case collection: '''createList("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
+			case scalar: '''_createScalar("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
+			case collection: '''_createList("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
 			case map: {
 				val pat = if (f.keyPattern !== null) '''"«f.keyPattern»"''' else "null"
-				'''createMap("«f.propertyName»", "«f.parentPath»", «f.implType».factory, «pat»);'''
+				'''_createMap("«f.propertyName»", "«f.parentPath»", «f.implType».factory, «pat»);'''
 			}
 		}
 	}

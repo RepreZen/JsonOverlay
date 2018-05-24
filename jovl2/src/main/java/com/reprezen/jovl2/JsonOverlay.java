@@ -12,7 +12,6 @@ package com.reprezen.jovl2;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,22 +31,24 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	protected JsonOverlay<?> parent;
 	protected JsonNode json;
 	protected final ReferenceRegistry refReg;
-	protected List<Integer> jsonPositions = null;
+	protected final OverlayFactory<V> factory;
 	private String pathInParent = null;
 	private boolean present;
 
-	protected JsonOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+	protected JsonOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
 		this.json = null;
 		this.value = value;
 		this.parent = parent;
+		this.factory = factory;
 		this.refReg = refReg;
 		this.present = value != null;
 	}
 
-	protected JsonOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+	protected JsonOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
 		this.json = json;
 		this.value = _fromJson(json);
 		this.parent = parent;
+		this.factory = factory;
 		this.refReg = refReg;
 		this.present = !json.isMissingNode();
 	}

@@ -14,14 +14,16 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	private final OverlayFactory<V> itemFactory;
 	private List<JsonOverlay<V>> overlays = Lists.newArrayList();
 
-	private ListOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> itemFactory, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
-		this.itemFactory = itemFactory;
+	private ListOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
+			ReferenceRegistry refReg) {
+		super(json, parent, factory, refReg);
+		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
 	}
 
-	private ListOverlay(List<V> value, JsonOverlay<?> parent, OverlayFactory<V> itemFactory, ReferenceRegistry refReg) {
-		super(Lists.newArrayList(value), parent, refReg);
-		this.itemFactory = itemFactory;
+	private ListOverlay(List<V> value, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
+			ReferenceRegistry refReg) {
+		super(Lists.newArrayList(value), parent, factory, refReg);
+		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
 	}
 
 	@Override
@@ -129,12 +131,16 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 		@Override
 		protected JsonOverlay<List<V>> _create(List<V> value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ListOverlay<V>(value, parent, itemFactory, refReg);
+			return new ListOverlay<V>(value, parent, this, refReg);
 		}
 
 		@Override
 		protected JsonOverlay<List<V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ListOverlay<V>(json, parent, itemFactory, refReg);
+			return new ListOverlay<V>(json, parent, this, refReg);
+		}
+
+		public OverlayFactory<V> getItemFactory() {
+			return itemFactory;
 		}
 	}
 }

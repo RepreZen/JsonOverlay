@@ -18,11 +18,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 public final class PrimitiveOverlay extends ScalarOverlay<Object> {
 
 	private PrimitiveOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+		super(json, parent, factory, refReg);
 	}
 
 	private PrimitiveOverlay(Object value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+		super(value, parent, factory, refReg);
 	}
 
 	@Override

@@ -14,25 +14,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public final class StringOverlay extends ScalarOverlay<String> {
 
-    private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(json, parent, refReg);
-    }
+	private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+		super(json, parent, factory, refReg);
+	}
 
-    private StringOverlay(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(value, parent, refReg);
-    }
+	private StringOverlay(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+		super(value, parent, factory, refReg);
+	}
 
-    @Override
-    protected String _fromJson(JsonNode json) {
-        return json.isTextual() ? json.textValue() : null;
-    }
+	@Override
+	protected String _fromJson(JsonNode json) {
+		return json.isTextual() ? json.textValue() : null;
+	}
 
-    @Override
-    protected JsonNode _toJsonInternal(SerializationOptions options) {
-        return value != null ? _jsonScalar(value) : _jsonMissing();
-    }
+	@Override
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonScalar(value) : _jsonMissing();
+	}
 
-    public static OverlayFactory<String> factory = new OverlayFactory<String>() {
+	public static OverlayFactory<String> factory = new OverlayFactory<String>() {
 
 		@Override
 		protected Class<StringOverlay> getOverlayClass() {

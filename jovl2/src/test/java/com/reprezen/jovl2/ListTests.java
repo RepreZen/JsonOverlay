@@ -15,18 +15,18 @@ public class ListTests extends Assert {
 	private OverlayFactory<List<Integer>> factory = ListOverlay.getFactory(IntegerOverlay.factory);
 
 	private final ReferenceRegistry refReg = new ReferenceRegistry();
-	
+
 	private final JsonNodeFactory jfac = JsonNodeFactory.instance;
 
 	@Test
 	public void testListFromValues() {
 		doChecks((ListOverlay<Integer>) factory.create(data, null, refReg));
 	}
-	
+
 	@Test
 	public void testListFromJson() {
 		ArrayNode json = jfac.arrayNode();
-		for (int i: data) {
+		for (int i : data) {
 			json.add(i);
 		}
 		doChecks((ListOverlay<Integer>) factory.create(json, null, refReg));
@@ -55,15 +55,15 @@ public class ListTests extends Assert {
 		overlay.set(0, 0);
 		// now 0,2..4,6..8
 		checkValueAt(overlay, 0, 0);
-		overlay.insert(1,  1);
+		overlay.insert(1, 1);
 		// now 0..4,6..8
 		checkValueAt(overlay, 1, 1);
-		overlay.insert(5,  5);
+		overlay.insert(5, 5);
 		// now 0..8
 		overlay.add(9);
 		// now 0..9
 		assertEquals(10, overlay.size());
-		for (int i =0 ; i < 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			checkValueAt(overlay, i, i);
 		}
 	}

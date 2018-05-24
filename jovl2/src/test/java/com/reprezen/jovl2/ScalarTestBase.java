@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 public abstract class ScalarTestBase<V> extends Assert {
 
-
 	private ReferenceRegistry refReg = new ReferenceRegistry();
 	private OverlayFactory<V> factory;
 	protected static JsonNodeFactory jfac = JsonNodeFactory.instance;

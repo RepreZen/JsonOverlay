@@ -17,18 +17,22 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	private final Pattern keyPattern;
 	private Map<String, JsonOverlay<V>> overlays = Maps.newLinkedHashMap();
 
-	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> valueFactory, String keyPattern,
+	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
 			ReferenceRegistry refReg) {
-		super(json, parent, refReg);
-		this.valueFactory = valueFactory;
+		super(json, parent, factory, refReg);
+		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
+		this.valueFactory = mapOverlayFactory.getValueFactory();
+		String keyPattern = mapOverlayFactory.getKeyPattern();
 		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
 	}
 
-	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<V> valueFactory,
+	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
 			ReferenceRegistry refReg) {
-		super(Maps.newLinkedHashMap(value), parent, refReg);
-		this.valueFactory = valueFactory;
-		this.keyPattern = null;
+		super(Maps.newLinkedHashMap(value), parent, factory, refReg);
+		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
+		this.valueFactory = mapOverlayFactory.getValueFactory();
+		String keyPattern = mapOverlayFactory.getKeyPattern();
+		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
 	}
 
 	@Override
@@ -134,12 +138,20 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		@Override
 		protected JsonOverlay<Map<String, V>> _create(Map<String, V> value, JsonOverlay<?> parent,
 				ReferenceRegistry refReg) {
-			return new MapOverlay<V>(value, parent, valueFactory, refReg);
+			return new MapOverlay<V>(value, parent, this, refReg);
 		}
 
 		@Override
 		protected JsonOverlay<Map<String, V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new MapOverlay<V>(json, parent, valueFactory, keyPattern, refReg);
+			return new MapOverlay<V>(json, parent, this, refReg);
+		}
+
+		public String getKeyPattern() {
+			return keyPattern;
+		}
+
+		public OverlayFactory<V> getValueFactory() {
+			return valueFactory;
 		}
 	}
 }

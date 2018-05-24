@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.reprezen.jovl2.model.TestModelParser;
 import com.reprezen.jovl2.model.impl.TestModelImpl;
+import com.reprezen.jovl2.model.intf.Color;
 import com.reprezen.jovl2.model.intf.TestModel;
 
 public class ApiTests extends Assert {
@@ -31,6 +32,11 @@ public class ApiTests extends Assert {
 		assertNull(model.getHeight());
 		model.setHeight(20);
 		assertEquals(Integer.valueOf(20), model.getHeight());
+		assertEquals(Color.GREEN, model.getColor());
+		model.setColor(Color.BLUE);
+		assertEquals(Color.BLUE, model.getColor());
+		model.setColor(null);
+		assertNull(model.getColor());
 		assertEquals(Arrays.asList("A", "B"), getEntryKeys());
 	}
 
@@ -68,7 +74,7 @@ public class ApiTests extends Assert {
 	@Test
 	public void testPathInParent() {
 		assertEquals("description", Overlay.of((TestModelImpl) model, "description", String.class).getPathInParent());
-		assertNull(Overlay.of(model.getItems(),0).getPathInParent());
+		assertNull(Overlay.of(model.getItems(), 0).getPathInParent());
 		assertEquals("A", Overlay.of(model.getEntries(), "A").getPathInParent());
 	}
 

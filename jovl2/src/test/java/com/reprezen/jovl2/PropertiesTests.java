@@ -65,9 +65,9 @@ public class PropertiesTests extends Assert {
 				END);
 		assertEquals(Integer.valueOf(10), foo.getNumField());
 		assertEquals("hello", foo.getStringField());
-		assertEquals(Lists.newArrayList(10,20,30), foo.getListField());
-		assertEquals(Maps.toMap(Arrays.asList("a","b"), s->1), foo.getMapField());
-		assertEquals(Maps.toMap(Arrays.asList("x-a"),  s->1), foo.getRootMap());
+		assertEquals(Lists.newArrayList(10, 20, 30), foo.getListField());
+		assertEquals(Maps.toMap(Arrays.asList("a", "b"), s -> 1), foo.getMapField());
+		assertEquals(Maps.toMap(Arrays.asList("x-a"), s -> 1), foo.getRootMap());
 		checkPropertyNames(foo, "num", "list", "string", "map", "x-a");
 	}
 
@@ -141,11 +141,11 @@ public class PropertiesTests extends Assert {
 	public static class Foo extends PropertiesOverlay<Foo> {
 
 		private Foo(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			super(json, parent, refReg);
+			super(json, parent, factory, refReg);
 		}
 
 		private Foo(Foo value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			super(value, parent, refReg);
+			super(value, parent, factory, refReg);
 		}
 
 		@Override

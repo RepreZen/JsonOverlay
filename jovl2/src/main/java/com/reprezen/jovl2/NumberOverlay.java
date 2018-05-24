@@ -20,11 +20,11 @@ import com.google.common.collect.Maps;
 public final class NumberOverlay extends ScalarOverlay<Number> {
 
 	private NumberOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+		super(json, parent, factory, refReg);
 	}
 
 	private NumberOverlay(Number value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+		super(value, parent, factory, refReg);
 	}
 
 	@Override

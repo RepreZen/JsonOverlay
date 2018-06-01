@@ -37,7 +37,7 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 
 	@Override
 	@Generated("com.reprezen.jovl2.gen.CodeGenerator")
-	protected void _elaborateChildren() {
+	protected void _elaborateJson() {
 		_createScalar("title", "title", StringOverlay.factory);
 	}
 

@@ -52,6 +52,17 @@ public class MapTests extends Assert {
 		// now complete again, but A, E, and J are final keys
 		assertEquals(10, overlay.size());
 		checkKeys(overlay, "B", "C", "D", "F", "G", "H", "I", "A", "E", "J");
+		MapOverlay<Integer> copy = (MapOverlay<Integer>) overlay._copy();
+		assertFalse("Copy operation should yield different object", overlay == copy);
+		assertEquals(overlay, copy);
+		for (String key : overlay.value.keySet()) {
+			assertFalse("Copy operation should create copy of each map entry",
+					overlay._getOverlay(key) == copy._getOverlay(key));
+		}
+		copy.remove("B");
+		copy.set("B", 1);
+		assertEquals(overlay, copy);
+		assertFalse("Key order difference not detected", overlay.equals(copy, true));
 	}
 
 	private void checkKeys(MapOverlay<Integer> overlay, String... keys) {

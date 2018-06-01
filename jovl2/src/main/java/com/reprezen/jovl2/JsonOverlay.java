@@ -69,10 +69,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.present = value != null;
 	}
 
-	/* packkage */ boolean _isPresent() {
+	/* package */ JsonOverlay<V> _copy() {
+		return factory.create(_get(), null, refReg);
+	}
+
+	/* package */ boolean _isPresent() {
 		return present;
 	}
-	
+
 	/* package */ JsonOverlay<?> _getParent() {
 		return parent;
 	}
@@ -113,6 +117,21 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	public String toString() {
 		return _toJson().toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof JsonOverlay) {
+			JsonOverlay<?> castObj = (JsonOverlay<?>) obj;
+			return value != null ? value.equals(castObj.value) : castObj.value == null;
+		} else {
+			return false; // obj is null or not an overlay object
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return value != null ? value.hashCode() : 0;
 	}
 
 	// some utility classes for overlays

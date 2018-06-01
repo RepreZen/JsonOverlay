@@ -31,6 +31,7 @@ public abstract class ScalarTestBase<V> extends Assert {
 		JsonOverlay<V> ovl = (JsonOverlay<V>) factory.create(value, null, refReg);
 		assertTrue(factory.getOverlayClass().isAssignableFrom(ovl.getClass()));
 		assertEquals(value, ovl._get());
+		testCopy(ovl);
 	}
 
 	@Test
@@ -54,6 +55,13 @@ public abstract class ScalarTestBase<V> extends Assert {
 		JsonOverlay<V> ovl = (JsonOverlay<V>) factory.create(json, null, refReg);
 		assertTrue(factory.getOverlayClass().isAssignableFrom(ovl.getClass()));
 		assertEquals(val, ovl._get());
+		testCopy(ovl);
 	}
-
+	
+	public void testCopy(JsonOverlay<V> ovl) {
+		JsonOverlay<V> copy = ovl._copy();
+		assertFalse("Copy operation should yield different object", ovl == copy);
+		assertEquals(ovl, copy);
+		assertEquals(ovl._get(), copy._get());
+	}
 }

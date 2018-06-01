@@ -66,6 +66,12 @@ public class ListTests extends Assert {
 		for (int i = 0; i < 10; i++) {
 			checkValueAt(overlay, i, i);
 		}
+		ListOverlay<Integer> copy = (ListOverlay<Integer>) overlay._copy();
+		assertFalse("Copy operation should create different object", overlay == copy);
+		assertEquals(overlay, copy);
+		for (int i = 0; i < overlay.size(); i++) {
+			assertFalse("Copy operation should create copies of list overlay items", overlay._getOverlay(i) == copy._getOverlay(i));
+		}
 	}
 
 	private void checkValueAt(ListOverlay<Integer> overlay, int index, int value) {

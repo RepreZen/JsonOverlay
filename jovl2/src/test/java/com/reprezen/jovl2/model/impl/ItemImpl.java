@@ -37,7 +37,7 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 
 	@Override
 	@Generated("com.reprezen.jovl2.gen.CodeGenerator")
-	protected void _elaborateChildren() {
+	protected void _elaborateJson() {
 		_createScalar("title", "title", StringOverlay.factory);
 	}
 

@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,21 +21,26 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	private List<PropertyLocator> childOrder = Lists.newArrayList();
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
+	private V elaborationValue = null;
 
-	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
+	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory,
+			ReferenceRegistry refReg) {
 		super(json, parent, factory, refReg);
 		this.deferElaboration = json.isMissingNode();
 	}
 
 	protected PropertiesOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
 		super(value, parent, factory, refReg);
-		elaborated = true;
+		this.elaborationValue = value;
 	}
 
 	protected <T> T _get(String name, Class<T> cls) {
 		return _get(name, true, cls);
 	}
-	
+
+	/* package */ List<String> _getPropertyNames() {
+		return childOrder.stream().map(locator -> locator.getName()).collect(Collectors.toList());
+	}
 	/* package */ <T> JsonOverlay<?> _getOverlay(String name) {
 		return children.get(name);
 	}
@@ -42,7 +49,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		JsonOverlay<?> overlay = children.get(name);
 		return overlay != null && !overlay.json.isMissingNode();
 	}
-	
+
 	protected <T> T _get(String name, boolean elaborate, Class<T> cls) {
 		if (elaborate) {
 			_ensureElaborated();
@@ -156,12 +163,28 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	@Override
 	protected void _elaborate() {
-		_elaborateChildren();
+		if (elaborationValue != null) {
+			_elaborateValue();
+		} else {
+			_elaborateJson();
+		}
 		Collections.sort(childOrder);
 		elaborated = true;
 	}
 
-	protected abstract void _elaborateChildren();
+	protected abstract void _elaborateJson();
+
+	private void _elaborateValue() {
+		@SuppressWarnings("unchecked")
+		PropertiesOverlay<V> overlay = (PropertiesOverlay<V>) elaborationValue;
+		children.clear();
+		for (Entry<String, JsonOverlay<?>> entry : overlay.children.entrySet()) {
+			children.put(entry.getKey(), entry.getValue()._copy());
+		}
+		childOrder.clear();
+		childOrder.addAll(overlay.childOrder);
+		this.elaborationValue = null;
+	}
 
 	@Override
 	protected boolean _isElaborated() {
@@ -176,7 +199,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return (ListOverlay<X>) _addChild(name, path, ListOverlay.getFactory(itemFactory));
 	}
 
-	protected <X> MapOverlay<X> _createMap(String name, String path, OverlayFactory<X> valueFactory, String keyPattern) {
+	protected <X> MapOverlay<X> _createMap(String name, String path, OverlayFactory<X> valueFactory,
+			String keyPattern) {
 		return (MapOverlay<X>) _addChild(name, path, MapOverlay.getFactory(valueFactory, keyPattern));
 	}
 
@@ -244,6 +268,24 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	protected JsonNode _fixJson(JsonNode json) {
 		return json;
+	}
+
+	public boolean equals(Object obj) {
+		return equals(obj, false);
+	}
+
+	public boolean equals(Object obj, boolean sameOrder) {
+		if (obj instanceof PropertiesOverlay<?>) {
+			PropertiesOverlay<?> castObj = (PropertiesOverlay<?>) obj;
+			return children.equals(castObj.children) && (!sameOrder || childOrder.equals(castObj.childOrder));
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
 	}
 
 	protected static class PropertyLocator implements Comparable<PropertyLocator> {

@@ -114,6 +114,36 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		return overlays.size();
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return equals(obj, false);
+	}
+
+	public boolean equals(Object obj, boolean sameOrder) {
+		if (obj instanceof MapOverlay<?>) {
+			MapOverlay<?> castObj = (MapOverlay<?>) obj;
+			return overlays.equals(castObj.overlays) && (!sameOrder || checkOrder(castObj));
+		}
+		return false;
+	}
+
+	private boolean checkOrder(MapOverlay<?> other) {
+		Iterator<String> myKeys = overlays.keySet().iterator();
+		Iterator<String> theirKeys = other.overlays.keySet().iterator();
+		while (myKeys.hasNext() && theirKeys.hasNext()) {
+			if (!myKeys.next().equals(theirKeys.next())) {
+				return false;
+			}
+		}
+		return !myKeys.hasNext() && !theirKeys.hasNext();
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
+	}
+
 	public static <V> OverlayFactory<Map<String, V>> getFactory(OverlayFactory<V> valueFactory, String keyPattern) {
 		return new MapOverlayFactory<V>(valueFactory, keyPattern);
 	}

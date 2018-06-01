@@ -69,6 +69,17 @@ public class PropertiesTests extends Assert {
 		assertEquals(Maps.toMap(Arrays.asList("a", "b"), s -> 1), foo.getMapField());
 		assertEquals(Maps.toMap(Arrays.asList("x-a"), s -> 1), foo.getRootMap());
 		checkPropertyNames(foo, "num", "list", "string", "map", "x-a");
+		Foo copy = (Foo) foo._copy();
+		assertFalse("Copy operation should create different object", foo == copy);
+		assertEquals(foo, copy);
+		for (String name: foo._getPropertyNames()) {
+			assertFalse("Copy operation should create copy of each property value", foo._getOverlay(name) == copy._getOverlay(name));
+		}
+		// foo2 has same content as foo, but numField comes last instead of first
+		Foo foo2 = createFooWithJson(10, LIST, 10, 20, 30, END, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
+				END);
+		assertEquals(foo, foo2);
+		assertFalse("Property order difference not detected", foo.equals(foo2, true));
 	}
 
 	@Test
@@ -149,7 +160,7 @@ public class PropertiesTests extends Assert {
 		}
 
 		@Override
-		protected void _elaborateChildren() {
+		protected void _elaborateJson() {
 			_createScalar("stringField", "string", StringOverlay.factory);
 			_createScalar("numField", "num", IntegerOverlay.factory);
 			_createList("listField", "list", IntegerOverlay.factory);

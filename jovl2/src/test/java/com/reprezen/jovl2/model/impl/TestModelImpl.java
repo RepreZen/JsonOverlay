@@ -297,7 +297,7 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 
 	@Override
 	@Generated("com.reprezen.jovl2.gen.CodeGenerator")
-	protected void _elaborateChildren() {
+	protected void _elaborateJson() {
 		_createScalar("description", "description", StringOverlay.factory);
 		_createScalar("width", "width", IntegerOverlay.factory);
 		_createScalar("height", "height", IntegerOverlay.factory);

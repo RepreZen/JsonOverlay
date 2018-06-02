@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public final class StringOverlay extends ScalarOverlay<String> {
 
-	private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+	private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
-	private StringOverlay(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, factory, refReg);
+	private StringOverlay(String value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 	}
 
 	@Override
@@ -40,13 +40,13 @@ public final class StringOverlay extends ScalarOverlay<String> {
 		}
 
 		@Override
-		public StringOverlay _create(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new StringOverlay(value, parent, refReg);
+		public StringOverlay _create(String value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new StringOverlay(value, parent, refMgr);
 		}
 
 		@Override
-		public StringOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new StringOverlay(json, parent, refReg);
+		public StringOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new StringOverlay(json, parent, refMgr);
 		}
 
 	};

@@ -14,11 +14,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class ScalarOverlay<V> extends JsonOverlay<V> {
 
-	protected ScalarOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+	protected ScalarOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
-	protected ScalarOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
-		super(value, parent, factory, refReg);
+	protected ScalarOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 	}
 }

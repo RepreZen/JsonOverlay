@@ -19,7 +19,7 @@ public class Overlay<V> {
 	}
 
 	public static <X> Overlay<Map<String, X>> of(MapOverlay<X> overlay) {
-		return new Overlay<Map<String, X>>((JsonOverlay<Map<String, X>>) overlay);
+		return new Overlay<Map<String, X>>(overlay);
 	}
 
 	public static <V> Overlay<Map<String, V>> of(Map<String, V> map) {
@@ -29,7 +29,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> Overlay<List<V>> of(ListOverlay<V> overlay) {
-		return new Overlay<List<V>>((JsonOverlay<List<V>>) overlay);
+		return new Overlay<List<V>>(overlay);
 	}
 
 	public static <V> Overlay<List<V>> of(List<V> list) {
@@ -102,7 +102,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> V get(JsonOverlay<V> overlay) {
-		return ((JsonOverlay<V>) overlay)._get();
+		return overlay._get();
 	}
 
 	// public JsonOverlay<?> find(JsonPointer path) {
@@ -127,7 +127,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> JsonNode toJson(JsonOverlay<V> overlay) {
-		return ((JsonOverlay<V>) overlay)._toJson();
+		return overlay._toJson();
 	}
 
 	// public JsonNode toJson(SerializationOptions options) {
@@ -153,7 +153,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> boolean isPresent(JsonOverlay<V> overlay) {
-		return ((JsonOverlay<V>) overlay)._isPresent();
+		return overlay._isPresent();
 	}
 
 	public boolean isElaborated() {
@@ -165,7 +165,7 @@ public class Overlay<V> {
 	}
 
 	public JsonOverlay<?> getParent() {
-		return (JsonOverlay<?>) overlay._getParent();
+		return overlay._getParent();
 	}
 
 	public static <V> JsonOverlay<?> getParent(JsonOverlay<V> overlay) {
@@ -246,65 +246,70 @@ public class Overlay<V> {
 	// return new Overlay<V>(overlay).getPropertyNames();
 	// }
 
-	// public boolean isReference(String key) {
-	// return getReference(key) != null;
-	// }
+	public boolean isReference(String key) {
+		return getReference(key) != null;
+	}
 
-	// public static <V> boolean isReference(JsonOverlay<V> overlay, String key) {
-	// return new Overlay<V>(overlay).isReference(key);
-	// }
+	public static <V> boolean isReference(JsonOverlay<V> overlay, String key) {
+		return new Overlay<V>(overlay).isReference(key);
+	}
 
-	// public boolean isReference(int index) {
-	// return getReference(index) != null;
-	// }
+	public boolean isReference(int index) {
+		return getReference(index) != null;
+	}
 
-	// public static <V> boolean isReference(JsonOverlay<V> overlay, int index) {
-	// return new Overlay<V>(overlay).getReference(index) != null;
-	// }
+	public static <V> boolean isReference(JsonOverlay<V> overlay, int index) {
+		return new Overlay<V>(overlay).getReference(index) != null;
+	}
 
-	// public Reference getReference(String key) {
-	// if (overlay instanceof PropertiesOverlay) {
-	// return getPropertyReference(key);
-	// } else if (overlay instanceof MapOverlay) {
-	// return getMapReference(key);
-	// } else {
-	// return null;
-	// }
-	// }
+	public Reference getReference(String key) {
+		if (overlay instanceof PropertiesOverlay) {
+			return getPropertyReference(key);
+		} else if (overlay instanceof MapOverlay) {
+			return getMapReference(key);
+		} else {
+			return null;
+		}
+	}
 
-	// public static <V> Reference getReference(JsonOverlay<V> overlay, String key)
-	// {
-	// return new Overlay<V>(overlay).getReference(key);
-	// }
+	public static <V> Reference getReference(JsonOverlay<V> overlay, String key) {
+		return new Overlay<V>(overlay).getReference(key);
+	}
 
-	// public Reference getReference(int index) {
-	// if (overlay instanceof ListOverlay) {
-	// return getListReference(index);
-	// } else {
-	// return null;
-	// }
-	// }
+	public Reference getReference(int index) {
+		if (overlay instanceof ListOverlay) {
+			return getListReference(index);
+		} else {
+			return null;
+		}
+	}
 
-	// public static <V> Reference getReference(JsonOverlay<V> overlay, int index) {
-	// return new Overlay<V>(overlay).getReference(index);
-	// }
+	public static <V> Reference getReference(JsonOverlay<V> overlay, int index) {
+		return new Overlay<V>(overlay).getReference(index);
+	}
 
-	// private Reference getPropertyReference(String name) {
-	// PropertiesOverlay<V> propsOverlay = (PropertiesOverlay<V>) overlay;
-	// return propsOverlay._getReference(name);
-	// }
+	private Reference getPropertyReference(String name) {
+		PropertiesOverlay<V> propsOverlay = (PropertiesOverlay<V>) overlay;
+		return getReference(propsOverlay._getOverlay(name));
 
-	// private Reference getMapReference(String key) {
-	// @SuppressWarnings("unchecked")
-	// MapOverlay<V> mapOverlay = (MapOverlay<V>) overlay;
-	// return mapOverlay.getReference(key);
-	// }
+	}
 
-	// private Reference getListReference(int index) {
-	// @SuppressWarnings("unchecked")
-	// ListOverlay<V> listOverlay = (ListOverlay<V>) overlay;
-	// return listOverlay.getReference(index);
-	// }
+	private Reference getMapReference(String key) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<V> mapOverlay = (MapOverlay<V>) overlay;
+		return getReference(mapOverlay._getOverlay(key));
+	}
+
+	private Reference getListReference(int index) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<V> listOverlay = (ListOverlay<V>) overlay;
+		return getReference(listOverlay._getOverlay(index));
+	}
+
+	private Reference getReference(JsonOverlay<?> overlay) {
+		RefOverlay<?> refOverlay = overlay != null ? overlay._getReference() : null;
+		return refOverlay != null ? refOverlay._getReference() : null;
+	}
 
 	private static JsonOverlay<?> getSidebandOverlay(Object o) {
 		try {

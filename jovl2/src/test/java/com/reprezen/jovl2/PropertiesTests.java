@@ -20,7 +20,7 @@ import com.google.common.collect.Queues;
 public class PropertiesTests extends Assert {
 
 	private static JsonNodeFactory jfac = JsonNodeFactory.instance;
-	private ReferenceRegistry refReg = new ReferenceRegistry();
+	private ReferenceManager refMgr = new ReferenceManager();
 	private final Object LIST = new Object();
 	private final Object MAP = new Object();
 	private final Object ROOT_MAP = new Object();
@@ -72,8 +72,9 @@ public class PropertiesTests extends Assert {
 		Foo copy = (Foo) foo._copy();
 		assertFalse("Copy operation should create different object", foo == copy);
 		assertEquals(foo, copy);
-		for (String name: foo._getPropertyNames()) {
-			assertFalse("Copy operation should create copy of each property value", foo._getOverlay(name) == copy._getOverlay(name));
+		for (String name : foo._getPropertyNames()) {
+			assertFalse("Copy operation should create copy of each property value",
+					foo._getOverlay(name) == copy._getOverlay(name));
 		}
 		// foo2 has same content as foo, but numField comes last instead of first
 		Foo foo2 = createFooWithJson(10, LIST, 10, 20, 30, END, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
@@ -121,7 +122,7 @@ public class PropertiesTests extends Assert {
 				json.setAll(gatherMap(queue));
 			}
 		}
-		return (Foo) Foo.factory.create(json, null, refReg);
+		return (Foo) Foo.factory.create(json, null, refMgr);
 	}
 
 	private ArrayNode gatherList(Deque<Object> queue) {
@@ -151,12 +152,12 @@ public class PropertiesTests extends Assert {
 
 	public static class Foo extends PropertiesOverlay<Foo> {
 
-		private Foo(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			super(json, parent, factory, refReg);
+		private Foo(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			super(json, parent, factory, refMgr);
 		}
 
-		private Foo(Foo value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			super(value, parent, factory, refReg);
+		private Foo(Foo value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			super(value, parent, factory, refMgr);
 		}
 
 		@Override
@@ -169,7 +170,7 @@ public class PropertiesTests extends Assert {
 		}
 
 		public String getStringField() {
-			return (String) _get("stringField", String.class);
+			return _get("stringField", String.class);
 		}
 
 		public void setStringField(String value) {
@@ -177,7 +178,7 @@ public class PropertiesTests extends Assert {
 		}
 
 		public Integer getNumField() {
-			return (Integer) _get("numField", Integer.class);
+			return _get("numField", Integer.class);
 		}
 
 		public void setNumField(Integer value) {
@@ -204,13 +205,13 @@ public class PropertiesTests extends Assert {
 			}
 
 			@Override
-			protected JsonOverlay<Foo> _create(Foo value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				return new Foo(value, parent, refReg);
+			protected JsonOverlay<Foo> _create(Foo value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				return new Foo(value, parent, refMgr);
 			}
 
 			@Override
-			protected JsonOverlay<Foo> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				return new Foo(json, parent, refReg);
+			protected JsonOverlay<Foo> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				return new Foo(json, parent, refMgr);
 			}
 
 		};

@@ -18,8 +18,8 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	private Map<String, JsonOverlay<V>> overlays = Maps.newLinkedHashMap();
 
 	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
-			ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+			ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
 		this.valueFactory = mapOverlayFactory.getValueFactory();
 		String keyPattern = mapOverlayFactory.getKeyPattern();
@@ -27,8 +27,8 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
-			ReferenceRegistry refReg) {
-		super(Maps.newLinkedHashMap(value), parent, factory, refReg);
+			ReferenceManager refMgr) {
+		super(Maps.newLinkedHashMap(value), parent, factory, refMgr);
 		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
 		this.valueFactory = mapOverlayFactory.getValueFactory();
 		String keyPattern = mapOverlayFactory.getKeyPattern();
@@ -57,7 +57,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	@Override
-	protected void _elaborate() {
+	protected void _elaborate(boolean atCreation) {
 		if (json != null) {
 			fillWithJson();
 		} else {
@@ -71,7 +71,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		for (Iterator<Entry<String, JsonNode>> iter = json.fields(); iter.hasNext();) {
 			Entry<String, JsonNode> entry = iter.next();
 			if (keyPattern == null || keyPattern.matcher(entry.getKey()).matches()) {
-				JsonOverlay<V> valOverlay = valueFactory.create(entry.getValue(), this, refReg);
+				JsonOverlay<V> valOverlay = valueFactory.create(entry.getValue(), this, refMgr);
 				overlays.put(entry.getKey(), valOverlay);
 				valOverlay._setPathInParent(entry.getKey());
 				value.put(entry.getKey(), valOverlay._get(false));
@@ -89,7 +89,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	private JsonOverlay<V> valueOverlayFor(V val) {
-		return valueFactory.create(val, this, refReg);
+		return valueFactory.create(val, this, refMgr);
 	}
 
 	public V get(String key) {
@@ -158,6 +158,11 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		}
 
 		@Override
+		public String getSignature() {
+			return String.format("map[%s|%s]", valueFactory.getSignature(), keyPattern != null ? keyPattern : "*");
+		}
+
+		@Override
 		protected Class<? extends JsonOverlay<? super Map<String, V>>> getOverlayClass() {
 			Class<?> overlayClass = MapOverlay.class;
 			@SuppressWarnings("unchecked")
@@ -167,13 +172,13 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 		@Override
 		protected JsonOverlay<Map<String, V>> _create(Map<String, V> value, JsonOverlay<?> parent,
-				ReferenceRegistry refReg) {
-			return new MapOverlay<V>(value, parent, this, refReg);
+				ReferenceManager refMgr) {
+			return new MapOverlay<V>(value, parent, this, refMgr);
 		}
 
 		@Override
-		protected JsonOverlay<Map<String, V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new MapOverlay<V>(json, parent, this, refReg);
+		protected JsonOverlay<Map<String, V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new MapOverlay<V>(json, parent, this, refMgr);
 		}
 
 		public String getKeyPattern() {

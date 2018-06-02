@@ -61,7 +61,7 @@ import com.reprezen.jovl2.OverlayFactory;
 import com.reprezen.jovl2.Primitive;
 import com.reprezen.jovl2.PrimitiveOverlay;
 import com.reprezen.jovl2.PropertiesOverlay;
-import com.reprezen.jovl2.ReferenceRegistry;
+import com.reprezen.jovl2.ReferenceManager;
 import com.reprezen.jovl2.StringOverlay;
 import com.reprezen.jovl2.gen.SimpleJavaGenerator.Member;
 import com.reprezen.jovl2.gen.TypeData.Field;
@@ -189,7 +189,7 @@ public abstract class TypeGenerator {
 				IModelPart.class, //
 				PropertiesOverlay.class, //
 				OverlayFactory.class, //
-				ReferenceRegistry.class, //
+				ReferenceManager.class, //
 				Inject.class, //
 				StringOverlay.class, //
 				IntegerOverlay.class, //

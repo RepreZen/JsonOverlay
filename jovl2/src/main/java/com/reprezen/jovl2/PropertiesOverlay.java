@@ -24,13 +24,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	private V elaborationValue = null;
 
 	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory,
-			ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+			ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 		this.deferElaboration = json.isMissingNode();
 	}
 
-	protected PropertiesOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceRegistry refReg) {
-		super(value, parent, factory, refReg);
+	protected PropertiesOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 		this.elaborationValue = value;
 	}
 
@@ -41,6 +41,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	/* package */ List<String> _getPropertyNames() {
 		return childOrder.stream().map(locator -> locator.getName()).collect(Collectors.toList());
 	}
+
 	/* package */ <T> JsonOverlay<?> _getOverlay(String name) {
 		return children.get(name);
 	}
@@ -73,13 +74,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	protected <T> List<T> _getList(String name, Class<T> cls) {
 		@SuppressWarnings("unchecked")
-		List<T> list = (List<T>) _get(name, List.class);
+		List<T> list = _get(name, List.class);
 		return list;
 	}
 
 	protected <T> List<T> _getList(String name, boolean elaborate, Class<T> cls) {
 		@SuppressWarnings("unchecked")
-		List<T> list = (List<T>) _get(name, elaborate, List.class);
+		List<T> list = _get(name, elaborate, List.class);
 		return list;
 	}
 
@@ -121,13 +122,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	protected <T> Map<String, T> _getMap(String name, Class<T> cls) {
 		@SuppressWarnings("unchecked")
-		Map<String, T> map = (Map<String, T>) _get(name, Map.class);
+		Map<String, T> map = _get(name, Map.class);
 		return map;
 	}
 
 	protected <T> Map<String, T> _getMap(String name, boolean elaborate, Class<T> cls) {
 		@SuppressWarnings("unchecked")
-		Map<String, T> map = (Map<String, T>) _get(name, elaborate, Map.class);
+		Map<String, T> map = _get(name, elaborate, Map.class);
 		return map;
 	}
 
@@ -155,14 +156,11 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		overlay.remove(key);
 	}
 
-	protected void _maybeElaborateAtCreation() {
-		if (!deferElaboration) {
-			_ensureElaborated();
-		}
-	}
-
 	@Override
-	protected void _elaborate() {
+	protected void _elaborate(boolean atCreation) {
+		if (atCreation && deferElaboration) {
+			return;
+		}
 		if (elaborationValue != null) {
 			_elaborateValue();
 		} else {
@@ -207,7 +205,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	private <X> JsonOverlay<X> _addChild(String name, String path, OverlayFactory<X> factory) {
 		JsonPointer pointer = JsonPointer.compile(path.isEmpty() ? "" : "/" + path);
 		JsonNode childJson = json.at(pointer);
-		JsonOverlay<X> child = factory.create(childJson, this, refReg);
+		JsonOverlay<X> child = factory.create(childJson, this, refMgr);
 		child._setPathInParent(path);
 		PropertyLocator locator = new PropertyLocator(name, path, json);
 		childOrder.add(locator);
@@ -270,6 +268,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return json;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return equals(obj, false);
 	}

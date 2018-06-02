@@ -13,7 +13,7 @@ public class MapTests extends Assert {
 
 	private OverlayFactory<Map<String, Integer>> factory = MapOverlay.getFactory(IntegerOverlay.factory, null);
 
-	private final ReferenceRegistry refReg = new ReferenceRegistry();
+	private final ReferenceManager refMgr = new ReferenceManager();
 
 	private final JsonNodeFactory jfac = JsonNodeFactory.instance;
 	private final char a = 'A';
@@ -24,7 +24,7 @@ public class MapTests extends Assert {
 		for (int i = 0; i < 10; i++) {
 			map.put(Character.toString((char) (a + i)), i);
 		}
-		doChecks((MapOverlay<Integer>) factory.create(map, null, refReg));
+		doChecks((MapOverlay<Integer>) factory.create(map, null, refMgr));
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class MapTests extends Assert {
 		for (int i = 0; i < 10; i++) {
 			obj.set(Character.toString((char) (a + i)), jfac.numberNode(i));
 		}
-		doChecks((MapOverlay<Integer>) factory.create(obj, null, refReg));
+		doChecks((MapOverlay<Integer>) factory.create(obj, null, refMgr));
 	}
 
 	private void doChecks(MapOverlay<Integer> overlay) {

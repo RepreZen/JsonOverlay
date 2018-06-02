@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 public abstract class ScalarTestBase<V> extends Assert {
 
-	private ReferenceRegistry refReg = new ReferenceRegistry();
+	private ReferenceManager refMgr = new ReferenceManager();
 	private OverlayFactory<V> factory;
 	protected static JsonNodeFactory jfac = JsonNodeFactory.instance;
 	V value;
@@ -28,7 +28,7 @@ public abstract class ScalarTestBase<V> extends Assert {
 
 	@Test
 	public void testOvlValueFromValue() {
-		JsonOverlay<V> ovl = (JsonOverlay<V>) factory.create(value, null, refReg);
+		JsonOverlay<V> ovl = factory.create(value, null, refMgr);
 		assertTrue(factory.getOverlayClass().isAssignableFrom(ovl.getClass()));
 		assertEquals(value, ovl._get());
 		testCopy(ovl);
@@ -52,12 +52,12 @@ public abstract class ScalarTestBase<V> extends Assert {
 	}
 
 	public void testWithJson(JsonNode json, V val) {
-		JsonOverlay<V> ovl = (JsonOverlay<V>) factory.create(json, null, refReg);
+		JsonOverlay<V> ovl = factory.create(json, null, refMgr);
 		assertTrue(factory.getOverlayClass().isAssignableFrom(ovl.getClass()));
 		assertEquals(val, ovl._get());
 		testCopy(ovl);
 	}
-	
+
 	public void testCopy(JsonOverlay<V> ovl) {
 		JsonOverlay<V> copy = ovl._copy();
 		assertFalse("Copy operation should yield different object", ovl == copy);

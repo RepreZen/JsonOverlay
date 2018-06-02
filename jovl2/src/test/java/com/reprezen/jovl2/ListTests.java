@@ -14,13 +14,13 @@ public class ListTests extends Assert {
 	private List<Integer> data = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 	private OverlayFactory<List<Integer>> factory = ListOverlay.getFactory(IntegerOverlay.factory);
 
-	private final ReferenceRegistry refReg = new ReferenceRegistry();
+	private final ReferenceManager refMgr = new ReferenceManager(null);
 
 	private final JsonNodeFactory jfac = JsonNodeFactory.instance;
 
 	@Test
 	public void testListFromValues() {
-		doChecks((ListOverlay<Integer>) factory.create(data, null, refReg));
+		doChecks((ListOverlay<Integer>) factory.create(data, null, refMgr));
 	}
 
 	@Test
@@ -29,7 +29,7 @@ public class ListTests extends Assert {
 		for (int i : data) {
 			json.add(i);
 		}
-		doChecks((ListOverlay<Integer>) factory.create(json, null, refReg));
+		doChecks((ListOverlay<Integer>) factory.create(json, null, refMgr));
 	}
 
 	private void doChecks(ListOverlay<Integer> overlay) {
@@ -70,7 +70,8 @@ public class ListTests extends Assert {
 		assertFalse("Copy operation should create different object", overlay == copy);
 		assertEquals(overlay, copy);
 		for (int i = 0; i < overlay.size(); i++) {
-			assertFalse("Copy operation should create copies of list overlay items", overlay._getOverlay(i) == copy._getOverlay(i));
+			assertFalse("Copy operation should create copies of list overlay items",
+					overlay._getOverlay(i) == copy._getOverlay(i));
 		}
 	}
 

@@ -1,97 +1,46 @@
-/*******************************************************************************
- *  Copyright (c) 2017 ModelSolv, Inc. and others.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  Contributors:
- *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
- *******************************************************************************/
 package com.reprezen.jovl2;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 
 public class ReferenceRegistry {
 
-	private Map<String, Reference> references = Maps.newHashMap();
-	private Map<JsonNode, JsonOverlay<?>> overlays = Maps.newIdentityHashMap();
+	private Map<String, ReferenceManager> managers = Maps.newHashMap();
+	private JsonLoader loader = new JsonLoader();
+	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = Maps.newHashMap();
+	private Map<Pair<JsonNode, String>, JsonOverlay<?>> overlaysByJson = Maps.newHashMap();
 
-	public Collection<Reference> getAllReferences() {
-		return references.values();
+	public ReferenceManager getManager(URL baseUrl) {
+		return managers.get(baseUrl.toString());
 	}
 
-	public String registerRef(JsonNode refStringNode, ResolutionBase base, boolean resolve) {
-		return getRef(refStringNode, base, resolve).getKey();
+	public void registerManager(URL baseUrl, ReferenceManager manager) {
+		managers.put(baseUrl.toString(), manager);
 	}
 
-	public String registerRef(String refString, ResolutionBase base, boolean resolve) {
-		return getRef(refString, base, resolve).getKey();
+	public JsonNode loadDoc(URL url) throws IOException {
+		return loader.load(url);
 	}
 
-	public Reference getRef(String key) {
-		return references.get(key);
+	public JsonOverlay<?> getOverlay(String normalizedRef, String factorySig) {
+		return overlaysByRef.get(Pair.of(normalizedRef, factorySig));
 	}
 
-	public Reference getRef(JsonNode refNode) {
-		if (refNode.isObject() && refNode.has("$ref") && refNode.has("key")) {
-			return getRef(refNode.get("key").textValue());
-		} else {
-			return null;
-		}
+	public void register(String normalizedRef, String factorySig, JsonOverlay<?> overlay) {
+		overlaysByRef.put(Pair.of(normalizedRef, factorySig), overlay);
 	}
 
-	public Reference getRef(JsonNode refStringNode, ResolutionBase base, boolean resolve) {
-		if (refStringNode.isTextual()) {
-			return getRef(refStringNode.textValue(), base, resolve);
-		} else {
-			String badRefString = refStringNode.toString();
-			Reference ref = new Reference(badRefString, base,
-					new ResolutionException("Non-text $ref property value in JSON reference node"), this);
-			String key = ref.getKey();
-			if (!references.containsKey(key)) {
-				references.put(key, ref);
-			}
-			return references.get(key);
-		}
+	public JsonOverlay<?> getOverlay(JsonNode json, String factorySig) {
+		return overlaysByJson.get(Pair.of(json, factorySig));
 	}
 
-	public Reference getRef(String refString, ResolutionBase base, boolean resolve) {
-		try {
-			if (base.isInvalid()) {
-				throw new ResolutionException("Invalid base for reference resolution", base.getError());
-			}
-			String comprehendedRef = base.comprehend(refString);
-			if (!references.containsKey(comprehendedRef)) {
-				references.put(comprehendedRef, new Reference(refString, comprehendedRef, base, this));
-			}
-			Reference ref = references.get(comprehendedRef);
-			if (resolve) {
-				ref.resolve(false);
-			}
-			return ref;
-		} catch (ResolutionException e) {
-			Reference ref = new Reference(refString, base, e, this);
-			references.put(refString, ref);
-			return ref;
-		}
-	}
-
-	public JsonOverlay<?> getOverlay(JsonNode node) {
-		return overlays.get(node);
-	}
-
-	public boolean hasOverlay(JsonNode node) {
-		return !node.isMissingNode() && overlays.containsKey(node);
-	}
-
-	public void setOverlay(JsonNode node, JsonOverlay<?> overlay) {
-		if (!node.isMissingNode() && overlay != null) {
-			overlays.put(node, overlay);
-		}
+	public void register(JsonNode json, String factorySig, JsonOverlay<?> overlay) {
+		overlaysByJson.put(Pair.of(json, factorySig), overlay);
 	}
 }

@@ -15,14 +15,14 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	private List<JsonOverlay<V>> overlays = Lists.newArrayList();
 
 	private ListOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
-			ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+			ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
 	}
 
 	private ListOverlay(List<V> value, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
-			ReferenceRegistry refReg) {
-		super(Lists.newArrayList(value), parent, factory, refReg);
+			ReferenceManager refMgr) {
+		super(Lists.newArrayList(value), parent, factory, refMgr);
 		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
 	}
 
@@ -48,7 +48,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	@Override
-	protected void _elaborate() {
+	protected void _elaborate(boolean atCreation) {
 		if (json != null) {
 			fillWithJson();
 		} else {
@@ -60,7 +60,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		value.clear();
 		overlays.clear();
 		for (Iterator<JsonNode> iter = json.elements(); iter.hasNext();) {
-			JsonOverlay<V> itemOverlay = itemFactory.create(iter.next(), this, refReg);
+			JsonOverlay<V> itemOverlay = itemFactory.create(iter.next(), this, refMgr);
 			overlays.add(itemOverlay);
 			value.add(itemOverlay._get(false));
 		}
@@ -74,7 +74,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	private JsonOverlay<V> itemOverlayFor(V itemValue) {
-		return itemFactory.create(itemValue, this, refReg);
+		return itemFactory.create(itemValue, this, refMgr);
 	}
 
 	public V get(int index) {
@@ -109,7 +109,6 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		return overlays.size();
 	}
 
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ListOverlay<?>) {
@@ -138,6 +137,11 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		}
 
 		@Override
+		public String getSignature() {
+			return String.format("list[%s]", itemFactory.getSignature());
+		}
+
+		@Override
 		protected Class<? extends JsonOverlay<? super List<V>>> getOverlayClass() {
 			Class<?> overlayClass = ListOverlay.class;
 			@SuppressWarnings("unchecked")
@@ -146,13 +150,13 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		}
 
 		@Override
-		protected JsonOverlay<List<V>> _create(List<V> value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ListOverlay<V>(value, parent, this, refReg);
+		protected JsonOverlay<List<V>> _create(List<V> value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new ListOverlay<V>(value, parent, this, refMgr);
 		}
 
 		@Override
-		protected JsonOverlay<List<V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ListOverlay<V>(json, parent, this, refReg);
+		protected JsonOverlay<List<V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new ListOverlay<V>(json, parent, this, refMgr);
 		}
 
 		public OverlayFactory<V> getItemFactory() {

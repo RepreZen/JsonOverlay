@@ -21,7 +21,7 @@ import com.reprezen.jovl2.JsonOverlay
 import com.reprezen.jovl2.ListOverlay
 import com.reprezen.jovl2.MapOverlay
 import com.reprezen.jovl2.OverlayFactory
-import com.reprezen.jovl2.ReferenceRegistry
+import com.reprezen.jovl2.ReferenceManager
 import com.reprezen.jovl2.gen.SimpleJavaGenerator.Member
 import com.reprezen.jovl2.gen.TypeData.Field
 import com.reprezen.jovl2.gen.TypeData.Structure
@@ -60,7 +60,7 @@ class ImplGenerator extends TypeGenerator {
 			'''))
 			members.add(type.enumFactoryMember)
 		} else {
-			members.add(getElaborateChildrenMethod(type))
+			members.add(getElaborateJsonMethod(type))
 			members.addAll(getFactoryMembers(type))
 		}
 		return members
@@ -99,13 +99,13 @@ class ImplGenerator extends TypeGenerator {
 		val members = new Members
 		requireTypes(JsonNode, JsonOverlay)
 		members.addMember('''
-			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(json, parent, factory, refReg);
+			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(json, parent, factory, refMgr);
 			}
 		''')
 		members.addMember('''
-			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(«type.lcName», parent, factory, refReg);
+			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(«type.lcName», parent, factory, refMgr);
 			}
 		''')
 		return members
@@ -267,9 +267,9 @@ class ImplGenerator extends TypeGenerator {
 		return methods
 	}
 
-	def private Member getElaborateChildrenMethod(Type type) {
+	def private Member getElaborateJsonMethod(Type type) {
 		return new Member('''
-			protected void _elaborateChildren() {
+			protected void _elaborateJson() {
 				«FOR f : type.fields.values.filter[!it.noImpl]»
 					«f.elaborateStatement»
 				«ENDFOR»
@@ -290,7 +290,7 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getEnumFactoryMember(Type type) {
-		requireTypes(OverlayFactory, JsonOverlay, JsonNode, ReferenceRegistry)
+		requireTypes(OverlayFactory, JsonOverlay, JsonNode, ReferenceManager)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>() {
 				@Override
@@ -299,13 +299,13 @@ class ImplGenerator extends TypeGenerator {
 				}
 				
 				@Override
-				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new «type.implType»(«type.lcName», parent, refReg);
+				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new «type.implType»(«type.lcName», parent, refMgr);
 				}
 				
 				@Override
-				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new «type.implType»(json, parent, refReg);
+				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new «type.implType»(json, parent, refMgr);
 				}			
 			};
 		''')
@@ -319,7 +319,7 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getFactoryMember(Type type) {
-		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, JsonOverlay)
+		requireTypes(OverlayFactory, JsonNode, ReferenceManager, JsonOverlay)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>(){
 				@Override
@@ -328,10 +328,10 @@ class ImplGenerator extends TypeGenerator {
 				}
 			
 				@Override
-				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
+				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
 					JsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
-						overlay = new «type.implType»(«type.lcName», parent, refReg);
+						overlay = new «type.implType»(«type.lcName», parent, refMgr);
 					«ELSE»
 						Class<? extends «type.name»> subtype = getSubtypeOf(«type.lcName»);
 						«getSubtypeCreate(type, type.lcName)»
@@ -342,10 +342,10 @@ class ImplGenerator extends TypeGenerator {
 				}
 			
 				@Override
-				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
 					JsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
-						overlay = new «type.implType»(json, parent, refReg);
+						overlay = new «type.implType»(json, parent, refMgr);
 					«ELSE»
 						Class<? extends «type.name»> subtype = getSubtypeOf(json);
 						«getSubtypeCreate(type, ".json")»
@@ -409,18 +409,18 @@ class ImplGenerator extends TypeGenerator {
 		val subtypes = t.subTypes
 		if (subtypes.empty) {
 			return '''
-				overlay = new «t.implType»(«t.castArg0(arg0)», parent, refReg);
+				overlay = new «t.implType»(«t.castArg0(arg0)», parent, refMgr);
 			'''
 		} else {
 			return '''
 				switch (subtype != null ? subtype.getSimpleName() : "") {
 					«FOR sub : subtypes»
 						case "«sub.name»":
-							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refReg, null);
+							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refMgr, null);
 							break;
 					«ENDFOR»
 					default:
-						overlay = new «t.implType»(«t.castArg0(arg0)», parent, refReg);
+						overlay = new «t.implType»(«t.castArg0(arg0)», parent, refMgr);
 				}
 			'''
 		}

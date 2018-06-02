@@ -41,13 +41,13 @@ public class JsonLoader {
 		if (cache.containsKey(urlString)) {
 			return cache.get(urlString);
 		}
-		try(InputStream in = url.openStream()) {
+		try (InputStream in = url.openStream()) {
 			String json = IOUtils.toString(in, Charsets.UTF_8);
 			return loadString(url, json);
 		}
 	}
 
-	public JsonNode loadString(URL url, String json) throws IOException, JsonProcessingException {
+	private JsonNode loadString(URL url, String json) throws IOException, JsonProcessingException {
 		JsonNode tree;
 		if (json.trim().startsWith("{")) {
 			tree = jsonMapper.readTree(json);

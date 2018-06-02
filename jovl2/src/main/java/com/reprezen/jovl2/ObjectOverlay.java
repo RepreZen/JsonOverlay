@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public final class ObjectOverlay extends ScalarOverlay<Object> {
 
-	private ObjectOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, factory, refReg);
+	private ObjectOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
-	private ObjectOverlay(Object value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, factory, refReg);
+	private ObjectOverlay(Object value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 	}
 
 	@Override
@@ -39,13 +39,13 @@ public final class ObjectOverlay extends ScalarOverlay<Object> {
 		}
 
 		@Override
-		public ObjectOverlay _create(Object value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ObjectOverlay(value, parent, refReg);
+		public ObjectOverlay _create(Object value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new ObjectOverlay(value, parent, refMgr);
 		}
 
 		@Override
-		public ObjectOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new ObjectOverlay(json, parent, refReg);
+		public ObjectOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new ObjectOverlay(json, parent, refMgr);
 		}
 	};
 }

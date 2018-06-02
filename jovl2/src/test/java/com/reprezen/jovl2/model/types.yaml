@@ -23,6 +23,9 @@ types:
       type: Integer
     color:
       type: Color
+    scalars:
+      structure: map
+      type: Scalars
 - name: Entry
   fields:
     title: {
@@ -40,3 +43,22 @@ types:
   - BLUE
   - INDIGO
   - VIOLET
+- name: Scalars
+  fields:
+    stringValue:
+      type: String
+    intValue:
+      type: Integer
+    numberValue:
+      type: Number
+    boolValue:
+      type: Boolean
+    objValue:
+      type: Object
+    primValue:
+      type: Primitive
+    colorValue:
+      type: Color
+    embeddedScalars:
+      type: Scalars
+

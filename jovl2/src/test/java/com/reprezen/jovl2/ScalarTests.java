@@ -222,12 +222,12 @@ public class ScalarTests {
 
 		public static class XEnumOverlay extends EnumOverlay<XEnum> {
 
-			public XEnumOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(json, parent, factory, refReg);
+			public XEnumOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(json, parent, factory, refMgr);
 			}
 
-			public XEnumOverlay(XEnum value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(value, parent, factory, refReg);
+			public XEnumOverlay(XEnum value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(value, parent, factory, refMgr);
 			}
 
 			@Override
@@ -242,13 +242,13 @@ public class ScalarTests {
 				}
 
 				@Override
-				public JsonOverlay<XEnum> _create(XEnum value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new XEnumOverlay(value, parent, refReg);
+				public JsonOverlay<XEnum> _create(XEnum value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new XEnumOverlay(value, parent, refMgr);
 				}
 
 				@Override
-				public JsonOverlay<XEnum> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new XEnumOverlay(json, parent, refReg);
+				public JsonOverlay<XEnum> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new XEnumOverlay(json, parent, refMgr);
 				}
 			};
 		}

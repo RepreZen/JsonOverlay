@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.reprezen.jovl2.ResolutionException.ReferenceCycleException;
 import com.reprezen.jovl2.model.TestModelParser;
 import com.reprezen.jovl2.model.intf.Color;
 import com.reprezen.jovl2.model.intf.Scalars;
@@ -64,10 +65,12 @@ public class ReferenceTests extends Assert {
 		assertNull(model.getScalar("badPointer"));
 		checkBadRef(Overlay.of(model.getScalars()).getReference("badPointer"));
 		checkBadRef(Overlay.of(model.getScalars()).getReference("cycle"));
+		assertTrue(Overlay.of(model.getScalars()).getReference("cycle")
+				.getInvalidReason() instanceof ReferenceCycleException);
 	}
 
 	private void checkBadRef(Reference ref) {
 		assertTrue(ref.isInvalid());
-		assertNotNull(ref.getInvalidReason());
+		assertTrue(ref.getInvalidReason() instanceof ResolutionException);
 	}
 }

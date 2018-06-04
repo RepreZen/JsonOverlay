@@ -16,6 +16,7 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
+import com.reprezen.jovl2.ResolutionException.ReferenceCycleException;
 
 public class Reference {
 
@@ -35,7 +36,7 @@ public class Reference {
 			this.pointer = fragment != null ? JsonPointer.compile(fragment) : null;
 		} catch (IllegalArgumentException e) {
 			this.valid = false;
-			this.invalidReason = new ResolutionException("Invalid JSON pointer in JSON reference", e);
+			this.invalidReason = new ResolutionException("Invalid JSON pointer in JSON reference", this, e);
 		}
 	}
 
@@ -90,7 +91,7 @@ public class Reference {
 		while (!isResolved()) {
 			String normalized = current.getNormalizedRef();
 			if (visited.contains(normalized)) {
-				return failResolve("Cannot resolve cyclic reference");
+				return failResolve(null, new ReferenceCycleException(this, current));
 			} else {
 				visited.add(normalized);
 			}
@@ -123,7 +124,11 @@ public class Reference {
 
 	private boolean failResolve(String msg, Exception e) {
 		this.valid = false;
-		this.invalidReason = new ResolutionException(msg, e);
+		if (e instanceof ResolutionException && msg == null) {
+			this.invalidReason = (ResolutionException) e;
+		} else {
+			this.invalidReason = new ResolutionException(msg, this, e);
+		}
 		return false;
 	}
 }

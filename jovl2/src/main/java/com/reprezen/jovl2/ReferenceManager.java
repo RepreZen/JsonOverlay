@@ -48,7 +48,7 @@ public class ReferenceManager {
 			ReferenceManager manager = getManagerFor(url);
 			return new Reference(refString, fragment, normalize(url, false).toString(), manager);
 		} catch (MalformedURLException e) {
-			return new Reference(refString, new ResolutionException(e), null);
+			return new Reference(refString, new ResolutionException(null, e), null);
 		}
 	}
 
@@ -70,8 +70,7 @@ public class ReferenceManager {
 					.upperCaseEscapeSequence() //
 					.decodeUnreservedCharacters() //
 					.removeDefaultPort() //
-					// does not work on non-HTTP URLs
-					// .encodeNonURICharacters() //
+					.encodeNonURICharacters() //
 					.removeDotSegments();
 			if (noFrag) {
 				normalizer = normalizer.removeFragment();

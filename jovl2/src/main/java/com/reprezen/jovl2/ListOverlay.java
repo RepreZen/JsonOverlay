@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.collect.Lists;
+import com.reprezen.jovl2.SerializationOptions.Option;
 
 public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
@@ -41,10 +41,15 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	@Override
 	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		ArrayNode array = _jsonArray();
-		for (JsonOverlay<V> itemOverlay : overlays) {
-			array.add(itemOverlay._toJson());
+		for (JsonOverlay<V> item : overlays) {
+			// we can't have missing children, since they'd screw up the position of other
+			// entries. So we set an option for each of chilren ensuring that they will
+			// return empty containers. This only affects list, map, and properties
+			// overlays. Map and properties overlays remove the keep-one option when
+			// serializing their children.
+			array.add(item._toJson(options.plus(Option.KEEP_ONE_EMPTY)));
 		}
-		return array.size() > 0 ? array : MissingNode.getInstance();
+		return array.size() > 0 || options.isKeepThisEmpty() ? array : _jsonMissing();
 	}
 
 	@Override

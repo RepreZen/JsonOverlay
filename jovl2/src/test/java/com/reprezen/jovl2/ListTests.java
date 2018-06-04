@@ -73,6 +73,8 @@ public class ListTests extends Assert {
 			assertFalse("Copy operation should create copies of list overlay items",
 					overlay._getOverlay(i) == copy._getOverlay(i));
 		}
+		copy = (ListOverlay<Integer>) overlay.factory.create(overlay._toJson(), null, refMgr);
+		assertEquals(overlay._get(), copy._get());
 	}
 
 	private void checkValueAt(ListOverlay<Integer> overlay, int index, int value) {

@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
+import com.reprezen.jovl2.SerializationOptions.Option;
 
 public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
@@ -51,9 +51,9 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		ObjectNode obj = _jsonObject();
 		for (Entry<String, JsonOverlay<V>> entry : overlays.entrySet()) {
-			obj.set(entry.getKey(), entry.getValue()._toJson());
+			obj.set(entry.getKey(), entry.getValue()._toJson(options.minus(Option.KEEP_ONE_EMPTY)));
 		}
-		return obj.size() > 0 ? obj : MissingNode.getInstance();
+		return obj.size() > 0 || options.isKeepThisEmpty() ? obj : _jsonMissing();
 	}
 
 	@Override

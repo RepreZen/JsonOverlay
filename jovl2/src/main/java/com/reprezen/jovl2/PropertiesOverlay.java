@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.reprezen.jovl2.SerializationOptions.Option;
 
 public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
@@ -227,13 +228,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		JsonNode obj = _jsonMissing();
 		for (PropertyLocator child : childOrder) {
-			JsonNode childJson = children.get(child.getName())._toJson();
+			JsonNode childJson = children.get(child.getName())._toJson(options.minus(Option.KEEP_ONE_EMPTY));
 			if (!childJson.isMissingNode()) {
 				obj = _injectChild(obj, childJson, child.getPointer());
 			}
 		}
-		obj = _fixJson(obj);
-		return obj.size() > 0 || options.isKeepThisEmpty() ? obj : _jsonMissing();
+		JsonNode result = _fixJson(obj);
+		return result.size() > 0 || options.isKeepThisEmpty() ? result : _jsonMissing();
 	}
 
 	private JsonNode _injectChild(JsonNode node, JsonNode child, JsonPointer pointer) {

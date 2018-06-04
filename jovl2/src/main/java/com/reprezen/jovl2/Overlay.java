@@ -130,23 +130,21 @@ public class Overlay<V> {
 		return overlay._toJson();
 	}
 
-	// public JsonNode toJson(SerializationOptions options) {
-	// return overlay.toJson(options);
-	// }
+	public JsonNode toJson(SerializationOptions options) {
+		return overlay._toJson(options);
+	}
 
-	// public static <V> JsonNode toJson(JsonOverlay<V> overlay,
-	// SerializationOptions options) {
-	// return ((JsonOverlay<V>) overlay).toJson(options);
-	// }
+	public static <V> JsonNode toJson(JsonOverlay<V> overlay, SerializationOptions options) {
+		return overlay._toJson(options);
+	}
 
-	// public JsonNode toJson(SerializationOptions.Option... options) {
-	// return overlay.toJson(options);
-	// }
+	public JsonNode toJson(SerializationOptions.Option... options) {
+		return overlay._toJson(options);
+	}
 
-	// public static <V> JsonNode toJson(JsonOverlay<V> overlay,
-	// SerializationOptions.Option... options) {
-	// return ((JsonOverlay<V>) overlay)._toJson(options);
-	// }
+	public static <V> JsonNode toJson(JsonOverlay<V> overlay, SerializationOptions.Option... options) {
+		return overlay._toJson(options);
+	}
 
 	public boolean isPresent() {
 		return overlay._isPresent();

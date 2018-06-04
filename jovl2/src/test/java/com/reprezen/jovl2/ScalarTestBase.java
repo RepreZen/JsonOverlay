@@ -51,6 +51,14 @@ public abstract class ScalarTestBase<V> extends Assert {
 		testWithJson(jfac.objectNode(), null);
 	}
 
+	@Test
+	public void testSerialization() {
+		JsonOverlay<V> ovl = factory.create(value, null, refMgr);
+		JsonNode json = ovl._toJson();
+		JsonOverlay<V> ovl2 = factory.create(json, null, refMgr);
+		assertEquals(ovl._get(), ovl2._get());
+	}
+
 	public void testWithJson(JsonNode json, V val) {
 		JsonOverlay<V> ovl = factory.create(json, null, refMgr);
 		assertTrue(factory.getOverlayClass().isAssignableFrom(ovl.getClass()));

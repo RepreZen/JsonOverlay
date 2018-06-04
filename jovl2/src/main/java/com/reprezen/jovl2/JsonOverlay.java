@@ -86,6 +86,10 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return factory.create(_get(), null, refMgr);
 	}
 
+	/* package */ boolean _isReference() {
+		return reference != null;
+	}
+
 	/* package */ RefOverlay<V> _getReference() {
 		return reference;
 	}
@@ -109,7 +113,21 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	/* package */ JsonNode _toJson() {
-		return _toJsonInternal(SerializationOptions.EMPTY);
+		return _toJson(SerializationOptions.EMPTY);
+	}
+
+	/* package */ JsonNode _toJson(SerializationOptions options) {
+		if (_isReference() && (options.isFollowRefs() || reference._getReference().isInvalid())) {
+			ObjectNode obj = _jsonObject();
+			obj.put("$ref", reference._getReference().getRefString());
+			return obj;
+		} else {
+			return _toJsonInternal(options);
+		}
+	}
+
+	/* package */ JsonNode _toJson(SerializationOptions.Option... options) {
+		return _toJson(new SerializationOptions(options));
 	}
 
 	protected abstract JsonNode _toJsonInternal(SerializationOptions options);

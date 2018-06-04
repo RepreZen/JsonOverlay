@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.reprezen.jovl2.gen;
 
-import static com.reprezen.jovl2.gen.Template.t;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +82,6 @@ public class TypeData {
 		private String name;
 		private Map<String, Field> fields = Maps.newLinkedHashMap();
 		private List<String> extendInterfaces = Lists.newArrayList();
-		private List<Method> extraMethods = Lists.newArrayList();
 		private Map<String, Collection<String>> imports = Maps.newHashMap();
 		private boolean noGen = false;
 		private String extensionOf;
@@ -143,10 +140,6 @@ public class TypeData {
 
 		public List<String> getExtendInterfaces() {
 			return extendInterfaces;
-		}
-
-		public List<Method> getExtraMethods() {
-			return extraMethods;
 		}
 
 		public Map<String, Collection<String>> getImports() {
@@ -210,14 +203,11 @@ public class TypeData {
 		private Structure structure = Structure.scalar;
 		private String type;
 		private String keyName = "name";
-		private List<String> keyDecls;
-		private boolean selfKeyed = false;
 		private String keyPattern;
 		private boolean noImpl;
 		private String id;
 		private boolean boolDefault = false;
 		private String parentPath;
-		private String createTest;
 
 		private Type container;
 
@@ -290,27 +280,8 @@ public class TypeData {
 			return keyName;
 		}
 
-		public Collection<String> getKeyDecls() {
-			return keyDecls;
-		}
-
-		public boolean isSelfKeyed() {
-			return selfKeyed;
-		}
-
 		public String getKeyPattern() {
 			return keyPattern;
-		}
-
-		public String getCreateTest() {
-			if (createTest != null) {
-				if (createTest.startsWith(".")) {
-					return t("json.at(${qpointer})${0}", this, createTest);
-				} else if (createTest.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
-					return t("${0}(json.at(${qpointer}))", this, createTest);
-				}
-			}
-			return createTest;
 		}
 
 		public boolean isNoImpl() {
@@ -364,16 +335,8 @@ public class TypeData {
 			return structure == Structure.scalar ? getLcName() : getLcPlural();
 		}
 
-		public String getPropertyType() {
-			return t("Child${0}Overlay<${type}>", this, getOverlayVariant());
-		}
-
 		public String getOverlayType() {
 			return getType() + (isScalarType() ? "Overlay" : "");
-		}
-
-		public String getTypeInCollection() {
-			return isScalarType() ? type : t("? extends ${type}", this);
 		}
 	}
 

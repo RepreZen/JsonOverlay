@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.reprezen.jovl2.gen;
 
-import static com.reprezen.jovl2.gen.Template.t;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,7 +85,8 @@ public abstract class TypeGenerator {
 	protected abstract TypeDeclaration<?> getTypeDeclaration(Type type, String suffix);
 
 	public void generate(Type type) throws IOException {
-		File javaFile = new File(dir, t("${name}${0}.java", type, suffix));
+		String filename = String.format("%s%s.java", type.getName(), suffix);
+		File javaFile = new File(dir, filename);
 		System.out.println("Generating " + javaFile.getCanonicalFile());
 		CompilationUnit existing = preserve && javaFile.exists() ? tryParse(javaFile) : null;
 		TypeDeclaration<?> declaration = getTypeDeclaration(type, suffix);

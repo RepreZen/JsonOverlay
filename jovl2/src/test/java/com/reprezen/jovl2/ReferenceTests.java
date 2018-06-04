@@ -30,6 +30,9 @@ public class ReferenceTests extends Assert {
 		checkScalarsValues(model.getScalar("s3"), true);
 		checkScalarsValues(model.getScalar("s4"), true);
 		checkScalarsValues(model.getScalar("s5"), false);
+		checkScalarsValues(model.getScalar("ext1"), false);
+		checkScalarsValues(model.getScalar("ext2"), false);
+		checkScalarsValues(model.getScalar("ext3"), true);
 	}
 
 	private void checkScalarsValues(Scalars s, boolean sharedRoot) {
@@ -58,6 +61,7 @@ public class ReferenceTests extends Assert {
 		assertTrue(model.getScalar("s7").getEmbeddedScalars() == model.getScalar("s7"));
 		assertTrue(model.getScalar("s8a").getEmbeddedScalars() == model.getScalar("s8b"));
 		assertTrue(model.getScalar("s8b").getEmbeddedScalars() == model.getScalar("s8a"));
+		assertTrue(model.getScalar("ext1") == model.getScalar("ext2"));
 	}
 
 	@Test

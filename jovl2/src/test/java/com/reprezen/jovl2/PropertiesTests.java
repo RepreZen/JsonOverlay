@@ -37,6 +37,10 @@ public class PropertiesTests extends Assert {
 		assertEquals(Integer.valueOf(10), foo.getNumField());
 		foo.setStringField(null);
 		assertNull(foo.getStringField());
+		assertTrue(foo == foo._getRoot());
+		JsonOverlay<String> stringOverlay = foo._getOverlay("stringField", String.class);
+		assertTrue(foo == stringOverlay._getRoot());
+		assertNull(Overlay.of(foo).getModel());
 	}
 
 	@Test

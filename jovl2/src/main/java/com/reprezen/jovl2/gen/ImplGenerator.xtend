@@ -62,6 +62,14 @@ class ImplGenerator extends TypeGenerator {
 		} else {
 			members.add(getElaborateJsonMethod(type))
 			members.addAll(getFactoryMembers(type))
+			if (type.typeData.modelType !== null) {
+				members.addMember('''
+					@Override
+					public Class<?> _getModelType() {
+						return «type.typeData.modelType».class;
+					}
+				''')
+			}
 		}
 		return members
 	}

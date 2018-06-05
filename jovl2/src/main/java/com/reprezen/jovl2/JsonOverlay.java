@@ -106,6 +106,36 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return parent;
 	}
 
+	/* package */ JsonOverlay<?> _getRoot() {
+		if (reference != null && reference._getReference().isValid()) {
+			return reference.getOverlay()._getRoot();
+		} else {
+			JsonOverlay<?> result = this;
+			while (result._getParent() != null) {
+				result = result._getParent();
+			}
+			return result;
+		}
+	}
+
+	/* package */ JsonOverlay<?> _getModel() {
+		if (reference != null && reference._getReference().isValid()) {
+			return reference.getOverlay()._getModel();
+		} else {
+			JsonOverlay<?> modelPart = this._getModelType() != null ? this : null;
+			JsonOverlay<?> result = this;
+			while (result._getParent() != null) {
+				result = result._getParent();
+				modelPart = modelPart == null && result._getModelType() != null ? result : null;
+			}
+			return modelPart != null && modelPart._getModelType().isAssignableFrom(result.getClass()) ? result : null;
+		}
+	}
+
+	protected Class<?> _getModelType() {
+		return null;
+	}
+
 	protected abstract V _fromJson(JsonNode json);
 
 	protected void _setParent(JsonOverlay<?> parent) {

@@ -18,6 +18,16 @@ public class Overlay<V> {
 		return new Overlay<V>(overlay);
 	}
 
+	public Overlay(IJsonOverlay<?> overlay) {
+		@SuppressWarnings("unchecked")
+		JsonOverlay<V> castOverlay = (JsonOverlay<V>) overlay;
+		this.overlay = castOverlay;
+	}
+
+	public static <V> Overlay<V> of(IJsonOverlay<V> overlay) {
+		return new Overlay<V>(overlay);
+	}
+
 	public static <X> Overlay<Map<String, X>> of(MapOverlay<X> overlay) {
 		return new Overlay<Map<String, X>>(overlay);
 	}
@@ -72,6 +82,16 @@ public class Overlay<V> {
 
 	public static <X> Overlay<X> of(PropertiesOverlay<?> props, String fieldName, Class<X> type) {
 		return new Overlay<X>(props, fieldName);
+	}
+
+	public static <X> Overlay<X> of(IJsonOverlay<?> props, String fieldName, Class<X> type) {
+		if (props instanceof PropertiesOverlay<?>) {
+			@SuppressWarnings("unchecked")
+			PropertiesOverlay<X> castProps = (PropertiesOverlay<X>) props;
+			return Overlay.of(castProps, fieldName, type);
+		} else {
+			return null;
+		}
 	}
 
 	public final V get() {
@@ -194,27 +214,23 @@ public class Overlay<V> {
 		return overlay._getPathInParent();
 	}
 
-	// public JsonOverlay<?> getRoot() {
-	// return overlay._getRoot();
-	// }
+	public JsonOverlay<?> getRoot() {
+		return overlay._getRoot();
+	}
 
-	// public static <V> JsonOverlay<?> getRoot(JsonOverlay<V> overlay) {
-	// return overlay)._getRoot();
-	// }
+	public static <V> JsonOverlay<?> getRoot(JsonOverlay<V> overlay) {
+		return overlay._getRoot();
+	}
 
-	// public <Model> Model getModel() {
-	// if (overlay instanceof IModelPart<?, ?>) {
-	// @SuppressWarnings("unchecked")
-	// Model root = (Model) overlay._getRoot();
-	// return root;
-	// } else {
-	// return null;
-	// }
-	// }
+	public <Model> Model getModel() {
+		@SuppressWarnings("unchecked")
+		Model model = (Model) overlay._getModel();
+		return model;
+	}
 
-	// public static <Model, V> Model getModel(JsonOverlay<V> overlay) {
-	// return new Overlay<V>(overlay).getModel();
-	// }
+	public static <Model, V> Model getModel(JsonOverlay<V> overlay) {
+		return new Overlay<V>(overlay).getModel();
+	}
 
 	// public String getPathFromRoot() {
 	// return overlay._getPathFromRoot();
@@ -317,5 +333,4 @@ public class Overlay<V> {
 			return null;
 		}
 	}
-
 }

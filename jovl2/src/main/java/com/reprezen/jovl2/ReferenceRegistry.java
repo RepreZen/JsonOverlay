@@ -14,7 +14,9 @@ public class ReferenceRegistry {
 	private Map<String, ReferenceManager> managers = Maps.newHashMap();
 	private JsonLoader loader = new JsonLoader();
 	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = Maps.newHashMap();
-	private Map<Pair<JsonNode, String>, JsonOverlay<?>> overlaysByJson = Maps.newHashMap();
+	// can't use Pair here because we need to index by JsonNode identity, not using
+	// its equals impl
+	private Map<JsonNode, Map<String, JsonOverlay<?>>> overlaysByJson = Maps.newIdentityHashMap();
 
 	public ReferenceManager getManager(URL baseUrl) {
 		return managers.get(baseUrl.toString());
@@ -37,10 +39,14 @@ public class ReferenceRegistry {
 	}
 
 	public JsonOverlay<?> getOverlay(JsonNode json, String factorySig) {
-		return overlaysByJson.get(Pair.of(json, factorySig));
+		Map<String, JsonOverlay<?>> overlaysBySig = overlaysByJson.get(json);
+		return overlaysBySig != null ? overlaysBySig.get(factorySig) : null;
 	}
 
 	public void register(JsonNode json, String factorySig, JsonOverlay<?> overlay) {
-		overlaysByJson.put(Pair.of(json, factorySig), overlay);
+		if (!overlaysByJson.containsKey(json)) {
+			overlaysByJson.put(json, Maps.newHashMap());
+		}
+		overlaysByJson.get(json).put(factorySig, overlay);
 	}
 }

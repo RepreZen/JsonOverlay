@@ -25,17 +25,17 @@ public class ReferenceTests extends Assert {
 	@Test
 	public void testRefAccess() {
 		assertEquals("Reference Test", model.getDescription());
-		checkScalarsValues(model.getScalar("s1"), true);
-		checkScalarsValues(model.getScalar("s2"), false);
-		checkScalarsValues(model.getScalar("s3"), true);
-		checkScalarsValues(model.getScalar("s4"), true);
-		checkScalarsValues(model.getScalar("s5"), false);
-		checkScalarsValues(model.getScalar("ext1"), false);
-		checkScalarsValues(model.getScalar("ext2"), false);
-		checkScalarsValues(model.getScalar("ext3"), true);
+		checkScalarsValues(model.getScalar("s1"), true, true);
+		checkScalarsValues(model.getScalar("s2"), false, true);
+		checkScalarsValues(model.getScalar("s3"), true, true);
+		checkScalarsValues(model.getScalar("s4"), true, true);
+		checkScalarsValues(model.getScalar("s5"), false, true);
+		checkScalarsValues(model.getScalar("ext1"), false, false);
+		checkScalarsValues(model.getScalar("ext2"), false, false);
+		checkScalarsValues(model.getScalar("ext3"), true, true);
 	}
 
-	private void checkScalarsValues(Scalars s, boolean sharedRoot) {
+	private void checkScalarsValues(Scalars s, boolean sharedRoot, boolean sharedValues) {
 		assertEquals("hello", s.getStringValue());
 		assertEquals(Integer.valueOf(10), s.getIntValue());
 		assertEquals(3.1, s.getNumberValue());
@@ -43,14 +43,14 @@ public class ReferenceTests extends Assert {
 		assertEquals(Arrays.asList(1, 2, 3), s.getObjValue());
 		assertEquals("abcde", s.getPrimValue());
 		assertEquals(Color.BLUE, s.getColorValue());
-		checkScalarsSharing(s, sharedRoot);
+		checkScalarsSharing(s, sharedRoot, sharedValues);
 	}
 
-	private void checkScalarsSharing(Scalars s, boolean sharedRoot) {
+	private void checkScalarsSharing(Scalars s, boolean sharedRoot, boolean sharedValues) {
 		Scalars s1 = model.getScalar("s1");
 		if (sharedRoot) {
 			assertTrue("Scalars objects should be shared", s1 == s);
-		} else {
+		} else if (sharedValues) {
 			assertTrue("String value should be shared", s1.getStringValue() == s.getStringValue());
 		}
 	}
@@ -76,5 +76,19 @@ public class ReferenceTests extends Assert {
 	private void checkBadRef(Reference ref) {
 		assertTrue(ref.isInvalid());
 		assertTrue(ref.getInvalidReason() instanceof ResolutionException);
+	}
+
+	@Test
+	public void testRoots() {
+		assertTrue(model == Overlay.of(model).getRoot());
+		assertTrue(model == Overlay.of(model.getScalar("s1")).getRoot());
+		Scalars ext1 = model.getScalar("ext1");
+		assertTrue(ext1 == Overlay.of(ext1).getRoot());
+		assertTrue(model == Overlay.of(model.getScalar("s3")).getRoot());
+
+		assertTrue(model == Overlay.of(model).getModel());
+		assertTrue(model == Overlay.of(model.getScalar("s1")).getModel());
+		assertNull(Overlay.of(ext1).getModel());
+		assertTrue(model == Overlay.of(model.getScalar("s3")).getModel());
 	}
 }

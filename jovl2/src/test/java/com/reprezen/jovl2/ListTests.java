@@ -75,6 +75,10 @@ public class ListTests extends Assert {
 		}
 		copy = (ListOverlay<Integer>) overlay.factory.create(overlay._toJson(), null, refMgr);
 		assertEquals(overlay._get(), copy._get());
+		assertTrue(overlay == overlay._getRoot());
+		JsonOverlay<Integer> itemOverlay = overlay._getOverlay(0);
+		assertTrue(overlay == itemOverlay._getRoot());
+		assertNull(Overlay.of(overlay).getModel());
 	}
 
 	private void checkValueAt(ListOverlay<Integer> overlay, int index, int value) {

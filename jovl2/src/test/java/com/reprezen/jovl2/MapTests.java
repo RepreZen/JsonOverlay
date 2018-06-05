@@ -63,6 +63,10 @@ public class MapTests extends Assert {
 		copy.set("B", 1);
 		assertEquals(overlay, copy);
 		assertFalse("Key order difference not detected", overlay.equals(copy, true));
+		assertTrue(overlay == overlay._getRoot());
+		JsonOverlay<Integer> valueOverlay = overlay._getOverlay("B");
+		assertTrue(overlay == valueOverlay._getRoot());
+		assertNull(Overlay.of(overlay).getModel());
 	}
 
 	private void checkKeys(MapOverlay<Integer> overlay, String... keys) {

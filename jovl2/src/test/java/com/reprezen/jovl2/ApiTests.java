@@ -78,6 +78,23 @@ public class ApiTests extends Assert {
 		assertEquals("A", Overlay.of(model.getEntries(), "A").getPathInParent());
 	}
 
+	@Test
+	public void testRoot() {
+		assertTrue(model == Overlay.of(model).getRoot());
+		assertTrue(model == Overlay.of(model, "description", String.class).getRoot());
+		assertTrue(model == Overlay.of(model, "integers", ListOverlay.class).getRoot());
+		assertTrue(model == Overlay.of(model, "namedIntegers", MapOverlay.class).getRoot());
+		assertTrue(model == Overlay.of(model.getEntries(), "A").getRoot());
+		assertTrue(model == Overlay.of(model.getItems(), 0).getRoot());
+
+		assertTrue(model == Overlay.of(model).getModel());
+		assertTrue(model == Overlay.of(model, "description", String.class).getModel());
+		assertTrue(model == Overlay.of(model, "integers", ListOverlay.class).getModel());
+		assertTrue(model == Overlay.of(model, "namedIntegers", MapOverlay.class).getModel());
+		assertTrue(model == Overlay.of(model.getEntries(), "A").getModel());
+		assertTrue(model == Overlay.of(model.getItems(), 0).getModel());
+	}
+
 	private List<String> getEntryKeys() {
 		return Lists.newArrayList(model.getEntries().keySet());
 	}

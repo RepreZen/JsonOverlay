@@ -51,4 +51,3 @@ scalars:
     $ref: "external.yaml#/scalar2"
   ext3:
     $ref: "external.yaml#/scalar3"
-      

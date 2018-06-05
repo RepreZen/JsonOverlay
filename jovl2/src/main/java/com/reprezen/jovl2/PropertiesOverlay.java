@@ -215,6 +215,46 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
+	protected JsonOverlay<?> _findInternal(JsonPointer path) {
+		for (JsonOverlay<?> child : children.values()) {
+			if (matchesPath(child, path)) {
+				JsonOverlay<?> found = child._find(tailPath(child, path));
+				if (found != null) {
+					return found;
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean matchesPath(JsonOverlay<?> child, JsonPointer path) {
+		JsonPointer childPath = getPointer(child);
+		while (!childPath.matches()) {
+			if (!childPath.matchesProperty(path.getMatchingProperty())) {
+				return false;
+			} else {
+				path = path.tail();
+				childPath = childPath.tail();
+			}
+		}
+		return true;
+	}
+
+	private JsonPointer tailPath(JsonOverlay<?> child, JsonPointer path) {
+		JsonPointer childPath = getPointer(child);
+		while (!childPath.matches()) {
+			path = path.tail();
+			childPath = childPath.tail();
+		}
+		return path;
+	}
+
+	private JsonPointer getPointer(JsonOverlay<?> child) {
+		String path = child._getPathInParent();
+		return JsonPointer.compile(path == null || path.isEmpty() ? "" : "/" + path);
+	}
+
+	@Override
 	public V _fromJson(JsonNode json) {
 		// parsing of the json node is expected to be done in the constructor of the
 		// subclass, so nothing is done here. But we do establish this object as its own

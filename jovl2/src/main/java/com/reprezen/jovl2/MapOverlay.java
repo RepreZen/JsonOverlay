@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
@@ -33,6 +34,12 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		this.valueFactory = mapOverlayFactory.getValueFactory();
 		String keyPattern = mapOverlayFactory.getKeyPattern();
 		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
+	}
+
+	@Override
+	protected JsonOverlay<?> _findInternal(JsonPointer path) {
+		String key = path.getMatchingProperty();
+		return overlays.containsKey(key) ? overlays.get(key)._find(path.tail()) : null;
 	}
 
 	@Override

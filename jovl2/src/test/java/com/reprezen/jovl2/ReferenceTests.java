@@ -91,4 +91,14 @@ public class ReferenceTests extends Assert {
 		assertNull(Overlay.of(ext1).getModel());
 		assertTrue(model == Overlay.of(model.getScalar("s3")).getModel());
 	}
+
+	@Test
+	public void testFind() {
+		assertTrue(model.getScalar("s1") == Overlay.of(model).find("/scalars/s1"));
+		assertTrue(model.getScalar("s3") == Overlay.of(model).find("/scalars/s1"));
+		assertTrue(model.getScalar("s3") == Overlay.of(model).find("/scalars/s3"));
+		assertTrue(model.getScalar("ext1") == Overlay.of(model).find("/scalars/ext1"));
+		assertTrue(model.getScalar("ext2") == Overlay.of(model).find("/scalars/ext1"));
+		assertTrue(model.getScalar("ext3") == Overlay.of(model).find("/scalars/s1"));
+	}
 }

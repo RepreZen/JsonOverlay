@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class Overlay<V> {
@@ -125,22 +126,21 @@ public class Overlay<V> {
 		return overlay._get();
 	}
 
-	// public JsonOverlay<?> find(JsonPointer path) {
-	// return overlay._find(path);
-	// }
+	public JsonOverlay<?> find(JsonPointer path) {
+		return overlay._find(path);
+	}
 
-	// public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, JsonPointer
-	// path) {
-	// return ((JsonOverlay<V>) overlay)._find(path);
-	// }
+	public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, JsonPointer path) {
+		return overlay._find(path);
+	}
 
-	// public JsonOverlay<?> find(String path) {
-	// return overlay._find(path);
-	// }
+	public JsonOverlay<?> find(String path) {
+		return overlay._find(path);
+	}
 
-	// public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, String path) {
-	// return ((JsonOverlay<V>) overlay)._find(path);
-	// }
+	public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, String path) {
+		return overlay._find(path);
+	}
 
 	public JsonNode toJson() {
 		return overlay._toJson();

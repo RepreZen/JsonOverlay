@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.reprezen.jovl2;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class ScalarOverlay<V> extends JsonOverlay<V> {
@@ -20,5 +21,9 @@ public abstract class ScalarOverlay<V> extends JsonOverlay<V> {
 
 	protected ScalarOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
 		super(value, parent, factory, refMgr);
+	}
+
+	public JsonOverlay<?> _findInternal(JsonPointer path) {
+		return null;
 	}
 }

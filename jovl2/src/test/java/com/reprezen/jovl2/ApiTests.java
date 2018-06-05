@@ -104,6 +104,23 @@ public class ApiTests extends Assert {
 		assertEquals(Sets.newHashSet("title"), Sets.newHashSet(Overlay.of(model.getItems(), 0).getPropertyNames()));
 	}
 
+	@Test
+	public void testFind() {
+		checkScalarFind("description", String.class, "/description");
+		checkScalarFind("width", Integer.class, "/width");
+		checkScalarFind("width", Integer.class, "/width");
+		checkScalarFind("color", Color.class, "/color");
+		assertTrue(Overlay.of(model.getItems(), 0).getOverlay() == Overlay.of(model).find("/items/0"));
+		assertTrue(Overlay.of(model.getItems(), 1).getOverlay() == Overlay.of(model).find("/items/1"));
+		assertFalse(Overlay.of(model.getItems(), 1).getOverlay() == Overlay.of(model).find("/items/0"));
+		assertTrue(
+				Overlay.of(model.getNamedIntegers(), "I").getOverlay() == Overlay.of(model).find("/namedIntegers/I"));
+		assertTrue(
+				Overlay.of(model.getNamedIntegers(), "II").getOverlay() == Overlay.of(model).find("/namedIntegers/II"));
+		assertFalse(
+				Overlay.of(model.getNamedIntegers(), "I").getOverlay() == Overlay.of(model).find("/namedIntegers/II"));
+	}
+
 	private List<String> getEntryKeys() {
 		return Lists.newArrayList(model.getEntries().keySet());
 	}
@@ -118,5 +135,9 @@ public class ApiTests extends Assert {
 
 	private void checkNamedIntegers(Integer... integers) {
 		assertEquals(Arrays.asList(integers), Lists.newArrayList(model.getNamedIntegers().values()));
+	}
+
+	private <V> void checkScalarFind(String field, Class<V> fieldType, String path) {
+		assertTrue(Overlay.of(model, field, fieldType).getOverlay() == Overlay.of(model).find(path));
 	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
@@ -24,6 +25,12 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 			ReferenceManager refMgr) {
 		super(Lists.newArrayList(value), parent, factory, refMgr);
 		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
+	}
+
+	@Override
+	protected JsonOverlay<?> _findInternal(JsonPointer path) {
+		int index = path.getMatchingIndex();
+		return index >= 0 && overlays.size() > index ? overlays.get(index)._find(path.tail()) : null;
 	}
 
 	@Override

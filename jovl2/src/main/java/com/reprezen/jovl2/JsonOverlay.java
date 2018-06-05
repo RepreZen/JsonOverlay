@@ -13,6 +13,7 @@ package com.reprezen.jovl2;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -136,6 +137,16 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return null;
 	}
 
+	/* package */ JsonOverlay<?> _find(JsonPointer path) {
+		return path.matches() ? thisOrRefTarget() : _findInternal(path);
+	}
+
+	/* package */ JsonOverlay<?> _find(String path) {
+		return _find(JsonPointer.compile(path));
+	}
+
+	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
+
 	protected abstract V _fromJson(JsonNode json);
 
 	protected void _setParent(JsonOverlay<?> parent) {
@@ -161,6 +172,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	protected abstract JsonNode _toJsonInternal(SerializationOptions options);
+
+	private JsonOverlay<V> thisOrRefTarget() {
+		if (reference == null || reference._getReference().isInvalid()) {
+			return this;
+		} else {
+			return reference.getOverlay();
+		}
+	}
 
 	protected void _elaborate(boolean atCreation) {
 		// most types of overlay don't need to do any elaboration

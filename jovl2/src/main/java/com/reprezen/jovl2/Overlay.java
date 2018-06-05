@@ -232,13 +232,13 @@ public class Overlay<V> {
 		return new Overlay<V>(overlay).getModel();
 	}
 
-	// public String getPathFromRoot() {
-	// return overlay._getPathFromRoot();
-	// }
+	public String getPathFromRoot() {
+		return overlay._getPathFromRoot();
+	}
 
-	// public static <V> String getPathFromFromRoot(JsonOverlay<V> overlay) {
-	// return ((JsonOverlay<V>) overlay)._getPathFromRoot();
-	// }
+	public static <V> String getPathFromFromRoot(JsonOverlay<V> overlay) {
+		return overlay._getPathFromRoot();
+	}
 
 	// public URL getJsonReference() {
 	// return overlay._getJsonReference();

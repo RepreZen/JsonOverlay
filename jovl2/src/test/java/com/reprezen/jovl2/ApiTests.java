@@ -45,12 +45,14 @@ public class ApiTests extends Assert {
 	public void testListApi() {
 		assertTrue(model.hasIntegers());
 		checkIntegers(1, 2, 3, 4, 5);
+		checkIntegersPaths();
 		assertEquals(Integer.valueOf(1), model.getInteger(0));
 		model.removeInteger(1);
 		model.addInteger(6);
 		model.setInteger(0, 100);
 		model.insertInteger(1, 200);
 		checkIntegers(100, 200, 3, 4, 5, 6);
+		checkIntegersPaths();
 		assertEquals("Title for item 1", model.getItem(0).getTitle());
 		assertEquals("Title for item 2", model.getItem(1).getTitle());
 	}
@@ -75,7 +77,7 @@ public class ApiTests extends Assert {
 	@Test
 	public void testPathInParent() {
 		assertEquals("description", Overlay.of((TestModelImpl) model, "description", String.class).getPathInParent());
-		assertNull(Overlay.of(model.getItems(), 0).getPathInParent());
+		assertEquals("0", Overlay.of(model.getItems(), 0).getPathInParent());
 		assertEquals("A", Overlay.of(model.getEntries(), "A").getPathInParent());
 	}
 
@@ -121,12 +123,29 @@ public class ApiTests extends Assert {
 				Overlay.of(model.getNamedIntegers(), "I").getOverlay() == Overlay.of(model).find("/namedIntegers/II"));
 	}
 
+	@Test
+	public void testPathFromRoot() {
+		assertEquals("/description", Overlay.of(model, "description", String.class).getPathFromRoot());
+		assertEquals("/width", Overlay.of(model, "width", Integer.class).getPathFromRoot());
+		assertEquals("/color", Overlay.of(model, "color", Color.class).getPathFromRoot());
+		assertEquals("/items/0", Overlay.of(model.getItems(), 0).getPathFromRoot());
+		assertEquals("/items/0/title", Overlay.of(model.getItem(0), "title", String.class).getPathFromRoot());
+		assertEquals(Overlay.of(model, "description", String.class).getPathFromRoot(), "/description");
+		assertEquals(Overlay.of(model, "description", String.class).getPathFromRoot(), "/description");
+	}
+
 	private List<String> getEntryKeys() {
 		return Lists.newArrayList(model.getEntries().keySet());
 	}
 
 	private void checkIntegers(Integer... integers) {
 		assertEquals(Arrays.asList(integers), model.getIntegers());
+	}
+
+	private void checkIntegersPaths() {
+		for (int i = 0; i < model.getIntegers().size(); i++) {
+			assertEquals(Integer.toString(i), Overlay.of(model.getIntegers(), i).getPathInParent());
+		}
 	}
 
 	private void checkNamedIntegerNames(String... names) {

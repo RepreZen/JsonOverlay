@@ -147,6 +147,11 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
 
+	/* package */String _getPathFromRoot() {
+		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
+				: "/";
+	}
+
 	protected abstract V _fromJson(JsonNode json);
 
 	protected void _setParent(JsonOverlay<?> parent) {

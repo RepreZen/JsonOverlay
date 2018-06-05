@@ -66,6 +66,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		} else {
 			fillWithValues();
 		}
+		_setChildParentPaths();
 	}
 
 	private void fillWithJson() {
@@ -100,25 +101,43 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	public void set(int index, V itemValue) {
 		value.set(index, itemValue);
 		overlays.set(index, itemOverlayFor(itemValue));
+		_setChildParentPath(index);
 	}
 
 	public void add(V itemValue) {
 		value.add(itemValue);
 		overlays.add(itemOverlayFor(itemValue));
+		_setChildParentPath(overlays.size() - 1);
 	}
 
 	public void insert(int index, V itemValue) {
 		value.add(index, itemValue);
 		overlays.add(index, itemOverlayFor(itemValue));
+		_setChildParentPaths(index, overlays.size());
 	}
 
 	public void remove(int index) {
 		value.remove(index);
 		overlays.remove(index);
+		_setChildParentPaths(index, overlays.size());
 	}
 
 	public int size() {
 		return overlays.size();
+	}
+
+	private void _setChildParentPaths() {
+		_setChildParentPaths(0, overlays.size());
+	}
+
+	private void _setChildParentPath(int index) {
+		_setChildParentPaths(index, index + 1);
+	}
+
+	private void _setChildParentPaths(int from, int to) {
+		for (int i = from; i < to; i++) {
+			overlays.get(i)._setPathInParent(Integer.toString(i));
+		}
 	}
 
 	@Override

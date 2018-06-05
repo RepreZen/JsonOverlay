@@ -16,6 +16,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 public class PropertiesTests extends Assert {
 
@@ -103,6 +104,13 @@ public class PropertiesTests extends Assert {
 		checkPropertyNames(foo, "num", "string");
 		foo = createFooWithJson();
 		checkPropertyNames(foo);
+	}
+
+	@Test
+	public void testPropertyNames() {
+		Foo foo = createFooWithJson();
+		assertEquals(Sets.newHashSet("stringField", "numField", "listField", "mapField", "rootMap"),
+				Sets.newHashSet(Overlay.of(foo).getPropertyNames()));
 	}
 
 	private void checkPropertyNames(Foo foo, String... expected) {

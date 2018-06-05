@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.reprezen.jovl2.model.TestModelParser;
 import com.reprezen.jovl2.model.impl.TestModelImpl;
 import com.reprezen.jovl2.model.intf.Color;
@@ -93,6 +94,14 @@ public class ApiTests extends Assert {
 		assertTrue(model == Overlay.of(model, "namedIntegers", MapOverlay.class).getModel());
 		assertTrue(model == Overlay.of(model.getEntries(), "A").getModel());
 		assertTrue(model == Overlay.of(model.getItems(), 0).getModel());
+	}
+
+	@Test
+	public void testPropNames() {
+		assertEquals(Sets.newHashSet("description", "width", "height", "entries", "items", "integers", "namedIntegers",
+				"color", "scalars"), Sets.newHashSet(Overlay.of(model).getPropertyNames()));
+		assertEquals(Sets.newHashSet("title"), Sets.newHashSet(Overlay.of(model.getEntries(), "A").getPropertyNames()));
+		assertEquals(Sets.newHashSet("title"), Sets.newHashSet(Overlay.of(model.getItems(), 0).getPropertyNames()));
 	}
 
 	private List<String> getEntryKeys() {

@@ -245,20 +245,20 @@ public class Overlay<V> {
 	// }
 
 	// public static <V> URL getJsonReference(JsonOverlay<V> overlay) {
-	// return ((JsonOverlay<V>) overlay)._getJsonReference();
+	// return overlay._getJsonReference();
 	// }
 
-	// public List<String> getPropertyNames() {
-	// if (overlay instanceof PropertiesOverlay) {
-	// return ((PropertiesOverlay<?>) overlay)._getPropertyNames();
-	// } else {
-	// return null;
-	// }
-	// }
+	public List<String> getPropertyNames() {
+		if (overlay instanceof PropertiesOverlay) {
+			return ((PropertiesOverlay<?>) overlay)._getPropertyNames();
+		} else {
+			return null;
+		}
+	}
 
-	// public static <V> List<String> getPropertyNames(JsonOverlay<V> overlay) {
-	// return new Overlay<V>(overlay).getPropertyNames();
-	// }
+	public static <V> List<String> getPropertyNames(JsonOverlay<V> overlay) {
+		return new Overlay<V>(overlay).getPropertyNames();
+	}
 
 	public boolean isReference(String key) {
 		return getReference(key) != null;

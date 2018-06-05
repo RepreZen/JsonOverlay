@@ -130,8 +130,20 @@ public class ApiTests extends Assert {
 		assertEquals("/color", Overlay.of(model, "color", Color.class).getPathFromRoot());
 		assertEquals("/items/0", Overlay.of(model.getItems(), 0).getPathFromRoot());
 		assertEquals("/items/0/title", Overlay.of(model.getItem(0), "title", String.class).getPathFromRoot());
-		assertEquals(Overlay.of(model, "description", String.class).getPathFromRoot(), "/description");
-		assertEquals(Overlay.of(model, "description", String.class).getPathFromRoot(), "/description");
+		assertEquals("/entries", Overlay.of(model.getEntries()).getPathFromRoot());
+		assertEquals("/entries/A", Overlay.of(model.getEntries(), "A").getPathFromRoot());
+	}
+
+	@Test
+	public void testJsonRefs() {
+		String url = getClass().getResource("/apiTestModel.yaml").toString();
+		assertEquals(url + "#/description", Overlay.of(model, "description", String.class).getJsonReference());
+		assertEquals(url + "#/width", Overlay.of(model, "width", Integer.class).getJsonReference());
+		assertEquals(url + "#/color", Overlay.of(model, "color", Color.class).getJsonReference());
+		assertEquals(url + "#/items/0", Overlay.of(model.getItems(), 0).getJsonReference());
+		assertEquals(url + "#/items/0/title", Overlay.of(model.getItem(0), "title", String.class).getJsonReference());
+		assertEquals(url + "#/entries", Overlay.of(model.getEntries()).getJsonReference());
+		assertEquals(url + "#/entries/A", Overlay.of(model.getEntries(), "A").getJsonReference());
 	}
 
 	private List<String> getEntryKeys() {

@@ -22,16 +22,27 @@ public abstract class OverlayFactory<V> {
 		return overlay;
 	}
 
+	@SuppressWarnings("unchecked")
 	public JsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
 		JsonOverlay<V> overlay;
 		if (Reference.isReferenceNode(json)) {
+			// set up a reference overlay delegate, but don't resolve until accessed
 			overlay = _create((V) null, null, refMgr);
 			RefOverlay<V> refOverlay = new RefOverlay<V>(json, parent, this, refMgr);
 			overlay._setReference(refOverlay);
 		} else {
-			overlay = _create(json, parent, refMgr);
-			refMgr.getRegistry().register(json, getSignature(), overlay);
-			overlay._elaborate(true);
+			JsonOverlay<?> existing = refMgr.getRegistry().getOverlay(json, getSignature());
+			if (existing != null) {
+				overlay = (JsonOverlay<V>) existing;
+				if (parent != null) {
+					overlay._setParent(parent);
+				}
+			} else {
+				overlay = _create(json, parent, refMgr);
+				overlay._setParent(parent);
+				refMgr.getRegistry().register(json, getSignature(), overlay);
+				overlay._elaborate(true);
+			}
 		}
 		return overlay;
 	}

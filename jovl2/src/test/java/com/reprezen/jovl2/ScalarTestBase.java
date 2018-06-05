@@ -1,5 +1,7 @@
 package com.reprezen.jovl2;
 
+import java.net.MalformedURLException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -70,6 +72,12 @@ public abstract class ScalarTestBase<V> extends Assert {
 	public void testPathFromRoot() {
 		JsonOverlay<V> ovl = factory.create(value, null, refMgr);
 		assertEquals(Overlay.of(ovl).getPathFromRoot(), "/");
+	}
+
+	@Test
+	public void testJsonRef() throws MalformedURLException {
+		JsonOverlay<V> ovl = factory.create(value, null, refMgr);
+		assertEquals("#", Overlay.of(ovl).getJsonReference());
 	}
 
 	public void testWithJson(JsonNode json, V val) {

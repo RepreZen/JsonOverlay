@@ -18,32 +18,34 @@ public class RefOverlay<V> {
 	}
 
 	/* package */JsonOverlay<V> getOverlay() {
+		if (!reference.isResolved()) {
+			reference.resolve();
+		}
+		if (target == null && reference.isValid()) {
+			ReferenceRegistry registry = refMgr.getRegistry();
+			{
+				@SuppressWarnings("unchecked")
+				JsonOverlay<V> castTarget = (JsonOverlay<V>) registry.getOverlay(reference.getNormalizedRef(),
+						factory.getSignature());
+				this.target = castTarget;
+			}
+			if (target == null) {
+				@SuppressWarnings("unchecked")
+				JsonOverlay<V> castTarget = (JsonOverlay<V>) registry.getOverlay(reference.getJson(),
+						factory.getSignature());
+				this.target = castTarget;
+			}
+			if (target == null) {
+				target = factory.create(reference.getJson(), null, refMgr);
+				target._setCreatingRef(reference);
+				refMgr.getRegistry().register(reference.getNormalizedRef(), factory.getSignature(), target);
+			}
+		}
 		return target;
 	}
 
 	public V _get() {
-		if (!reference.isResolved()) {
-			reference.resolve();
-			if (reference.isValid()) {
-				ReferenceRegistry registry = refMgr.getRegistry();
-				{
-					@SuppressWarnings("unchecked")
-					JsonOverlay<V> castTarget = (JsonOverlay<V>) registry.getOverlay(reference.getNormalizedRef(),
-							factory.getSignature());
-					this.target = castTarget;
-				}
-				if (target == null) {
-					@SuppressWarnings("unchecked")
-					JsonOverlay<V> castTarget = (JsonOverlay<V>) registry.getOverlay(reference.getJson(),
-							factory.getSignature());
-					this.target = castTarget;
-				}
-				if (target == null) {
-					target = factory.create(reference.getJson(), null, refMgr);
-					refMgr.getRegistry().register(reference.getNormalizedRef(), factory.getSignature(), target);
-				}
-			}
-		}
+		getOverlay();
 		return target != null ? target._get() : null;
 	}
 

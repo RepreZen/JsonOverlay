@@ -240,13 +240,21 @@ public class Overlay<V> {
 		return overlay._getPathFromRoot();
 	}
 
-	// public URL getJsonReference() {
-	// return overlay._getJsonReference();
-	// }
+	public String getJsonReference() {
+		return overlay._getJsonReference();
+	}
 
-	// public static <V> URL getJsonReference(JsonOverlay<V> overlay) {
-	// return overlay._getJsonReference();
-	// }
+	public String getJsonReference(boolean forRef) {
+		return overlay._getJsonReference(forRef);
+	}
+
+	public static <V> String getJsonReference(JsonOverlay<V> overlay) {
+		return overlay._getJsonReference();
+	}
+
+	public static <V> String getJsonReference(JsonOverlay<V> overlay, boolean forRef) {
+		return overlay._getJsonReference(forRef);
+	}
 
 	public List<String> getPropertyNames() {
 		if (overlay instanceof PropertiesOverlay) {

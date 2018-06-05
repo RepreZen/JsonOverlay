@@ -36,6 +36,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	private String pathInParent = null;
 	private boolean present;
 	private RefOverlay<V> reference = null;
+	private Reference creatingRef = null;
 
 	protected JsonOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
 		this.json = null;
@@ -99,6 +100,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.reference = reference;
 	}
 
+	/* package */ Reference _getCreatingRef() {
+		return creatingRef;
+	}
+
+	/* pakcage */ void _setCreatingRef(Reference creatingRef) {
+		this.creatingRef = creatingRef;
+	}
+
 	/* package */ boolean _isPresent() {
 		return present;
 	}
@@ -150,6 +159,24 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	/* package */String _getPathFromRoot() {
 		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
 				: "/";
+	}
+
+	/* package */String _getJsonReference() {
+		return _getJsonReference(false);
+	}
+
+	/* package */String _getJsonReference(boolean forRef) {
+		if (_isReference() && reference._getReference().isValid() && !forRef) {
+			return reference.getOverlay()._getJsonReference(false);
+		}
+		if (creatingRef != null && creatingRef.isValid()) {
+			return creatingRef.getNormalizedRef();
+		} else if (parent != null) {
+			String ref = parent._getJsonReference();
+			return ref + (ref.contains("#") ? "" : "#") + "/" + pathInParent;
+		} else {
+			return "#";
+		}
 	}
 
 	protected abstract V _fromJson(JsonNode json);
@@ -230,52 +257,54 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	// some utility classes for overlays
 
+	private static JsonNodeFactory fac = MinSharingJsonNodeFactory.instance;
+
 	protected static ObjectNode _jsonObject() {
-		return JsonNodeFactory.instance.objectNode();
+		return fac.objectNode();
 	}
 
 	protected static ArrayNode _jsonArray() {
-		return JsonNodeFactory.instance.arrayNode();
+		return fac.arrayNode();
 	}
 
 	protected static TextNode _jsonScalar(String s) {
-		return JsonNodeFactory.instance.textNode(s);
+		return fac.textNode(s);
 	}
 
 	protected static ValueNode _jsonScalar(int n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(long n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(short n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(byte n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(double n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(float n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(BigInteger n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonScalar(BigDecimal n) {
-		return JsonNodeFactory.instance.numberNode(n);
+		return fac.numberNode(n);
 	}
 
 	protected static ValueNode _jsonBoolean(boolean b) {
-		return JsonNodeFactory.instance.booleanNode(b);
+		return fac.booleanNode(b);
 	}
 
 	protected static MissingNode _jsonMissing() {
@@ -283,6 +312,6 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	protected static NullNode _jsonNull() {
-		return JsonNodeFactory.instance.nullNode();
+		return fac.nullNode();
 	}
 }

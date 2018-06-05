@@ -44,9 +44,13 @@ public class ReferenceRegistry {
 	}
 
 	public void register(JsonNode json, String factorySig, JsonOverlay<?> overlay) {
-		if (!overlaysByJson.containsKey(json)) {
-			overlaysByJson.put(json, Maps.newHashMap());
+		// can't share boolean or nulls because they don't have a public constructor,
+		// and factory uses shared instances
+		if (!json.isMissingNode() && !json.isBoolean() && !json.isNull()) {
+			if (!overlaysByJson.containsKey(json)) {
+				overlaysByJson.put(json, Maps.newHashMap());
+			}
+			overlaysByJson.get(json).put(factorySig, overlay);
 		}
-		overlaysByJson.get(json).put(factorySig, overlay);
 	}
 }

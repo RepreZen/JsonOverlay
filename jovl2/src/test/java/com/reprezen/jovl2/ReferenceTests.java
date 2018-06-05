@@ -101,4 +101,20 @@ public class ReferenceTests extends Assert {
 		assertTrue(model.getScalar("ext2") == Overlay.of(model).find("/scalars/ext1"));
 		assertTrue(model.getScalar("ext3") == Overlay.of(model).find("/scalars/s1"));
 	}
+
+	@Test
+	public void testJsonRefs() {
+		String url = getClass().getResource("/refTest.yaml").toString();
+		String ext = getClass().getResource("/external.yaml").toString();
+		assertEquals(url, Overlay.of(model).getJsonReference());
+		assertEquals(url + "#/scalars/s1", Overlay.of(model.getScalars(), "s1").getJsonReference());
+		assertEquals(url + "#/scalars/s1/stringValue",
+				Overlay.of(model.getScalar("s1"), "stringValue", String.class).getJsonReference());
+		assertEquals(url + "#/scalars/s1/stringValue",
+				Overlay.of(model.getScalar("s2"), "stringValue", String.class).getJsonReference());
+		assertEquals(url + "#/scalars/s1", Overlay.of(model.getScalar("s3")).getJsonReference());
+		assertEquals(ext + "#/scalar1", Overlay.of(model.getScalar("ext1")).getJsonReference());
+		assertEquals(ext + "#/scalar1", Overlay.of(model.getScalar("ext2")).getJsonReference());
+		assertEquals(url + "#/scalars/s1", Overlay.of(model.getScalar("ext3")).getJsonReference());
+	}
 }

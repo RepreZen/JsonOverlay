@@ -55,10 +55,24 @@ public class Reference {
 	}
 
 	public boolean isValid() {
+		return isValid(true);
+	}
+
+	public boolean isValid(boolean resolve) {
+		if (resolve) {
+			resolve();
+		}
 		return isResolved() && valid;
 	}
 
 	public boolean isInvalid() {
+		return isInvalid(true);
+	}
+
+	public boolean isInvalid(boolean resolve) {
+		if (resolve) {
+			resolve();
+		}
 		return isResolved() && !valid;
 	}
 
@@ -71,9 +85,7 @@ public class Reference {
 	}
 
 	public JsonNode getJson() {
-		if (!isResolved()) {
-			resolve();
-		}
+		resolve();
 		return json;
 	}
 
@@ -88,7 +100,7 @@ public class Reference {
 	public boolean resolve() {
 		Set<String> visited = Sets.newHashSet();
 		Reference current = this;
-		while (!isResolved()) {
+		while (valid == null) {
 			String normalized = current.getNormalizedRef();
 			if (visited.contains(normalized)) {
 				return failResolve(null, new ReferenceCycleException(this, current));
@@ -104,7 +116,7 @@ public class Reference {
 			currentJson = current.pointer != null ? currentJson.at(current.pointer) : currentJson;
 			if (isReferenceNode(currentJson)) {
 				current = manager.getReference(currentJson);
-				if (current.isInvalid()) {
+				if (current.isInvalid(false)) {
 					return failResolve("Invalid reference in reference chain", current.getInvalidReason());
 				}
 			} else {
@@ -115,7 +127,7 @@ public class Reference {
 				this.valid = true;
 			}
 		}
-		return isValid();
+		return isValid(false);
 	}
 
 	private boolean failResolve(String msg) {

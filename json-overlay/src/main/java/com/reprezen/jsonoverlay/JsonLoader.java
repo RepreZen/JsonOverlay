@@ -10,19 +10,18 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
+import java.util.Scanner;
 
-import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 
 public class JsonLoader {
@@ -41,9 +40,11 @@ public class JsonLoader {
 		if (cache.containsKey(urlString)) {
 			return cache.get(urlString);
 		}
-		try(InputStream in = url.openStream()) {
-			String json = IOUtils.toString(in, Charsets.UTF_8);
-			return loadString(url, json);
+		try (InputStream in = url.openStream()) {
+			try (Scanner scanner = new Scanner(in, "UTF-8")) {
+				String json = scanner.useDelimiter("\\z").next();
+				return loadString(url, json);
+			}
 		}
 	}
 

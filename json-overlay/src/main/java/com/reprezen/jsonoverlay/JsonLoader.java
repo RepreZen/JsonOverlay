@@ -42,7 +42,7 @@ public class JsonLoader {
 		}
 		try (InputStream in = url.openStream()) {
 			try (Scanner scanner = new Scanner(in, "UTF-8")) {
-				String json = scanner.useDelimiter("\\z").next();
+				String json = scanner.useDelimiter("\\Z").next();
 				return loadString(url, json);
 			}
 		}

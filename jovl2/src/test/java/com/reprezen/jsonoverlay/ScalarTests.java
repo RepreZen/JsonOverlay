@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.reprezen.jsonoverlay.ScalarTests.EnumTests.XEnum;
 
 public class ScalarTests {
 
@@ -198,6 +197,10 @@ public class ScalarTests {
 		}
 	}
 
+	public static enum XEnum {
+		A, B, C
+	}
+
 	@RunWith(Parameterized.class)
 	public static class EnumTests extends ScalarTestBase<XEnum> {
 
@@ -214,10 +217,6 @@ public class ScalarTests {
 		@Override
 		protected JsonNode toJson(XEnum value) {
 			return value != null ? jfac.textNode(value.name()) : MissingNode.getInstance();
-		}
-
-		public static enum XEnum {
-			A, B, C
 		}
 
 		public static class XEnumOverlay extends EnumOverlay<XEnum> {

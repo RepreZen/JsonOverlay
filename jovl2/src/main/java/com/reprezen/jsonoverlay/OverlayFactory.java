@@ -28,8 +28,7 @@ public abstract class OverlayFactory<V> {
 		if (Reference.isReferenceNode(json)) {
 			// set up a reference overlay delegate, but don't resolve until accessed
 			overlay = _create((V) null, null, refMgr);
-			RefOverlay<V> refOverlay = new RefOverlay<V>(json, parent, this, refMgr);
-			overlay._setReference(refOverlay);
+			overlay._setReference(refMgr.getReference(json));
 		} else {
 			JsonOverlay<?> existing = refMgr.getRegistry().getOverlay(json, getSignature());
 			if (existing != null) {

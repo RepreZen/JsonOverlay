@@ -171,7 +171,7 @@ class ImplGenerator extends TypeGenerator {
 		}
 		methods.addMember('''
 			public void set«f.name»(«f.type» «f.lcName») {
-				_set("«f.propertyName»", «f.lcName», «f.type».class);
+				_setScalar("«f.propertyName»", «f.lcName», «f.type».class);
 			}
 		''')
 		return methods
@@ -202,7 +202,7 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		methods.addMember('''
 			public void set«f.plural»(List<«f.type»> «f.lcPlural») {
-				_set("«f.propertyName»", «f.lcPlural», «f.type».class);
+				_setList("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''
@@ -260,7 +260,7 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		methods.addMember('''
 			public void set«f.plural»(Map<String, «f.type»> «f.lcPlural») {
-				_set("«f.propertyName»", «f.lcPlural», «f.type».class);
+				_setMap("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''

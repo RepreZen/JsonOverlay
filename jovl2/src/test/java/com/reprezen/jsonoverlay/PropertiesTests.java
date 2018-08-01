@@ -186,7 +186,7 @@ public class PropertiesTests extends Assert {
 		}
 
 		public void setStringField(String value) {
-			_set("stringField", value, String.class);
+			_setScalar("stringField", value, String.class);
 		}
 
 		public Integer getNumField() {
@@ -194,7 +194,7 @@ public class PropertiesTests extends Assert {
 		}
 
 		public void setNumField(Integer value) {
-			_set("numField", value, Integer.class);
+			_setScalar("numField", value, Integer.class);
 		}
 
 		public List<Integer> getListField() {

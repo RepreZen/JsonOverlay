@@ -329,8 +329,7 @@ public class Overlay<V> {
 	}
 
 	private Reference getReference(JsonOverlay<?> overlay) {
-		RefOverlay<?> refOverlay = overlay != null ? overlay._getReference() : null;
-		return refOverlay != null ? refOverlay._getReference() : null;
+		return overlay != null ? overlay._getReference() : null;
 	}
 
 	private static JsonOverlay<?> getSidebandOverlay(Object o) {

@@ -67,7 +67,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return overlay;
 	}
 
-	protected <T> void _set(String name, T val, Class<T> cls) {
+	protected <T> void _setScalar(String name, T val, Class<T> cls) {
 		@SuppressWarnings("unchecked")
 		JsonOverlay<T> overlay = (JsonOverlay<T>) children.get(name);
 		overlay._set(val);
@@ -86,12 +86,16 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	protected <T> T _get(String name, int index, Class<T> cls) {
+		return _get(name, index, true, cls);
+	}
+
+	protected <T> T _get(String name, int index, boolean elaborate, Class<T> cls) {
 		@SuppressWarnings("unchecked")
 		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
 		return overlay.get(index);
 	}
 
-	protected <T> void _set(String name, List<T> listVal, Class<T> cls) {
+	protected <T> void _setList(String name, List<T> listVal, Class<T> cls) {
 		@SuppressWarnings("unchecked")
 		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
 		overlay._set(listVal);
@@ -134,12 +138,16 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	protected <T> T _get(String name, String key, Class<T> cls) {
+		return _get(name, key, true, cls);
+	}
+
+	protected <T> T _get(String name, String key, boolean elaborate, Class<T> cls) {
 		@SuppressWarnings("unchecked")
 		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
 		return overlay.get(key);
 	}
 
-	protected <T> void _set(String name, Map<String, T> mapVal, Class<T> cls) {
+	protected <T> void _setMap(String name, Map<String, T> mapVal, Class<T> cls) {
 		@SuppressWarnings("unchecked")
 		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
 		overlay._set(mapVal);
@@ -186,7 +194,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	protected boolean _isElaborated() {
+	public boolean _isElaborated() {
 		return elaborated;
 	}
 

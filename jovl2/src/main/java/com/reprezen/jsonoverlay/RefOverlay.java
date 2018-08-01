@@ -17,6 +17,13 @@ public class RefOverlay<V> {
 		this.refMgr = refMgr;
 	}
 
+	public RefOverlay(Reference reference, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		this.reference = reference;
+		this.parent = parent;
+		this.factory = factory;
+		this.refMgr = refMgr;
+	}
+
 	/* package */JsonOverlay<V> getOverlay() {
 		if (!reference.isResolved()) {
 			reference.resolve();

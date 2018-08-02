@@ -1,0 +1,12 @@
+scalar1:
+  stringValue: hello
+  intValue: 10
+  numberValue: 3.1
+  boolValue: true
+  objValue: [1,2,3]
+  primValue: abcde
+  colorValue: BLUE
+scalar2:
+  $ref: "#/scalar1"
+scalar3:
+  $ref: "refTest.yaml#/scalars/s1"  

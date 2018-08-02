@@ -15,18 +15,18 @@ import java.math.BigInteger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class PrimitiveOverlay extends ScalarOverlay<Object> {
+public final class PrimitiveOverlay extends ScalarOverlay<Object> {
 
-	private PrimitiveOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+	private PrimitiveOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
-	private PrimitiveOverlay(Object value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+	private PrimitiveOverlay(Object value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 	}
 
 	@Override
-	public Object fromJson(JsonNode json) {
+	protected Object _fromJson(JsonNode json) {
 		if (json.isTextual()) {
 			return json.textValue();
 		} else if (json.isNumber()) {
@@ -39,27 +39,27 @@ public class PrimitiveOverlay extends ScalarOverlay<Object> {
 	}
 
 	@Override
-	public JsonNode _toJsonInternal(SerializationOptions options) {
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		if (value == null) {
-			return jsonMissing();
+			return _jsonMissing();
 		} else if (value instanceof String) {
-			return jsonScalar((String) value);
+			return _jsonScalar((String) value);
 		} else if (value instanceof BigDecimal) {
-			return jsonScalar((BigDecimal) value);
+			return _jsonScalar((BigDecimal) value);
 		} else if (value instanceof BigInteger) {
-			return jsonScalar((BigInteger) value);
+			return _jsonScalar((BigInteger) value);
 		} else if (value instanceof Byte) {
-			return jsonScalar((Byte) value);
+			return _jsonScalar((Byte) value);
 		} else if (value instanceof Double) {
-			return jsonScalar((Double) value);
+			return _jsonScalar((Double) value);
 		} else if (value instanceof Float) {
-			return jsonScalar((Float) value);
+			return _jsonScalar((Float) value);
 		} else if (value instanceof Integer) {
-			return jsonScalar((Integer) value);
+			return _jsonScalar((Integer) value);
 		} else if (value instanceof Long) {
-			return jsonScalar((Long) value);
+			return _jsonScalar((Long) value);
 		} else if (value instanceof Short) {
-			return jsonScalar((Short) value);
+			return _jsonScalar((Short) value);
 		} else {
 			return null;
 		}
@@ -73,13 +73,13 @@ public class PrimitiveOverlay extends ScalarOverlay<Object> {
 		}
 
 		@Override
-		public PrimitiveOverlay _create(Object value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new PrimitiveOverlay(value, parent, refReg);
+		public PrimitiveOverlay _create(Object value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new PrimitiveOverlay(value, parent, refMgr);
 		}
 
 		@Override
-		public PrimitiveOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new PrimitiveOverlay(json, parent, refReg);
+		public PrimitiveOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new PrimitiveOverlay(json, parent, refMgr);
 		}
 
 	};

@@ -12,24 +12,24 @@ package com.reprezen.jsonoverlay;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class BooleanOverlay extends ScalarOverlay<Boolean> {
+public final class BooleanOverlay extends ScalarOverlay<Boolean> {
 
-	private BooleanOverlay(Boolean value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+	private BooleanOverlay(Boolean value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 	}
 
-	private BooleanOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+	private BooleanOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
 	@Override
-	public Boolean fromJson(JsonNode json) {
+	protected Boolean _fromJson(JsonNode json) {
 		return json.isBoolean() ? json.booleanValue() : null;
 	}
 
 	@Override
-	public JsonNode _toJsonInternal(SerializationOptions options) {
-		return value != null ? jsonBoolean(value) : jsonMissing();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonBoolean(value) : _jsonMissing();
 	}
 
 	public static OverlayFactory<Boolean> factory = new OverlayFactory<Boolean>() {
@@ -39,13 +39,13 @@ public class BooleanOverlay extends ScalarOverlay<Boolean> {
 		}
 
 		@Override
-		public BooleanOverlay _create(Boolean value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new BooleanOverlay(value, parent, refReg);
+		public BooleanOverlay _create(Boolean value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new BooleanOverlay(value, parent, refMgr);
 		}
 
 		@Override
-		public BooleanOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new BooleanOverlay(json, parent, refReg);
+		public BooleanOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new BooleanOverlay(json, parent, refMgr);
 		}
 	};
 }

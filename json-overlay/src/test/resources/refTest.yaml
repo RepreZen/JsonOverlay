@@ -1,0 +1,53 @@
+description: Reference Test
+scalars:
+  s1:
+    stringValue: hello
+    intValue: 10
+    numberValue: 3.1
+    boolValue: true
+    objValue: [1,2,3]
+    primValue: abcde
+    colorValue: BLUE
+  s2:
+    stringValue:
+      $ref: "#/scalars/s1/stringValue"
+    intValue:
+      $ref: "#/scalars/s1/intValue"
+    numberValue:
+      $ref: "#/scalars/s1/numberValue"
+    boolValue:
+      $ref: "#/scalars/s1/boolValue"
+    objValue:
+      $ref: "#/scalars/s1/objValue"
+    primValue:
+      $ref: "#/scalars/s1/primValue"
+    colorValue:
+      $ref: "#/scalars/s1/colorValue"
+  s3:
+    $ref: "#/scalars/s1"
+  s4:
+    $ref: "#/scalars/s3"
+  s5:
+    $ref: "#/scalars/s2"
+  s6:
+    embeddedScalars:
+      $ref: "#/scalars/s5"
+  s7:
+    embeddedScalars:
+      $ref: "#/scalars/s7"
+  s8a:
+    embeddedScalars:
+      $ref: "#/scalars/s8b"
+  s8b:
+    embeddedScalars:
+      $ref: "#/scalars/s8a"
+  badPointer:
+    $ref: "#hello"
+  cycle:
+    $ref: "#/scalars/cycle"
+  ext1:
+    $ref: "external.yaml#/scalar1"
+  ext2:
+    $ref: "external.yaml#/scalar2"
+  ext3:
+    $ref: "external.yaml#/scalar3"

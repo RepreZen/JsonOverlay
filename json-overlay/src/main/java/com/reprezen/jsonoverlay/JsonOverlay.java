@@ -12,9 +12,6 @@ package com.reprezen.jsonoverlay;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Iterator;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,202 +24,224 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
-public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
+public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	protected final static ObjectMapper mapper = new ObjectMapper();
 
 	protected V value = null;
 	protected JsonOverlay<?> parent;
-	protected JsonNode json = null;
-	protected ReferenceRegistry refReg;
+	protected JsonNode json;
+	protected final ReferenceManager refMgr;
+	protected final OverlayFactory<V> factory;
 	private String pathInParent = null;
-	private Reference reference = null;
+	private boolean present;
+	private RefOverlay<V> refOverlay = null;
+	private Reference creatingRef = null;
 
-	public JsonOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+	protected JsonOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		this.json = null;
 		this.value = value;
 		this.parent = parent;
-		this.refReg = refReg;
+		this.factory = factory;
+		this.refMgr = refMgr;
+		this.present = value != null;
 	}
 
-	public JsonOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
+	protected JsonOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
 		this.json = json;
-		this.value = fromJson(json);
+		if (Reference.isReferenceNode(json)) {
+			this.refOverlay = new RefOverlay<V>(json, parent, factory, refMgr);
+		} else {
+			this.value = _fromJson(json);
+		}
 		this.parent = parent;
-		this.refReg = refReg;
-	}
-
-	protected void setReference(Reference reference) {
-		this.reference = reference;
-	}
-
-	@Override
-	/* protected */boolean _isPresent() {
-		return value != null && !json.isMissingNode();
-	}
-
-	@Override
-	/* package */boolean _isElaborated() {
-		// most overlays are complete when constructed
-		return true;
-	}
-
-	@Override
-	/* package */ AbstractJsonOverlay<?> _find(JsonPointer path) {
-		return path.matches() ? this : _findInternal(path);
-	}
-
-	abstract protected AbstractJsonOverlay<?> _findInternal(JsonPointer path);
-
-	@Override
-	/* package */ AbstractJsonOverlay<?> _find(String path) {
-		return _find(JsonPointer.compile(path));
+		this.factory = factory;
+		this.refMgr = refMgr;
+		this.present = !json.isMissingNode();
 	}
 
 	/* package */ V _get() {
-		return value;
+		return _get(true);
 	}
 
-	/* package */void _set(V value) {
-		_set(value, true);
+	/* package */ V _get(boolean elaborate) {
+		if (_isValidRef()) {
+			return refOverlay._get();
+		} else {
+			if (elaborate) {
+				_ensureElaborated();
+			}
+			return value;
+		}
 	}
 
-	protected void _set(V value, boolean invalidate) {
+	/* package */ void _set(V value) {
 		this.value = value;
+		this.present = value != null;
+		this.refOverlay = null;
+	}
+
+	/* package */ JsonOverlay<V> _copy() {
+		return factory.create(_get(), null, refMgr);
+	}
+
+	/* package */ boolean _isReference() {
+		return refOverlay != null;
+	}
+
+	private boolean _isValidRef() {
+		return refOverlay != null ? refOverlay._getReference().isValid() : false;
+	}
+
+	/* package */ Reference _getReference() {
+		return refOverlay != null ? refOverlay._getReference() : null;
+	}
+
+	/* package */ void _setReference(Reference reference) {
+		this.refOverlay = new RefOverlay<V>(reference, parent, factory, refMgr);
+	}
+
+	/* package */ Reference _getCreatingRef() {
+		return creatingRef;
+	}
+
+	/* pakcage */ void _setCreatingRef(Reference creatingRef) {
+		this.creatingRef = creatingRef;
+	}
+
+	/* package */ boolean _isPresent() {
+		return (_isValidRef() ? refOverlay.getOverlay() : this).present;
 	}
 
 	/* package */ JsonOverlay<?> _getParent() {
-		return parent;
+		return _getParent(true);
 	}
 
-	protected void setParent(JsonOverlay<?> parent) {
-		this.parent = parent;
+	/* package */ JsonOverlay<?> _getParent(boolean followRef) {
+		return (followRef && _isValidRef() ? refOverlay.getOverlay() : this).parent;
 	}
 
-	protected void setPathInParent(String pathInParent) {
-		this.pathInParent = pathInParent;
+	/* package */ JsonOverlay<?> _getRoot() {
+		if (_isValidRef()) {
+			return refOverlay.getOverlay()._getRoot();
+		} else {
+			JsonOverlay<?> result = this;
+			while (result._getParent() != null) {
+				result = result._getParent();
+			}
+			return result;
+		}
 	}
 
-	/* package */String _getPathInParent() {
-		return pathInParent;
+	/* package */ JsonOverlay<?> _getModel() {
+		if (_isValidRef()) {
+			return refOverlay.getOverlay()._getModel();
+		} else {
+			JsonOverlay<?> modelPart = this._getModelType() != null ? this : null;
+			JsonOverlay<?> result = this;
+			while (result._getParent() != null) {
+				result = result._getParent();
+				modelPart = modelPart == null && result._getModelType() != null ? result : null;
+			}
+			return modelPart != null && modelPart._getModelType().isAssignableFrom(result.getClass()) ? result : null;
+		}
 	}
+
+	protected Class<?> _getModelType() {
+		return _isValidRef() ? refOverlay.getOverlay()._getModelType() : null;
+	}
+
+	/* package */ JsonOverlay<?> _find(JsonPointer path) {
+		return path.matches() ? thisOrRefTarget() : _findInternal(path);
+	}
+
+	/* package */ JsonOverlay<?> _find(String path) {
+		return _find(JsonPointer.compile(path));
+	}
+
+	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
 
 	/* package */String _getPathFromRoot() {
 		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
 				: "/";
 	}
 
-	@Override
-	/* package */URL _getJsonReference() {
-		URL result = null;
-		try {
-			if (reference != null) {
-				result = new URL(reference.getCanonicalRefString());
-			} else {
-				URL parentUrl = parent != null ? parent._getJsonReference() : null;
-				if (parentUrl != null) {
-					JsonPointer ptr = JsonPointer.compile(parentUrl.getRef());
-					ptr = ptr.append(JsonPointer.compile("/" + pathInParent));
-					result = new URL(parentUrl, "#" + ptr.toString());
-				}
-			}
-		} catch (IllegalArgumentException | MalformedURLException e) {
+	/* package */String _getJsonReference() {
+		return _getJsonReference(false);
+	}
+
+	/* package */String _getJsonReference(boolean forRef) {
+		if (_isReference() && refOverlay._getReference().isValid() && !forRef) {
+			return refOverlay.getOverlay()._getJsonReference(false);
 		}
-		return result;
+		if (creatingRef != null && creatingRef.isValid()) {
+			return creatingRef.getNormalizedRef();
+		} else if (parent != null) {
+			String ref = parent._getJsonReference();
+			return ref + (ref.contains("#") ? "" : "#") + "/" + pathInParent;
+		} else {
+			return "#";
+		}
 	}
 
-	/* package */JsonOverlay<?> _getRoot() {
-		return parent != null ? parent._getRoot() : this;
+	protected abstract V _fromJson(JsonNode json);
+
+	protected void _setParent(JsonOverlay<?> parent) {
+		this.parent = parent;
 	}
 
-	protected abstract V fromJson(JsonNode json);
-
-	protected void elaborate() {
+	/* package */ JsonNode _toJson() {
+		return _toJson(SerializationOptions.EMPTY);
 	}
 
-	private static final SerializationOptions emptyOptions = new SerializationOptions();
-
-	@Override
-	/* package */JsonNode _toJson() {
-		return _toJsonInternal(emptyOptions);
-	}
-
-	@Override
-	/* package */JsonNode _toJson(SerializationOptions.Option... options) {
-		return _toJsonInternal(new SerializationOptions(options));
-	}
-
-	@Override
-	/* package */JsonNode _toJson(SerializationOptions options) {
-		return _toJsonInternal(options);
-	}
-
-	/* package */abstract JsonNode _toJsonInternal(SerializationOptions options);
-
-	// some utility classes for overlays
-
-	protected static ObjectNode jsonObject() {
-		return JsonNodeFactory.instance.objectNode();
-	}
-
-	protected static ArrayNode jsonArray() {
-		return JsonNodeFactory.instance.arrayNode();
-	}
-
-	protected static TextNode jsonScalar(String s) {
-		return JsonNodeFactory.instance.textNode(s);
-	}
-
-	protected static ValueNode jsonScalar(int n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(long n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(short n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(byte n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(double n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(float n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(BigInteger n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonScalar(BigDecimal n) {
-		return JsonNodeFactory.instance.numberNode(n);
-	}
-
-	protected static ValueNode jsonBoolean(boolean b) {
-		return JsonNodeFactory.instance.booleanNode(b);
-	}
-
-	protected static MissingNode jsonMissing() {
-		return MissingNode.getInstance();
-	}
-
-	protected static NullNode jsonNull() {
-		return JsonNodeFactory.instance.nullNode();
-	}
-
-	protected static final <T> Iterable<T> iterable(final Iterator<T> iterator) {
-		return new Iterable<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return iterator;
+	/* package */ JsonNode _toJson(SerializationOptions options) {
+		if (_isReference()) {
+			if (!options.isFollowRefs() || refOverlay._getReference().isInvalid()) {
+				ObjectNode obj = _jsonObject();
+				obj.put("$ref", refOverlay._getReference().getRefString());
+				return obj;
+			} else {
+				return refOverlay.getOverlay()._toJson(options);
 			}
-		};
+		} else {
+			return _toJsonInternal(options);
+		}
+	}
+
+	/* package */ JsonNode _toJson(SerializationOptions.Option... options) {
+		return _toJson(new SerializationOptions(options));
+	}
+
+	protected abstract JsonNode _toJsonInternal(SerializationOptions options);
+
+	private JsonOverlay<V> thisOrRefTarget() {
+		if (refOverlay == null || refOverlay._getReference().isInvalid()) {
+			return this;
+		} else {
+			return refOverlay.getOverlay();
+		}
+	}
+
+	protected void _elaborate(boolean atCreation) {
+		// most types of overlay don't need to do any elaboration
+	}
+
+	protected boolean _isElaborated() {
+		return true;
+	}
+
+	protected void _ensureElaborated() {
+		if (!_isElaborated() && refOverlay == null) {
+			_elaborate(false);
+		}
+	}
+
+	/* package */ String _getPathInParent() {
+		return pathInParent;
+	}
+
+	/* package */ void _setPathInParent(String pathInParent) {
+		this.pathInParent = pathInParent;
 	}
 
 	@Override
@@ -230,4 +249,78 @@ public abstract class JsonOverlay<V> extends AbstractJsonOverlay<V> {
 		return _toJson().toString();
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof JsonOverlay) {
+			JsonOverlay<?> castObj = (JsonOverlay<?>) obj;
+			return value != null ? value.equals(castObj.value) : castObj.value == null;
+		} else {
+			return false; // obj is null or not an overlay object
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return value != null ? value.hashCode() : 0;
+	}
+
+	// some utility classes for overlays
+
+	private static JsonNodeFactory fac = MinSharingJsonNodeFactory.instance;
+
+	protected static ObjectNode _jsonObject() {
+		return fac.objectNode();
+	}
+
+	protected static ArrayNode _jsonArray() {
+		return fac.arrayNode();
+	}
+
+	protected static TextNode _jsonScalar(String s) {
+		return fac.textNode(s);
+	}
+
+	protected static ValueNode _jsonScalar(int n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(long n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(short n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(byte n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(double n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(float n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(BigInteger n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonScalar(BigDecimal n) {
+		return fac.numberNode(n);
+	}
+
+	protected static ValueNode _jsonBoolean(boolean b) {
+		return fac.booleanNode(b);
+	}
+
+	protected static MissingNode _jsonMissing() {
+		return MissingNode.getInstance();
+	}
+
+	protected static NullNode _jsonNull() {
+		return fac.nullNode();
+	}
 }

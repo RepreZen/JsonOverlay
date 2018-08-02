@@ -1,4 +1,4 @@
-package com.reprezen.jsonoverlay.test.model;
+package com.reprezen.jsonoverlay.model;
 
 import java.io.IOException;
 
@@ -13,9 +13,9 @@ public class GenTestModel {
 	public static void main(String[] args)
 			throws JsonParseException, JsonMappingException, IOException, ParseException {
 		CodeGenerator.main(new String[] { //
-				"-t", "src/test/java/com/reprezen/jsonoverlay/test/model/types.yaml", //
-				"-p", "com.reprezen.jsonoverlay.test.model", //
-				"-d", "src/test/java/com/reprezen/jsonoverlay/test/model", //
+				"-t", "src/test/java/com/reprezen/jsonoverlay/model/types.yaml", //
+				"-p", "com.reprezen.jsonoverlay.model", //
+				"-d", "src/test/java/com/reprezen/jsonoverlay/model", //
 				"-i", "intf", //
 				"-I", "intf", //
 				"-c", "impl", //

@@ -18,7 +18,7 @@ import com.reprezen.jsonoverlay.gen.TypeData.Field
 import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
-import java.util.Collection
+import java.util.List
 import java.util.Map
 
 class InterfaceGenerator extends TypeGenerator {
@@ -108,11 +108,12 @@ class InterfaceGenerator extends TypeGenerator {
 
 	def private getCollectionMethods(Field f) {
 		val methods = new Members
-		requireTypes(Collection)
-		methods.addMember('''Collection<«f.type»> get«f.plural»();''')
+		requireTypes(List)
+		methods.addMember('''List<«f.type»> get«f.plural»();''')
+		methods.addMember('''List<«f.type»> get«f.plural»(boolean elaborate);''')
 		methods.addMember('''boolean has«f.plural»();''')
 		methods.addMember('''«f.type» get«f.name»(int index);''')
-		methods.addMember('''void set«f.plural»(Collection<«f.type»> «f.lcPlural»);''')
+		methods.addMember('''void set«f.plural»(List<«f.type»> «f.lcPlural»);''')
 		methods.addMember('''void set«f.name»(int index, «f.type» «f.lcName»);''')
 		methods.addMember('''void add«f.name»(«f.type» «f.lcName»);''')
 		methods.addMember('''void insert«f.name»(int index, «f.type» «f.lcName»);''')
@@ -124,6 +125,8 @@ class InterfaceGenerator extends TypeGenerator {
 		requireTypes(Map)
 		val methods = new Members
 		methods.addMember('''Map<String, «f.type»> get«f.plural»();''')
+		methods.addMember('''Map<String, «f.type»> get«f.plural»(boolean elaborate);''')
+		methods.addMember('''boolean has«f.plural»();''')
 		methods.addMember('''boolean has«f.name»(String «f.keyName»);''')
 		methods.addMember('''«f.type» get«f.name»(String «f.keyName»);''')
 		methods.addMember('''void set«f.plural»(Map<String, «f.type»> «f.lcPlural»);''')

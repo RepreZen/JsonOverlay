@@ -1,0 +1,64 @@
+modelType: TestModel
+types:
+- name: TestModel
+  fields:
+    description: {
+      }
+    width:
+      type: Integer
+    height:
+      type: Integer
+    entries:
+      name: Entry
+      structure: map
+      plural: Entries
+    items:
+      structure: collection
+      type: Item
+    integers:
+      structure: collection
+      type: Integer
+    namedIntegers:
+      structure: map
+      type: Integer
+    color:
+      type: Color
+    scalars:
+      structure: map
+      type: Scalars
+- name: Entry
+  fields:
+    title: {
+      }
+- name: Item
+  fields:
+    title: {
+      }
+- name: Color
+  enumValues:
+  - RED
+  - ORANGE
+  - YELLOW
+  - GREEN
+  - BLUE
+  - INDIGO
+  - VIOLET
+- name: Scalars
+  fields:
+    stringValue:
+      type: String
+    intValue:
+      type: Integer
+    numberValue:
+      type: Number
+    boolValue:
+      type: Boolean
+    objValue:
+      type: Object
+    primValue:
+      type: Primitive
+    colorValue:
+      type: Color
+    embeddedScalars:
+      type: Scalars
+

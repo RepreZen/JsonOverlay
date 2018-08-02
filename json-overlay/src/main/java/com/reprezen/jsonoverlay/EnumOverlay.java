@@ -16,17 +16,17 @@ public abstract class EnumOverlay<V extends Enum<V>> extends ScalarOverlay<V> {
 
 	private Class<V> enumClass = null;
 
-	public EnumOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
+	protected EnumOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
 	}
 
-	public EnumOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+	protected EnumOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
 		this.enumClass = getEnumClass();
 	}
 
 	@Override
-	protected V fromJson(JsonNode json) {
+	protected V _fromJson(JsonNode json) {
 		if (!json.isTextual()) {
 			return null;
 		}
@@ -41,8 +41,8 @@ public abstract class EnumOverlay<V extends Enum<V>> extends ScalarOverlay<V> {
 	}
 
 	@Override
-	public JsonNode _toJsonInternal(SerializationOptions options) {
-		return value != null ? jsonScalar(value.name()) : jsonMissing();
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonScalar(value.name()) : _jsonMissing();
 	}
 
 	protected abstract Class<V> getEnumClass();

@@ -13,25 +13,27 @@ package com.reprezen.jsonoverlay;
 public class ResolutionException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
+	private Reference ref;
 
-	public ResolutionException() {
-		super();
+	public ResolutionException(Reference ref) {
+		this(null, ref, null);
 	}
 
-	public ResolutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
-	public ResolutionException(String message, Throwable cause) {
+	public ResolutionException(String message, Reference ref, Throwable cause) {
 		super(message, cause);
+		this.ref = ref;
 	}
 
-	public ResolutionException(String message) {
-		super(message);
+	public ResolutionException(String message, Reference ref) {
+		this(message, ref, null);
 	}
 
-	public ResolutionException(Throwable cause) {
-		super(cause);
+	public ResolutionException(Reference ref, Throwable cause) {
+		this(null, ref, cause);
+	}
+
+	public Reference getReference() {
+		return ref;
 	}
 
 	public static class ReferenceCycleException extends ResolutionException {
@@ -40,8 +42,8 @@ public class ResolutionException extends RuntimeException {
 
 		private Reference detectedAt;
 
-		public ReferenceCycleException(Reference detectedAt) {
-			super("This reference participates in a reference cycle");
+		public ReferenceCycleException(Reference ref, Reference detectedAt) {
+			super("This reference participates in a reference cycle", ref);
 			this.detectedAt = detectedAt;
 		}
 

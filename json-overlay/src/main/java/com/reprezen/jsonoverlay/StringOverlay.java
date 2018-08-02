@@ -12,27 +12,27 @@ package com.reprezen.jsonoverlay;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class StringOverlay extends ScalarOverlay<String> {
+public final class StringOverlay extends ScalarOverlay<String> {
 
-    private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(json, parent, refReg);
-    }
+	private StringOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
+	}
 
-    private StringOverlay(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-        super(value, parent, refReg);
-    }
+	private StringOverlay(String value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
+	}
 
-    @Override
-    public String fromJson(JsonNode json) {
-        return json.isTextual() ? json.textValue() : null;
-    }
+	@Override
+	protected String _fromJson(JsonNode json) {
+		return json.isTextual() ? json.textValue() : null;
+	}
 
-    @Override
-    public JsonNode _toJsonInternal(SerializationOptions options) {
-        return value != null ? jsonScalar(value) : jsonMissing();
-    }
+	@Override
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		return value != null ? _jsonScalar(value) : _jsonMissing();
+	}
 
-    public static OverlayFactory<String> factory = new OverlayFactory<String>() {
+	public static OverlayFactory<String> factory = new OverlayFactory<String>() {
 
 		@Override
 		protected Class<StringOverlay> getOverlayClass() {
@@ -40,13 +40,13 @@ public class StringOverlay extends ScalarOverlay<String> {
 		}
 
 		@Override
-		public StringOverlay _create(String value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new StringOverlay(value, parent, refReg);
+		public StringOverlay _create(String value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new StringOverlay(value, parent, refMgr);
 		}
 
 		@Override
-		public StringOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new StringOverlay(json, parent, refReg);
+		public StringOverlay _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new StringOverlay(json, parent, refMgr);
 		}
 
 	};

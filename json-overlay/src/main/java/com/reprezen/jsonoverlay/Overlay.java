@@ -1,103 +1,109 @@
 package com.reprezen.jsonoverlay;
 
-import java.net.URL;
-import java.util.Collection;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.jsonoverlay.ListOverlay.WrappedCollection;
-import com.reprezen.jsonoverlay.MapOverlay.WrappedMap;
 
 public class Overlay<V> {
 
-	private AbstractJsonOverlay<V> overlay;
+	private JsonOverlay<V> overlay;
 
-	public Overlay(IJsonOverlay<V> overlay) {
-		this.overlay = (AbstractJsonOverlay<V>) overlay;
+	public Overlay(JsonOverlay<V> overlay) {
+		this.overlay = overlay;
+	}
+
+	public static <V> Overlay<V> of(JsonOverlay<V> overlay) {
+		return new Overlay<V>(overlay);
+	}
+
+	public Overlay(IJsonOverlay<?> overlay) {
+		@SuppressWarnings("unchecked")
+		JsonOverlay<V> castOverlay = (JsonOverlay<V>) overlay;
+		this.overlay = castOverlay;
 	}
 
 	public static <V> Overlay<V> of(IJsonOverlay<V> overlay) {
 		return new Overlay<V>(overlay);
 	}
 
-	public static <X> Overlay<Map<String, X>> of(MapOverlay<X> overlay) {
-		return new Overlay<Map<String, X>>((IJsonOverlay<Map<String, X>>) overlay);
+	public static <V> Overlay<Map<String, V>> of(MapOverlay<V> overlay) {
+		return new Overlay<Map<String, V>>(overlay);
 	}
 
 	public static <V> Overlay<Map<String, V>> of(Map<String, V> map) {
-		if (map instanceof WrappedMap) {
-			MapOverlay<V> mapOverlay = ((WrappedMap<V>) map).getOverlay();
-			return Overlay.of(mapOverlay);
-		} else {
-			return null;
-		}
+		@SuppressWarnings("unchecked")
+		MapOverlay<V> overlay = (MapOverlay<V>) getSidebandOverlay(map);
+		return overlay != null ? new Overlay<Map<String, V>>(overlay) : null;
 	}
 
-	public static <X> Overlay<Collection<X>> of(ListOverlay<X> overlay) {
-		return new Overlay<Collection<X>>((IJsonOverlay<Collection<X>>) overlay);
+	public static <V> Overlay<List<V>> of(ListOverlay<V> overlay) {
+		return new Overlay<List<V>>(overlay);
 	}
 
-	public static <V> Overlay<Collection<V>> of(Collection<V> list) {
-		if (list instanceof WrappedCollection) {
-			ListOverlay<V> listOverlay = ((WrappedCollection<V>) list).getOverlay();
-			return Overlay.of(listOverlay);
-		} else {
-			return null;
-		}
+	public static <V> Overlay<List<V>> of(List<V> list) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<V> overlay = (ListOverlay<V>) getSidebandOverlay(list);
+		return overlay != null ? new Overlay<List<V>>(overlay) : null;
 	}
 
 	public Overlay(MapOverlay<V> map, String key) {
-		this.overlay = map._get(key);
+		this.overlay = map._getOverlay(key);
 	}
 
 	public static <V> Overlay<V> of(MapOverlay<V> map, String key) {
 		return new Overlay<V>(map, key);
 	}
 
+	public static <V> Overlay<V> of(Map<String, V> map, String key) {
+		Overlay<Map<String, V>> mapOverlay = Overlay.of(map);
+		return mapOverlay != null ? Overlay.of((MapOverlay<V>) mapOverlay.getOverlay(), key) : null;
+	}
+
 	public Overlay(ListOverlay<V> list, int index) {
-		this.overlay = list._get(index);
+		this.overlay = list._getOverlay(index);
 	}
 
 	public static <V> Overlay<V> of(ListOverlay<V> list, int index) {
 		return new Overlay<V>(list, index);
 	}
 
-	public Overlay(PropertiesOverlay<?> props, String fieldName, Class<? extends V> type) {
-		AbstractJsonOverlay<?> overlay = props._get(fieldName);
-		Object value = overlay != null ? overlay._get() : null;
-		if (value == null || type.isAssignableFrom(value.getClass())) {
-			@SuppressWarnings("unchecked")
-			IJsonOverlay<V> castOverlay1 = (IJsonOverlay<V>) overlay;
-			if (castOverlay1 instanceof ChildOverlay) {
-				@SuppressWarnings("unchecked")
-				AbstractJsonOverlay<V> castOverlay2 = (AbstractJsonOverlay<V>) ((ChildOverlay<?>) castOverlay1)
-						.getOverlay();
-				this.overlay = castOverlay2;
-			} else {
-				this.overlay = (AbstractJsonOverlay<V>) castOverlay1;
-			}
-		} else {
-			this.overlay = null;
-		}
+	public static <V> Overlay<V> of(List<V> list, int index) {
+		Overlay<List<V>> listOverlay = Overlay.of(list);
+		return listOverlay != null ? Overlay.of((ListOverlay<V>) listOverlay.getOverlay(), index) : null;
 	}
 
-	public static <V> Overlay<V> of(Object props, String fieldName, Class<? extends V> type) {
-		if (props instanceof PropertiesOverlay) {
-			PropertiesOverlay<?> castProps = (PropertiesOverlay<?>) props;
-			return new Overlay<V>(castProps, fieldName, type);
+	public Overlay(PropertiesOverlay<?> props, String fieldName) {
+		@SuppressWarnings("unchecked")
+		JsonOverlay<V> overlay = (JsonOverlay<V>) props._getOverlay(fieldName);
+		this.overlay = overlay;
+	}
+
+	public static <X> Overlay<X> of(PropertiesOverlay<?> props, String fieldName, Class<X> type) {
+		return new Overlay<X>(props, fieldName);
+	}
+
+	public static <X> Overlay<X> of(IJsonOverlay<?> props, String fieldName, Class<X> type) {
+		if (props instanceof PropertiesOverlay<?>) {
+			@SuppressWarnings("unchecked")
+			PropertiesOverlay<X> castProps = (PropertiesOverlay<X>) props;
+			return Overlay.of(castProps, fieldName, type);
 		} else {
 			return null;
 		}
-
 	}
 
 	public final V get() {
 		return overlay._get();
 	}
 
-	public final IJsonOverlay<V> getOverlay() {
+	public static <V> V get(JsonOverlay<V> overlay) {
+		return overlay._get();
+	}
+
+	public final JsonOverlay<V> getOverlay() {
 		return overlay;
 	}
 
@@ -120,76 +126,84 @@ public class Overlay<V> {
 		}
 	}
 
-	public static <V> V get(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._get();
+	public static <V> MapOverlay<V> getMapOverlay(Map<String, V> map) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<V> overlay = (MapOverlay<V>) getSidebandOverlay(map);
+		return overlay;
 	}
 
-	public AbstractJsonOverlay<?> find(JsonPointer path) {
+	public static <V> ListOverlay<V> getListOverlay(List<V> list) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<V> overlay = (ListOverlay<V>) getSidebandOverlay(list);
+		return overlay;
+	}
+
+	public JsonOverlay<?> find(JsonPointer path) {
 		return overlay._find(path);
 	}
 
-	public static <V> AbstractJsonOverlay<?> find(IJsonOverlay<V> overlay, JsonPointer path) {
-		return ((AbstractJsonOverlay<V>) overlay)._find(path);
-	}
-
-	public AbstractJsonOverlay<?> find(String path) {
+	public static JsonOverlay<?> find(JsonOverlay<?> overlay, JsonPointer path) {
 		return overlay._find(path);
 	}
 
-	public static <V> AbstractJsonOverlay<?> find(IJsonOverlay<V> overlay, String path) {
-		return ((AbstractJsonOverlay<V>) overlay)._find(path);
+	public JsonOverlay<?> find(String path) {
+		return overlay._find(path);
+	}
+
+	public static <V, OV extends JsonOverlay<V>> JsonOverlay<?> find(OV overlay, String path) {
+		return overlay._find(path);
 	}
 
 	public JsonNode toJson() {
 		return overlay._toJson();
 	}
 
-	public static <V> JsonNode toJson(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._toJson();
+	public static <V> JsonNode toJson(JsonOverlay<V> overlay) {
+		return overlay._toJson();
 	}
 
 	public JsonNode toJson(SerializationOptions options) {
 		return overlay._toJson(options);
 	}
 
-	public static <V> JsonNode toJson(IJsonOverlay<V> overlay, SerializationOptions options) {
-		return ((AbstractJsonOverlay<V>) overlay)._toJson(options);
+	public static <V> JsonNode toJson(JsonOverlay<V> overlay, SerializationOptions options) {
+		return overlay._toJson(options);
 	}
 
 	public JsonNode toJson(SerializationOptions.Option... options) {
 		return overlay._toJson(options);
 	}
 
-	public static <V> JsonNode toJson(IJsonOverlay<V> overlay, SerializationOptions.Option... options) {
-		return ((AbstractJsonOverlay<V>) overlay)._toJson(options);
+	public static <V> JsonNode toJson(JsonOverlay<V> overlay, SerializationOptions.Option... options) {
+		return overlay._toJson(options);
 	}
 
 	public boolean isPresent() {
 		return overlay._isPresent();
 	}
 
-	public static <V> boolean isPresent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._isPresent();
+	public static <V> boolean isPresent(JsonOverlay<V> overlay) {
+		return overlay._isPresent();
 	}
 
 	public boolean isElaborated() {
 		return overlay._isElaborated();
 	}
 
-	public static <V> boolean isElaborated(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._isElaborated();
+	public static <V> boolean isElaborated(JsonOverlay<V> overlay) {
+		return overlay._isElaborated();
 	}
 
 	public JsonOverlay<?> getParent() {
-		return (JsonOverlay<?>) overlay._getParent();
+		return overlay._getParent();
 	}
 
-	public static <V> IJsonOverlay<?> getParent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._getParent();
+	public static <V> JsonOverlay<?> getParent(JsonOverlay<V> overlay) {
+		return overlay._getParent();
 	}
 
 	public PropertiesOverlay<?> getParentPropertiesOverlay() {
-		IJsonOverlay<?> parent = getParent();
+		JsonOverlay<?> parent = getParent();
 		while (parent != null) {
 			if (parent instanceof PropertiesOverlay<?>) {
 				return (PropertiesOverlay<?>) parent;
@@ -200,7 +214,7 @@ public class Overlay<V> {
 		return null;
 	}
 
-	public static <V> PropertiesOverlay<?> getParentPropertiesOverlay(IJsonOverlay<V> overlay) {
+	public static <V> PropertiesOverlay<?> getParentPropertiesOverlay(JsonOverlay<V> overlay) {
 		return new Overlay<V>(overlay).getParentPropertiesOverlay();
 	}
 
@@ -208,29 +222,25 @@ public class Overlay<V> {
 		return overlay._getPathInParent();
 	}
 
-	public static <V> String getPathInParent(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._getPathInParent();
+	public static String getPathInParent(JsonOverlay<?> overlay) {
+		return overlay._getPathInParent();
 	}
 
-	public AbstractJsonOverlay<?> getRoot() {
+	public JsonOverlay<?> getRoot() {
 		return overlay._getRoot();
 	}
 
-	public static <V> AbstractJsonOverlay<?> getRoot(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._getRoot();
+	public static JsonOverlay<?> getRoot(JsonOverlay<?> overlay) {
+		return overlay._getRoot();
 	}
 
 	public <Model> Model getModel() {
-		if (overlay instanceof IModelPart<?, ?>) {
-			@SuppressWarnings("unchecked")
-			Model root = (Model) overlay._getRoot();
-			return root;
-		} else {
-			return null;
-		}
+		@SuppressWarnings("unchecked")
+		Model model = (Model) overlay._getModel();
+		return model;
 	}
 
-	public static <Model, V> Model getModel(IJsonOverlay<V> overlay) {
+	public static <Model, V> Model getModel(JsonOverlay<V> overlay) {
 		return new Overlay<V>(overlay).getModel();
 	}
 
@@ -238,27 +248,35 @@ public class Overlay<V> {
 		return overlay._getPathFromRoot();
 	}
 
-	public static <V> String getPathFromFromRoot(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._getPathFromRoot();
+	public static String getPathFromFromRoot(JsonOverlay<?> overlay) {
+		return overlay._getPathFromRoot();
 	}
 
-	public URL getJsonReference() {
+	public String getJsonReference() {
 		return overlay._getJsonReference();
 	}
 
-	public static <V> URL getJsonReference(IJsonOverlay<V> overlay) {
-		return ((AbstractJsonOverlay<V>) overlay)._getJsonReference();
+	public static String getJsonReference(JsonOverlay<?> overlay) {
+		return overlay._getJsonReference();
+	}
+
+	public String getJsonReference(boolean forRef) {
+		return overlay._getJsonReference(forRef);
+	}
+
+	public static String getJsonReference(JsonOverlay<?> overlay, boolean forRef) {
+		return overlay._getJsonReference(forRef);
 	}
 
 	public List<String> getPropertyNames() {
 		if (overlay instanceof PropertiesOverlay) {
-			return ((PropertiesOverlay<?>) overlay).getPropertyNames();
+			return ((PropertiesOverlay<?>) overlay)._getPropertyNames();
 		} else {
 			return null;
 		}
 	}
 
-	public static <V> List<String> getPropertyNames(IJsonOverlay<V> overlay) {
+	public static <V> List<String> getPropertyNames(JsonOverlay<V> overlay) {
 		return new Overlay<V>(overlay).getPropertyNames();
 	}
 
@@ -266,7 +284,7 @@ public class Overlay<V> {
 		return getReference(key) != null;
 	}
 
-	public static <V> boolean isReference(IJsonOverlay<V> overlay, String key) {
+	public static <V> boolean isReference(JsonOverlay<V> overlay, String key) {
 		return new Overlay<V>(overlay).isReference(key);
 	}
 
@@ -274,7 +292,7 @@ public class Overlay<V> {
 		return getReference(index) != null;
 	}
 
-	public static <V> boolean isReference(IJsonOverlay<V> overlay, int index) {
+	public static <V> boolean isReference(JsonOverlay<V> overlay, int index) {
 		return new Overlay<V>(overlay).getReference(index) != null;
 	}
 
@@ -288,7 +306,7 @@ public class Overlay<V> {
 		}
 	}
 
-	public static <V> Reference getReference(IJsonOverlay<V> overlay, String key) {
+	public static <V> Reference getReference(JsonOverlay<V> overlay, String key) {
 		return new Overlay<V>(overlay).getReference(key);
 	}
 
@@ -300,24 +318,37 @@ public class Overlay<V> {
 		}
 	}
 
-	public static <V> Reference getReference(IJsonOverlay<V> overlay, int index) {
+	public static <V> Reference getReference(JsonOverlay<V> overlay, int index) {
 		return new Overlay<V>(overlay).getReference(index);
 	}
 
 	private Reference getPropertyReference(String name) {
 		PropertiesOverlay<V> propsOverlay = (PropertiesOverlay<V>) overlay;
-		return propsOverlay.getReference(name);
+		return getReference(propsOverlay._getOverlay(name));
 	}
 
 	private Reference getMapReference(String key) {
 		@SuppressWarnings("unchecked")
 		MapOverlay<V> mapOverlay = (MapOverlay<V>) overlay;
-		return mapOverlay.getReference(key);
+		return getReference(mapOverlay._getOverlay(key));
 	}
 
 	private Reference getListReference(int index) {
 		@SuppressWarnings("unchecked")
 		ListOverlay<V> listOverlay = (ListOverlay<V>) overlay;
-		return listOverlay.getReference(index);
+		return getReference(listOverlay._getOverlay(index));
+	}
+
+	private Reference getReference(JsonOverlay<?> overlay) {
+		return overlay != null ? overlay._getReference() : null;
+	}
+
+	private static JsonOverlay<?> getSidebandOverlay(Object o) {
+		try {
+			return (JsonOverlay<?>) o.getClass().getMethod("getOverlay").invoke(o);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			return null;
+		}
 	}
 }

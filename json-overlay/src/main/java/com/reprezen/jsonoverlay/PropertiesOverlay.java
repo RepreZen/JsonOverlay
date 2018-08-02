@@ -1,76 +1,196 @@
-/*******************************************************************************
- *  Copyright (c) 2017 ModelSolv, Inc. and others.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  Contributors:
- *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
- *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
-import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
 public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
-	private List<ChildOverlay<?>> children = Lists.newArrayList();
-	private static Map<Class<?>, List<String>> propertyNames = Maps.newHashMap();
+	// retrieve property values from this map by property name
+	private Map<String, JsonOverlay<?>> children = Maps.newHashMap();
+	// this queue sets ordering for serialization, so it matches parsed JSON
+	private List<PropertyLocator> childOrder = Lists.newArrayList();
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
+	private V elaborationValue = null;
 
-	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(json, parent, refReg);
-		deferElaboration = json.isMissingNode();
-		gatherPropertyNames();
+	protected PropertiesOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> factory,
+			ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
+		this.deferElaboration = json.isMissingNode();
 	}
 
-	public PropertiesOverlay(V value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-		super(value, parent, refReg);
+	protected PropertiesOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
+		super(value, parent, factory, refMgr);
+		this.elaborationValue = value;
+	}
+
+	protected <T> T _get(String name, Class<T> cls) {
+		return _get(name, true, cls);
+	}
+
+	/* package */ List<String> _getPropertyNames() {
+		return childOrder.stream().map(locator -> locator.getName()).collect(Collectors.toList());
+	}
+
+	/* package */ <T> JsonOverlay<?> _getOverlay(String name) {
+		return children.get(name);
+	}
+
+	protected boolean _isPresent(String name) {
+		JsonOverlay<?> overlay = children.get(name);
+		return overlay != null && !overlay.json.isMissingNode();
+	}
+
+	protected <T> T _get(String name, boolean elaborate, Class<T> cls) {
+		if (elaborate) {
+			_ensureElaborated();
+		}
+		@SuppressWarnings("unchecked")
+		JsonOverlay<T> overlay = (JsonOverlay<T>) children.get(name);
+		return overlay._get();
+	}
+
+	protected <T> JsonOverlay<T> _getOverlay(String name, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		JsonOverlay<T> overlay = (JsonOverlay<T>) children.get(name);
+		return overlay;
+	}
+
+	protected <T> void _setScalar(String name, T val, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		JsonOverlay<T> overlay = (JsonOverlay<T>) children.get(name);
+		overlay._set(val);
+	}
+
+	protected <T> List<T> _getList(String name, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		List<T> list = _get(name, List.class);
+		return list;
+	}
+
+	protected <T> List<T> _getList(String name, boolean elaborate, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		List<T> list = _get(name, elaborate, List.class);
+		return list;
+	}
+
+	protected <T> T _get(String name, int index, Class<T> cls) {
+		return _get(name, index, true, cls);
+	}
+
+	protected <T> T _get(String name, int index, boolean elaborate, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		return overlay.get(index);
+	}
+
+	protected <T> void _setList(String name, List<T> listVal, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		overlay._set(listVal);
+	}
+
+	protected <T> void _set(String name, int index, T val, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		overlay.set(index, val);
+	}
+
+	protected <T> void _insert(String name, int index, T val, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		overlay.insert(index, val);
+	}
+
+	protected <T> void _add(String name, T val, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		overlay.add(val);
+	}
+
+	protected <T> void _remove(String name, int index, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<T> overlay = (ListOverlay<T>) children.get(name);
+		overlay.remove(index);
+	}
+
+	protected <T> Map<String, T> _getMap(String name, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		Map<String, T> map = _get(name, Map.class);
+		return map;
+	}
+
+	protected <T> Map<String, T> _getMap(String name, boolean elaborate, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		Map<String, T> map = _get(name, elaborate, Map.class);
+		return map;
+	}
+
+	protected <T> T _get(String name, String key, Class<T> cls) {
+		return _get(name, key, true, cls);
+	}
+
+	protected <T> T _get(String name, String key, boolean elaborate, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
+		return overlay.get(key);
+	}
+
+	protected <T> void _setMap(String name, Map<String, T> mapVal, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
+		overlay._set(mapVal);
+	}
+
+	protected <T> void _set(String name, String key, T val, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
+		overlay.set(key, val);
+	}
+
+	protected <T> void _remove(String name, String key, Class<T> cls) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<T> overlay = (MapOverlay<T>) children.get(name);
+		overlay.remove(key);
+	}
+
+	@Override
+	protected void _elaborate(boolean atCreation) {
+		if (atCreation && deferElaboration) {
+			return;
+		}
+		if (elaborationValue != null) {
+			_elaborateValue();
+		} else {
+			_elaborateJson();
+		}
+		Collections.sort(childOrder);
 		elaborated = true;
-		gatherPropertyNames();
 	}
 
-	private void gatherPropertyNames() {
-		if (!propertyNames.containsKey(getClass())) {
-			List<String> names = Lists.newArrayList();
-			for (Field field : getClass().getDeclaredFields()) {
-				if (IJsonOverlay.class.isAssignableFrom(field.getType())) {
-					names.add(field.getName());
-				}
-			}
-			propertyNames.put(getClass(), names);
+	protected abstract void _elaborateJson();
+
+	private void _elaborateValue() {
+		@SuppressWarnings("unchecked")
+		PropertiesOverlay<V> overlay = (PropertiesOverlay<V>) elaborationValue;
+		children.clear();
+		for (Entry<String, JsonOverlay<?>> entry : overlay.children.entrySet()) {
+			children.put(entry.getKey(), entry.getValue()._copy());
 		}
-	}
-
-	/* package */ List<String> getPropertyNames() {
-		return propertyNames.get(getClass());
-	}
-
-	protected void maybeElaborateChildrenAtCreation() {
-		if (!deferElaboration) {
-			ensureElaborated();
-		}
-	}
-
-	protected void ensureElaborated() {
-		if (!elaborated) {
-			elaborateChildren();
-			elaborated = true;
-		}
-	}
-
-	protected void elaborateChildren() {
+		childOrder.clear();
+		childOrder.addAll(overlay.childOrder);
+		this.elaborationValue = null;
 	}
 
 	@Override
@@ -78,11 +198,35 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return elaborated;
 	}
 
+	protected <X> JsonOverlay<X> _createScalar(String name, String path, OverlayFactory<X> factory) {
+		return _addChild(name, path, factory);
+	}
+
+	protected <X> ListOverlay<X> _createList(String name, String path, OverlayFactory<X> itemFactory) {
+		return (ListOverlay<X>) _addChild(name, path, ListOverlay.getFactory(itemFactory));
+	}
+
+	protected <X> MapOverlay<X> _createMap(String name, String path, OverlayFactory<X> valueFactory,
+			String keyPattern) {
+		return (MapOverlay<X>) _addChild(name, path, MapOverlay.getFactory(valueFactory, keyPattern));
+	}
+
+	private <X> JsonOverlay<X> _addChild(String name, String path, OverlayFactory<X> factory) {
+		JsonPointer pointer = JsonPointer.compile(path.isEmpty() ? "" : "/" + path);
+		JsonNode childJson = json.at(pointer);
+		JsonOverlay<X> child = factory.create(childJson, this, refMgr);
+		child._setPathInParent(path);
+		PropertyLocator locator = new PropertyLocator(name, path, json);
+		childOrder.add(locator);
+		children.put(name, child);
+		return child;
+	}
+
 	@Override
-	public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
-		for (ChildOverlay<?> child : children) {
-			if (child.matchesPath(path)) {
-				AbstractJsonOverlay<?> found = child._find(child.tailPath(path));
+	protected JsonOverlay<?> _findInternal(JsonPointer path) {
+		for (JsonOverlay<?> child : children.values()) {
+			if (matchesPath(child, path)) {
+				JsonOverlay<?> found = child._find(tailPath(child, path));
 				if (found != null) {
 					return found;
 				}
@@ -91,8 +235,35 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return null;
 	}
 
+	private boolean matchesPath(JsonOverlay<?> child, JsonPointer path) {
+		JsonPointer childPath = getPointer(child);
+		while (!childPath.matches()) {
+			if (!childPath.matchesProperty(path.getMatchingProperty())) {
+				return false;
+			} else {
+				path = path.tail();
+				childPath = childPath.tail();
+			}
+		}
+		return true;
+	}
+
+	private JsonPointer tailPath(JsonOverlay<?> child, JsonPointer path) {
+		JsonPointer childPath = getPointer(child);
+		while (!childPath.matches()) {
+			path = path.tail();
+			childPath = childPath.tail();
+		}
+		return path;
+	}
+
+	private JsonPointer getPointer(JsonOverlay<?> child) {
+		String path = child._getPathInParent();
+		return JsonPointer.compile(path == null || path.isEmpty() ? "" : "/" + path);
+	}
+
 	@Override
-	public V fromJson(JsonNode json) {
+	public V _fromJson(JsonNode json) {
 		// parsing of the json node is expected to be done in the constructor of the
 		// subclass, so nothing is done here. But we do establish this object as its own
 		// value.
@@ -102,111 +273,147 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public JsonNode _toJsonInternal(SerializationOptions options) {
-		JsonNode obj = jsonMissing();
-		for (ChildOverlay<?> child : children) {
-			JsonNode childJson = child._toJson(options.minus(Option.KEEP_ONE_EMPTY));
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		JsonNode obj = _jsonMissing();
+		for (PropertyLocator child : childOrder) {
+			JsonNode childJson = children.get(child.getName())._toJson(options.minus(Option.KEEP_ONE_EMPTY));
 			if (!childJson.isMissingNode()) {
-				obj = child.getPath().setInPath(obj, childJson);
+				obj = _injectChild(obj, childJson, child.getPointer());
 			}
 		}
-		JsonNode result = fixJson(obj);
-		return result.size() > 0 || options.isKeepThisEmpty() ? result : jsonMissing();
+		JsonNode result = _fixJson(obj);
+		return result.size() > 0 || options.isKeepThisEmpty() ? result : _jsonMissing();
 	}
 
-	protected JsonNode fixJson(JsonNode json) {
+	private JsonNode _injectChild(JsonNode node, JsonNode child, JsonPointer pointer) {
+		if (pointer.matches()) {
+			// inject into current node, which means:
+			// * If current is missing, return child
+			// * If current and child are both objects, merge child into current
+			// * Otherwise error
+			if (node.isMissingNode()) {
+				return child;
+			} else if (node.isObject() && child.isObject()) {
+				((ObjectNode) node).setAll((ObjectNode) child);
+				return node;
+			} else {
+				throw new IllegalArgumentException();
+			}
+		} else if (node.isObject() || node.isMissingNode()) {
+			String name = pointer.getMatchingProperty();
+			JsonNode childNode = _injectChild(node.path(name), child, pointer.tail());
+			if (!childNode.isMissingNode()) {
+				node = node.isObject() ? node : _jsonObject();
+				((ObjectNode) node).set(name, childNode);
+			}
+			return node;
+		} else {
+			// can't add a property name to a non-object
+			throw new IllegalArgumentException();
+		}
+	}
+
+	protected JsonNode _fixJson(JsonNode json) {
 		return json;
 	}
 
-
-	
 	@Override
-	V _get() {
-		ensureElaborated();
-		return super._get();
+	public boolean equals(Object obj) {
+		return equals(obj, false);
 	}
 
-	public V _get(boolean elaborate) {
-		return elaborate ? _get() : super._get();
+	public boolean equals(Object obj, boolean sameOrder) {
+		if (obj instanceof PropertiesOverlay<?>) {
+			PropertiesOverlay<?> castObj = (PropertiesOverlay<?>) obj;
+			return children.equals(castObj.children) && (!sameOrder || childOrder.equals(castObj.childOrder));
+		}
+		return false;
 	}
 
-	/* package */ AbstractJsonOverlay<?> _get(String fieldName) {
-		Optional<Field> field = Stream.of(this.getClass().getDeclaredFields())
-				.filter(f -> f.getName().equals(fieldName)).findFirst();
-		if (field.isPresent()) {
-			try {
-				field.get().setAccessible(true);
-				return (AbstractJsonOverlay<?>) field.get().get(this);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
+	}
+
+	protected static class PropertyLocator implements Comparable<PropertyLocator> {
+		private final String name;
+		private final JsonPointer pointer;
+		private final List<Integer> vector;
+
+		public PropertyLocator(String name, String path, JsonNode json) {
+			this.name = name;
+			this.pointer = JsonPointer.compile(path.isEmpty() ? "" : "/" + path);
+			this.vector = computeVector(pointer, json);
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public JsonPointer getPointer() {
+			return pointer;
+		}
+
+		private List<Integer> computeVector(JsonPointer pointer, JsonNode json) {
+			// the "position vector" computed by this method is key to keeping our children
+			// sorted by the order in which they appeared in a parsed JSON object. The
+			// vector list contains the index, in each level of object nesting, of the
+			// property on the path to each child's value. The ordering of these vectors
+			// thus represents the order in which the properties appeared in the parsed
+			// JSON, with missing properties arbitrarily ordered at the end. Root-level maps
+			// are also ordered at the end. They are either partial, in which case their
+			// actual members may be scattered among other properties and we don't try to
+			// maintain that ordering, or they represent the entire root object, in which
+			// case the ordering is irrelevant.
+			JsonNode currentJson = json;
+			List<Integer> result = Lists.newArrayList();
+			// we only consider object nodes and continue until our pointer is fully
+			// consumed
+			while (currentJson instanceof ObjectNode && !pointer.matches()) {
+				String key = pointer.getMatchingProperty();
+				boolean found = false;
+				int i = 0;
+				for (Iterator<String> iter = currentJson.fieldNames(); iter.hasNext(); i += 1) {
+					if (key.equals(iter.next())) {
+						found = true;
+						result.add(i);
+						currentJson = currentJson.get(key);
+						pointer = pointer.tail();
+						break;
+					}
+				}
+				if (!found) {
+					// no match at current level, so child is not present - exclude from ordering
+					return null;
+				}
 			}
+			// empty vector means the path was empty and matched the root json object. This
+			// occurs only with maps, which are excluded from ordering.
+			return result.isEmpty() ? null : result;
 		}
-		return null;
-	}
 
-	@Override
-	public void _set(V value) {
-		super._set(value);
-		elaborateChildren();
-	}
+		@Override
+		public int compareTo(PropertyLocator other) {
+			if (vector == null) {
+				return other.vector == null ? name.compareTo(other.name) : 1;
+			} else if (other.vector == null) {
+				return -1;
+			} else {
+				int cmp = 0;
+				// first component where paths differ determines relative ordering
+				for (int i = 0; cmp == 0 && i < vector.size() && i < other.vector.size(); i++) {
+					cmp = vector.get(i) - other.vector.get(i);
+				}
+				return cmp;
+			}
 
-	protected <T> ChildOverlay<T> createChild(boolean create, String path, JsonOverlay<?> parent,
-			OverlayFactory<T> factory) {
-		return create ? createChild(path, parent, factory) : null;
-	}
-
-	protected <T> ChildOverlay<T> createChild(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
-		ChildOverlay<T> child = new ChildOverlay<>(path, json.at("/" + path), parent, factory, refReg);
-		if (child.getOverlay() != null) {
-			child.getOverlay().setPathInParent(path);
 		}
-		children.add(child);
-		return child;
-	}
 
-	protected <T> ChildMapOverlay<T> createChildMap(boolean create, String path, JsonOverlay<?> parent,
-			OverlayFactory<T> factory, String keyPattern) {
-		return create ? createChildMap(path, parent, factory, keyPattern) : null;
-	}
+		@Override
+		public String toString() {
+			return String.format("Loc[%s]=%s", name, vector);
+		}
 
-	protected <T> ChildMapOverlay<T> createChildMap(String path, JsonOverlay<?> parent, OverlayFactory<T> factory,
-			String keyPattern) {
-		ChildMapOverlay<T> child = new ChildMapOverlay<T>(path, json.at(pathPointer(path)), parent,
-				MapOverlay.getFactory(factory, keyPattern), refReg);
-		child.getOverlay().setPathInParent(path);
-		children.add(child);
-		return child;
 	}
-
-	protected <T> ChildListOverlay<T> createChildList(boolean create, String path, JsonOverlay<?> parent,
-			OverlayFactory<T> factory) {
-		return create ? createChildList(path, parent, factory) : null;
-	}
-
-	protected <T> ChildListOverlay<T> createChildList(String path, JsonOverlay<?> parent, OverlayFactory<T> factory) {
-		ChildListOverlay<T> child = new ChildListOverlay<T>(path, json.at(pathPointer(path)), parent,
-				ListOverlay.getFactory(factory), refReg);
-		child.getOverlay().setPathInParent(path);
-		children.add(child);
-		return child;
-	}
-
-	private JsonPointer pathPointer(String path) {
-		return (path == null || path.isEmpty()) ? JsonPointer.compile("") : JsonPointer.compile("/" + path);
-	}
-
-	@Override
-	protected void elaborate() {
-		maybeElaborateChildrenAtCreation();
-	}
-
-	/* package */ boolean isReference(String name) {
-		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
-		return childOverlay.isReference();
-	}
-
-	/* package */ Reference getReference(String name) {
-		ChildOverlay<?> childOverlay = (ChildOverlay<?>) _get(name);
-		return childOverlay.getReference();
-	}
-
 }

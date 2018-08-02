@@ -29,6 +29,10 @@ public class JsonLoader {
 	private static ObjectMapper jsonMapper = new ObjectMapper();
 	private static ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 	private Yaml yaml = new Yaml();
+	static {
+		jsonMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
+		yamlMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
+	}
 
 	private Map<String, JsonNode> cache = Maps.newHashMap();
 

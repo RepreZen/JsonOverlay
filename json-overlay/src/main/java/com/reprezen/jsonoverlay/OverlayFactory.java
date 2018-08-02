@@ -14,52 +14,49 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class OverlayFactory<V> {
 
-	private final Class<? extends AbstractJsonOverlay<? super V>> overlayClass = getOverlayClass();
+	private final Class<? extends IJsonOverlay<? super V>> overlayClass = getOverlayClass();
 
-	public JsonOverlay<V> create(V value, JsonOverlay<?> parent, ReferenceRegistry refReg, Reference ref) {
-		JsonOverlay<V> overlay = _create(value, parent, refReg);
-		overlay.setReference(ref);
+	public JsonOverlay<V> create(V value, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		JsonOverlay<V> overlay = _create(value, parent, refMgr);
+		overlay._elaborate(true);
 		return overlay;
 	}
 
-	public AbstractJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg,
-			Reference ref) {
-		return create(json, parent, false, refReg, ref);
-	}
-
-	public AbstractJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, boolean partial,
-			ReferenceRegistry refReg, Reference ref) {
-		JsonOverlay<V> overlay = (JsonOverlay<V>) create(json, parent, partial, refReg);
-		overlay.setReference(ref);
-		return overlay;
-	}
-
-	protected AbstractJsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, boolean partial,
-			ReferenceRegistry refReg) {
-		if (!partial && refReg.hasOverlay(json) && isCompatible(refReg.getOverlay(json))) {
-			@SuppressWarnings("unchecked")
-			JsonOverlay<V> overlay = (JsonOverlay<V>) refReg.getOverlay(json);
-			if (parent != null) {
-				overlay.setParent(parent);
-			}
-			return overlay;
+	@SuppressWarnings("unchecked")
+	public JsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+		JsonOverlay<V> overlay;
+		if (Reference.isReferenceNode(json)) {
+			// set up a reference overlay delegate, but don't resolve until accessed
+			overlay = _create((V) null, null, refMgr);
+			overlay._setReference(refMgr.getReference(json));
 		} else {
-			JsonOverlay<V> overlay = _create(json, parent, refReg);
-			if (!partial) {
-				refReg.setOverlay(json, overlay);
+			JsonOverlay<?> existing = refMgr.getRegistry().getOverlay(json, getSignature());
+			if (existing != null) {
+				overlay = (JsonOverlay<V>) existing;
+				if (parent != null) {
+					overlay._setParent(parent);
+				}
+			} else {
+				overlay = _create(json, parent, refMgr);
+				overlay._setParent(parent);
+				refMgr.getRegistry().register(json, getSignature(), overlay);
+				overlay._elaborate(true);
 			}
-			overlay.elaborate();
-			return overlay;
 		}
+		return overlay;
 	}
 
-	public boolean isCompatible(AbstractJsonOverlay<?> overlay) {
+	public boolean isCompatible(JsonOverlay<?> overlay) {
 		return overlayClass.isAssignableFrom(overlay.getClass());
 	}
 
-	protected abstract Class<? extends AbstractJsonOverlay<? super V>> getOverlayClass();
+	public String getSignature() {
+		return getOverlayClass().getSimpleName();
+	}
 
-	protected abstract JsonOverlay<V> _create(V value, JsonOverlay<?> parent, ReferenceRegistry refReg);
+	protected abstract Class<? extends JsonOverlay<? super V>> getOverlayClass();
 
-	protected abstract JsonOverlay<V> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg);
+	protected abstract JsonOverlay<V> _create(V value, JsonOverlay<?> parent, ReferenceManager refMgr);
+
+	protected abstract JsonOverlay<V> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr);
 }

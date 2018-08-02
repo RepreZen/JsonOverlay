@@ -1,22 +1,10 @@
-/*******************************************************************************
- *  Copyright (c) 2017 ModelSolv, Inc. and others.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  Contributors:
- *     ModelSolv, Inc. - initial API and implementation and/or initial documentation
- *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
-import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -25,27 +13,59 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
-public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
-	private Map<String, AbstractJsonOverlay<V>> overlays = Maps.newLinkedHashMap();
-	private OverlayFactory<V> valueFactory;
-	private Pattern keyPattern;
+public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
-	public MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<V> valueFactory, Pattern keyPattern,
-			ReferenceRegistry refReg) {
-		super(value, parent, refReg);
-		this.valueFactory = valueFactory;
-		this.keyPattern = keyPattern;
+	private final OverlayFactory<V> valueFactory;
+	private final Pattern keyPattern;
+	private Map<String, JsonOverlay<V>> overlays = Maps.newLinkedHashMap();
+
+	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
+			ReferenceManager refMgr) {
+		super(json, parent, factory, refMgr);
+		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
+		this.valueFactory = mapOverlayFactory.getValueFactory();
+		String keyPattern = mapOverlayFactory.getKeyPattern();
+		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
 	}
 
-	public MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<V> valueFactory, Pattern keyPattern,
-			ReferenceRegistry refReg) {
-		super(json, parent, refReg);
-		this.valueFactory = valueFactory;
-		this.keyPattern = keyPattern;
+	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
+			ReferenceManager refMgr) {
+		super(Maps.newLinkedHashMap(value), parent, factory, refMgr);
+		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
+		this.valueFactory = mapOverlayFactory.getValueFactory();
+		String keyPattern = mapOverlayFactory.getKeyPattern();
+		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
 	}
 
 	@Override
-	protected void elaborate() {
+	protected JsonOverlay<?> _findInternal(JsonPointer path) {
+		String key = path.getMatchingProperty();
+		return overlays.containsKey(key) ? overlays.get(key)._find(path.tail()) : null;
+	}
+
+	@Override
+	protected Map<String, V> _fromJson(JsonNode json) {
+		return new LinkedHashMap<String, V>() {
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unused")
+			public MapOverlay<V> getOverlay() {
+				return MapOverlay.this;
+			}
+		};
+	}
+
+	@Override
+	protected JsonNode _toJsonInternal(SerializationOptions options) {
+		ObjectNode obj = _jsonObject();
+		for (Entry<String, JsonOverlay<V>> entry : overlays.entrySet()) {
+			obj.set(entry.getKey(), entry.getValue()._toJson(options.minus(Option.KEEP_ONE_EMPTY)));
+		}
+		return obj.size() > 0 || options.isKeepThisEmpty() ? obj : _jsonMissing();
+	}
+
+	@Override
+	protected void _elaborate(boolean atCreation) {
 		if (json != null) {
 			fillWithJson();
 		} else {
@@ -53,132 +73,109 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		}
 	}
 
-	private void fillWithValues() {
-		overlays.clear();
-		if (value != null) {
-			for (Entry<String, V> entry : value.entrySet()) {
-				overlays.put(entry.getKey(),
-						new ChildOverlay<>(entry.getKey(), entry.getValue(), this, valueFactory, refReg));
-			}
-		}
-	}
-
 	private void fillWithJson() {
 		value.clear();
 		overlays.clear();
-		if (!json.isMissingNode()) {
-			for (Entry<String, JsonNode> field : iterable(json.fields())) {
-				String key = field.getKey();
-				if (keyPattern == null || keyPattern.matcher(key).matches()) {
-					ChildOverlay<V> overlay = new ChildOverlay<V>(key, json.get(key), this, valueFactory, refReg);
-					overlays.put(key, overlay);
-					overlay.getOverlay().setPathInParent(key);
-					value.put(key, overlay._get(false));
-				}
+		for (Iterator<Entry<String, JsonNode>> iter = json.fields(); iter.hasNext();) {
+			Entry<String, JsonNode> entry = iter.next();
+			if (keyPattern == null || keyPattern.matcher(entry.getKey()).matches()) {
+				JsonOverlay<V> valOverlay = valueFactory.create(entry.getValue(), this, refMgr);
+				overlays.put(entry.getKey(), valOverlay);
+				valOverlay._setPathInParent(entry.getKey());
+				value.put(entry.getKey(), valOverlay._get(false));
 			}
 		}
 	}
 
-	@Override
-	public Map<String, V> _get() {
-		return wrap(value);
+	private void fillWithValues() {
+		overlays.clear();
+		for (Entry<String, V> entry : value.entrySet()) {
+			JsonOverlay<V> valOverlay = valueOverlayFor(entry.getValue());
+			overlays.put(entry.getKey(), valOverlay);
+			valOverlay._setPathInParent(entry.getKey());
+		}
 	}
 
-	private Map<String, V> wrap(Map<String, V> map) {
-		return map instanceof WrappedMap ? map : new WrappedMap<V>(map, this);
+	private JsonOverlay<V> valueOverlayFor(V val) {
+		return valueFactory.create(val, this, refMgr);
 	}
 
-	/* package */ AbstractJsonOverlay<V> _get(String key) {
+	public V get(String key) {
+		return overlays.get(key)._get();
+	}
+
+	/* package */ JsonOverlay<V> _getOverlay(String key) {
 		return overlays.get(key);
 	}
 
-	@Override
-	public AbstractJsonOverlay<?> _findInternal(JsonPointer path) {
-		String key = path.getMatchingProperty();
-		return overlays.containsKey(key) ? overlays.get(key)._find(path.tail()) : null;
+	public Set<String> keySet() {
+		return value.keySet();
 	}
 
-	@Override
-	protected Map<String, V> fromJson(JsonNode json) {
-		return Maps.newLinkedHashMap();
+	public void set(String key, V val) {
+		value.put(key, val);
+		overlays.put(key, valueOverlayFor(val));
 	}
 
-	@Override
-	public JsonNode _toJsonInternal(SerializationOptions options) {
-		ObjectNode obj = jsonObject();
-		for (Entry<String, AbstractJsonOverlay<V>> entry : overlays.entrySet()) {
-			obj.set(entry.getKey(), entry.getValue()._toJson(options.plus(Option.KEEP_ONE_EMPTY)));
-		}
-		return obj.size() > 0 || options.isKeepThisEmpty() ? obj : jsonMissing();
-	}
-
-	public boolean containsKey(String name) {
-		return overlays.containsKey(name);
-	}
-
-	public V get(String name) {
-		AbstractJsonOverlay<V> overlay = overlays.get(name);
-		return overlay != null ? overlay._get() : null;
-	}
-
-	protected AbstractJsonOverlay<V> getOverlay(String name) {
-		return overlays.get(name);
-	}
-
-	public void set(String name, V value) {
-		overlays.put(name, valueFactory.create(value, this, refReg, null));
-	}
-
-	public void remove(String name) {
-		overlays.remove(name);
+	public void remove(String key) {
+		value.remove(key);
+		overlays.remove(key);
 	}
 
 	public int size() {
 		return overlays.size();
 	}
 
-	public Pattern getKeyPattern() {
-		return keyPattern;
+	@Override
+	public boolean equals(Object obj) {
+		return equals(obj, false);
 	}
 
-	public Set<String> keySet() {
-		return overlays.keySet();
+	public boolean equals(Object obj, boolean sameOrder) {
+		if (obj instanceof MapOverlay<?>) {
+			MapOverlay<?> castObj = (MapOverlay<?>) obj;
+			return overlays.equals(castObj.overlays) && (!sameOrder || checkOrder(castObj));
+		}
+		return false;
 	}
 
-	public boolean isReference(String key) {
-		ChildOverlay<V> childOverlay = (ChildOverlay<V>) overlays.get(key);
-		return childOverlay.isReference();
+	private boolean checkOrder(MapOverlay<?> other) {
+		Iterator<String> myKeys = overlays.keySet().iterator();
+		Iterator<String> theirKeys = other.overlays.keySet().iterator();
+		while (myKeys.hasNext() && theirKeys.hasNext()) {
+			if (!myKeys.next().equals(theirKeys.next())) {
+				return false;
+			}
+		}
+		return !myKeys.hasNext() && !theirKeys.hasNext();
 	}
 
-	public Reference getReference(String key) {
-		ChildOverlay<V> childOverlay = (ChildOverlay<V>) overlays.get(key);
-		return childOverlay.getReference();
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
 	}
 
 	public static <V> OverlayFactory<Map<String, V>> getFactory(OverlayFactory<V> valueFactory, String keyPattern) {
-		return new MapOverlayFactory<V>(valueFactory, getWholeMatchPattern(keyPattern));
+		return new MapOverlayFactory<V>(valueFactory, keyPattern);
 	}
 
-	private static Pattern getWholeMatchPattern(String pat) {
-		return pat != null ? Pattern.compile("^" + pat + "$") : null;
-	}
+	private static class MapOverlayFactory<V> extends OverlayFactory<Map<String, V>> {
+		private final OverlayFactory<V> valueFactory;
+		private final String keyPattern;
 
-	protected static class MapOverlayFactory<V> extends OverlayFactory<Map<String, V>> {
-
-		private OverlayFactory<V> valueFactory;
-		private Pattern keyPattern;
-
-		public MapOverlayFactory(OverlayFactory<V> valueFactory, Pattern keyPattern) {
+		public MapOverlayFactory(OverlayFactory<V> valueFactory, String keyPattern) {
 			this.valueFactory = valueFactory;
 			this.keyPattern = keyPattern;
 		}
 
-		public Pattern getKeyPattern() {
-			return keyPattern;
+		@Override
+		public String getSignature() {
+			return String.format("map[%s|%s]", valueFactory.getSignature(), keyPattern != null ? keyPattern : "*");
 		}
 
 		@Override
-		protected Class<? extends JsonOverlay<Map<String, V>>> getOverlayClass() {
+		protected Class<? extends JsonOverlay<? super Map<String, V>>> getOverlayClass() {
 			Class<?> overlayClass = MapOverlay.class;
 			@SuppressWarnings("unchecked")
 			Class<? extends JsonOverlay<Map<String, V>>> castClass = (Class<? extends JsonOverlay<Map<String, V>>>) overlayClass;
@@ -186,119 +183,22 @@ public class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		}
 
 		@Override
-		public MapOverlay<V> _create(Map<String, V> value, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new MapOverlay<V>(value, parent, valueFactory, keyPattern, refReg);
+		protected JsonOverlay<Map<String, V>> _create(Map<String, V> value, JsonOverlay<?> parent,
+				ReferenceManager refMgr) {
+			return new MapOverlay<V>(value, parent, this, refMgr);
 		}
 
 		@Override
-		public MapOverlay<V> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-			return new MapOverlay<V>(json, parent, valueFactory, keyPattern, refReg);
-		}
-	}
-
-	/* package */ static class WrappedMap<V> implements Map<String, V> {
-		Map<String, V> map;
-		MapOverlay<V> overlay;
-
-		public WrappedMap(Map<String, V> map, MapOverlay<V> overlay) {
-			this.map = map;
-			this.overlay = overlay;
+		protected JsonOverlay<Map<String, V>> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+			return new MapOverlay<V>(json, parent, this, refMgr);
 		}
 
-		public MapOverlay<V> getOverlay() {
-			return overlay;
+		public String getKeyPattern() {
+			return keyPattern;
 		}
 
-		public void clear() {
-			map.clear();
-		}
-
-		public V compute(String key, BiFunction<? super String, ? super V, ? extends V> remappingFunction) {
-			return map.compute(key, remappingFunction);
-		}
-
-		public V computeIfAbsent(String key, Function<? super String, ? extends V> mappingFunction) {
-			return map.computeIfAbsent(key, mappingFunction);
-		}
-
-		public V computeIfPresent(String key, BiFunction<? super String, ? super V, ? extends V> remappingFunction) {
-			return map.computeIfPresent(key, remappingFunction);
-		}
-
-		public boolean containsKey(Object key) {
-			return map.containsKey(key);
-		}
-
-		public boolean containsValue(Object value) {
-			return map.containsValue(value);
-		}
-
-		public Set<Entry<String, V>> entrySet() {
-			return map.entrySet();
-		}
-
-		public void forEach(BiConsumer<? super String, ? super V> action) {
-			map.forEach(action);
-		}
-
-		public V get(Object key) {
-			return map.get(key);
-		}
-
-		public V getOrDefault(Object key, V defaultValue) {
-			return map.getOrDefault(key, defaultValue);
-		}
-
-		public boolean isEmpty() {
-			return map.isEmpty();
-		}
-
-		public Set<String> keySet() {
-			return map.keySet();
-		}
-
-		public V merge(String key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-			return map.merge(key, value, remappingFunction);
-		}
-
-		public V put(String key, V value) {
-			return map.put(key, value);
-		}
-
-		public void putAll(Map<? extends String, ? extends V> m) {
-			map.putAll(m);
-		}
-
-		public V putIfAbsent(String key, V value) {
-			return map.putIfAbsent(key, value);
-		}
-
-		public boolean remove(Object key, Object value) {
-			return map.remove(key, value);
-		}
-
-		public V remove(Object key) {
-			return map.remove(key);
-		}
-
-		public boolean replace(String key, V oldValue, V newValue) {
-			return map.replace(key, oldValue, newValue);
-		}
-
-		public V replace(String key, V value) {
-			return map.replace(key, value);
-		}
-
-		public void replaceAll(BiFunction<? super String, ? super V, ? extends V> function) {
-			map.replaceAll(function);
-		}
-
-		public int size() {
-			return map.size();
-		}
-
-		public Collection<V> values() {
-			return map.values();
+		public OverlayFactory<V> getValueFactory() {
+			return valueFactory;
 		}
 	}
 }

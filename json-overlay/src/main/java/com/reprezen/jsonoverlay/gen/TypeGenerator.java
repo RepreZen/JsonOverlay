@@ -10,14 +10,13 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay.gen;
 
-import static com.reprezen.jsonoverlay.gen.Template.t;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -45,11 +44,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-import com.reprezen.jsonoverlay.AbstractJsonOverlay;
 import com.reprezen.jsonoverlay.BooleanOverlay;
-import com.reprezen.jsonoverlay.ChildListOverlay;
-import com.reprezen.jsonoverlay.ChildMapOverlay;
-import com.reprezen.jsonoverlay.ChildOverlay;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.jsonoverlay.IModelPart;
@@ -63,7 +58,7 @@ import com.reprezen.jsonoverlay.OverlayFactory;
 import com.reprezen.jsonoverlay.Primitive;
 import com.reprezen.jsonoverlay.PrimitiveOverlay;
 import com.reprezen.jsonoverlay.PropertiesOverlay;
-import com.reprezen.jsonoverlay.ReferenceRegistry;
+import com.reprezen.jsonoverlay.ReferenceManager;
 import com.reprezen.jsonoverlay.StringOverlay;
 import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member;
 import com.reprezen.jsonoverlay.gen.TypeData.Field;
@@ -89,7 +84,8 @@ public abstract class TypeGenerator {
 	protected abstract TypeDeclaration<?> getTypeDeclaration(Type type, String suffix);
 
 	public void generate(Type type) throws IOException {
-		File javaFile = new File(dir, t("${name}${0}.java", type, suffix));
+		String filename = String.format("%s%s.java", type.getName(), suffix);
+		File javaFile = new File(dir, filename);
 		System.out.println("Generating " + javaFile.getCanonicalFile());
 		CompilationUnit existing = preserve && javaFile.exists() ? tryParse(javaFile) : null;
 		TypeDeclaration<?> declaration = getTypeDeclaration(type, suffix);
@@ -178,7 +174,7 @@ public abstract class TypeGenerator {
 		Map<String, String> results = Maps.newHashMap();
 		ArrayList<Class<?>> overlays = Lists.<Class<?>>newArrayList( //
 				Generated.class, //
-				Collection.class, //
+				List.class, //
 				Map.class, //
 				Optional.class, //
 				Collectors.class, //
@@ -188,14 +184,10 @@ public abstract class TypeGenerator {
 				JsonPointer.class, //
 				IJsonOverlay.class, //
 				JsonOverlay.class, //
-				AbstractJsonOverlay.class, //
 				IModelPart.class, //
 				PropertiesOverlay.class, //
-				ChildOverlay.class, //
-				ChildMapOverlay.class, //
-				ChildListOverlay.class, //
 				OverlayFactory.class, //
-				ReferenceRegistry.class, //
+				ReferenceManager.class, //
 				Inject.class, //
 				StringOverlay.class, //
 				IntegerOverlay.class, //

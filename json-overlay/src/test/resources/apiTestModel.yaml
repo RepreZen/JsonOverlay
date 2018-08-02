@@ -1,0 +1,19 @@
+---
+description: Model description
+width: 10
+entries:
+  A:
+    title: Title for entry A
+  B:
+    title: Title for entry B
+items:
+  - title: Title for item 1
+  - title: Title for item 2
+integers: [1,2,3,4,5]
+namedIntegers:
+  I: 1
+  II: 2
+  III: 3
+  IV: 4
+  V: 5
+color: GREEN

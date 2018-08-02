@@ -16,22 +16,20 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.google.common.collect.Queues
 import com.google.common.collect.Sets
-import com.reprezen.jsonoverlay.AbstractJsonOverlay
-import com.reprezen.jsonoverlay.ChildListOverlay
-import com.reprezen.jsonoverlay.ChildMapOverlay
-import com.reprezen.jsonoverlay.ChildOverlay
 import com.reprezen.jsonoverlay.EnumOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
 import com.reprezen.jsonoverlay.OverlayFactory
-import com.reprezen.jsonoverlay.ReferenceRegistry
+import com.reprezen.jsonoverlay.ReferenceManager
 import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member
 import com.reprezen.jsonoverlay.gen.TypeData.Field
 import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
+import com.reprezen.jsonoverlay.gen.TypeGenerator
 import java.io.File
 import java.util.Collection
+import java.util.List
 import java.util.Map
 import java.util.stream.Collectors
 
@@ -63,8 +61,16 @@ class ImplGenerator extends TypeGenerator {
 			'''))
 			members.add(type.enumFactoryMember)
 		} else {
-			members.add(getElaborateChildrenMethod(type))
+			members.add(getElaborateJsonMethod(type))
 			members.addAll(getFactoryMembers(type))
+			if (type.typeData.modelType !== null) {
+				members.addMember('''
+					@Override
+					public Class<?> _getModelType() {
+						return «type.typeData.modelType».class;
+					}
+				''')
+			}
 		}
 		return members
 	}
@@ -102,13 +108,13 @@ class ImplGenerator extends TypeGenerator {
 		val members = new Members
 		requireTypes(JsonNode, JsonOverlay)
 		members.addMember('''
-			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(json, parent, refReg);
+			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(json, parent, factory, refMgr);
 			}
 		''')
 		members.addMember('''
-			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-				super(«type.lcName», parent, refReg);
+			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
+				super(«type.lcName», parent, factory, refMgr);
 			}
 		''')
 		return members
@@ -116,21 +122,6 @@ class ImplGenerator extends TypeGenerator {
 
 	override boolean skipField(Field field) {
 		return field.noImpl
-	}
-
-	override Members getFieldMembers(Field field) {
-		val members = new Members
-		requireTypes(field.getType(), field.getImplType())
-		members.addMember('''private «field.propertyType» «field.propertyName»;''')
-		switch (field.getStructure()) {
-			case scalar:
-				requireTypes(ChildOverlay)
-			case collection:
-				requireTypes(Collection, ListOverlay, ChildListOverlay)
-			case map:
-				requireTypes(Map, MapOverlay, ChildMapOverlay)
-		}
-		return members
 	}
 
 	override Members getFieldMethods(Field field) {
@@ -160,140 +151,170 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public «f.type» get«f.name»() {
-				return «f.propertyName»._get();	
+				return _get("«f.propertyName»", «f.type».class);
 			}
 		''')
 		if (f.structure == Structure.scalar && !f.isScalarType) {
 			methods.addMember('''
 				public «f.type» get«f.name»(boolean elaborate) {
-					return «f.propertyName»._get(elaborate);
+					return _get("«f.propertyName»", elaborate, «f.type».class);
 				}
 			''')
 		}
 		if (f.isBoolean) {
 			methods.addMember('''
 				public boolean is«f.name»() {
-					return «f.propertyName»._get() != null ? «f.propertyName»._get() : «f.boolDefault»;
+					Boolean bool = _get("«f.propertyName»", Boolean.class);
+					return bool != null ? bool : «f.boolDefault»;
 				}
 			''')
 		}
 		methods.addMember('''
 			public void set«f.name»(«f.type» «f.lcName») {
-				this.«f.lcName»._set(«f.lcName»);
+				_setScalar("«f.propertyName»", «f.lcName», «f.type».class);
 			}
 		''')
 		return methods
 	}
 
 	def private Members getCollectionMethods(Field f) {
+		requireTypes(List, ListOverlay)
 		val methods = new Members
 		methods.addMember('''
-			public Collection<«f.type»> get«f.plural»() {
-					return «f.propertyName»._get();
-				}
+			public List<«f.type»> get«f.plural»() {
+				return _getList("«f.propertyName»", «f.type».class);
+			}
+		''')
+		methods.addMember('''
+			public List<«f.type»> get«f.plural»(boolean elaborate) {
+				return _getList("«f.propertyName»", elaborate, «f.type».class);
+			}
 		''')
 		methods.addMember('''
 			public boolean has«f.plural»() {
-				return «f.propertyName»._isPresent();
+				return _isPresent("«f.propertyName»");
 			}
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(int index) {
-				return «f.propertyName»._get(index);
+				return _get("«f.propertyName»", index, «f.type».class);
 			}
 		''')
 		methods.addMember('''
-			public void set«f.plural»(Collection<«f.type»> «f.lcPlural») {
-				this.«f.propertyName»._set(«f.lcPlural»);
+			public void set«f.plural»(List<«f.type»> «f.lcPlural») {
+				_setList("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(int index, «f.type» «f.lcName») {
-				«f.propertyName»._set(index, «f.lcName»);
+				_set("«f.propertyName»", index, «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void add«f.name»(«f.type» «f.lcName») {
-				«f.propertyName»._add(«f.lcName»);
+				_add("«f.propertyName»", «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void insert«f.name»(int index, «f.type» «f.lcName») {
-				«f.propertyName»._insert(index, «f.lcName»);
+				_insert("«f.propertyName»", index, «f.lcName», «f.type».class);
 			}
 		''')
 
 		methods.addMember('''
 			public void remove«f.name»(int index) {
-				«f.propertyName»._remove(index);
+				_remove("«f.propertyName»", index, «f.type».class);
 			}
 		''')
 		return methods
 	}
 
 	def private Members getMapMethods(Field f) {
+		requireTypes(Map, MapOverlay)
 		val methods = new Members
 		methods.addMember('''
 			public Map<String, «f.type»> get«f.plural»() {
-				return «f.propertyName»._get();
+				return _getMap("«f.propertyName»", «f.type».class);
+			}
+		''')
+		methods.addMember('''
+			public Map<String, «f.type»> get«f.plural»(boolean elaborate) {
+				return _getMap("«f.propertyName»", elaborate, «f.type».class);
+			}
+		''')
+
+		methods.addMember('''
+			public boolean has«f.plural»() {
+				return _isPresent("«f.propertyName»");
 			}
 		''')
 		methods.addMember('''
 			public boolean has«f.name»(String «f.keyName») {
-				return «f.propertyName».containsKey(«f.keyName»);
+				return _getMap("«f.propertyName»", «f.type».class).containsKey(«f.keyName»);
 			}
 		''')
 		methods.addMember('''
 			public «f.type» get«f.name»(String «f.keyName») {
-				return «f.propertyName»._get(«f.keyName»);
+				return _get("«f.propertyName»", «f.keyName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.plural»(Map<String, «f.type»> «f.lcPlural») {
-				this.«f.propertyName»._set(«f.lcPlural»);
+				_setMap("«f.propertyName»", «f.lcPlural», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void set«f.name»(String «f.keyName», «f.type» «f.lcName») {
-				«f.propertyName»._set(«f.keyName», «f.lcName»);
+				_set("«f.propertyName»", «f.keyName», «f.lcName», «f.type».class);
 			}
 		''')
 		methods.addMember('''
 			public void remove«f.name»(String «f.keyName») {
-				«f.propertyName»._remove(«f.keyName»);
+				_remove("«f.propertyName»", «f.keyName», «f.type».class);
 			}
 		''')
 		return methods
 	}
 
-	def private Member getElaborateChildrenMethod(Type type) {
+	def private Member getElaborateJsonMethod(Type type) {
 		return new Member('''
-			protected void elaborateChildren() {
-				super.elaborateChildren();
+			protected void _elaborateJson() {
 				«FOR f : type.fields.values.filter[!it.noImpl]»
-					«f.propertyName» = «f.propertyNew»;
+					«f.elaborateStatement»
 				«ENDFOR»
 			}
 		''').override
 	}
 
+	def private String getElaborateStatement(Field f) {
+		requireTypes(f.implType)
+		return switch (f.structure) {
+			case scalar: '''_createScalar("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
+			case collection: '''_createList("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
+			case map: {
+				val pat = if (f.keyPattern !== null) '''"«f.keyPattern.replaceAll("\\\\","\\\\\\\\")»"''' else "null"
+				'''_createMap("«f.propertyName»", "«f.parentPath»", «f.implType».factory, «pat»);'''
+			}
+		}
+	}
+
 	def private Member getEnumFactoryMember(Type type) {
-		requireTypes(OverlayFactory, AbstractJsonOverlay, JsonOverlay, JsonNode, ReferenceRegistry)
+		requireTypes(OverlayFactory, JsonOverlay, JsonNode, ReferenceManager)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>() {
 				@Override
-				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends JsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 				
 				@Override
-				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new «type.implType»(«type.lcName», parent, refReg);
+				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new «type.implType»(«type.lcName», parent, refMgr);
 				}
 				
 				@Override
-				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					return new «type.implType»(json, parent, refReg);
+				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+					return new «type.implType»(json, parent, refMgr);
 				}			
 			};
 		''')
@@ -307,19 +328,19 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Member getFactoryMember(Type type) {
-		requireTypes(OverlayFactory, JsonNode, ReferenceRegistry, AbstractJsonOverlay)
+		requireTypes(OverlayFactory, JsonNode, ReferenceManager, JsonOverlay)
 		return new Member('''
 			public static OverlayFactory<«type.name»> factory = new OverlayFactory<«type.name»>(){
 				@Override
-				protected Class<? extends AbstractJsonOverlay<? super «type.name»>> getOverlayClass() {
+				protected Class<? extends JsonOverlay<? super «type.name»>> getOverlayClass() {
 					return «type.implType».class;
 				}
 			
 				@Override
-				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					AbstractJsonOverlay<?> overlay;
+				public JsonOverlay<«type.name»> _create(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
+					JsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
-						overlay = new «type.implType»(«type.lcName», parent, refReg);
+						overlay = new «type.implType»(«type.lcName», parent, refMgr);
 					«ELSE»
 						Class<? extends «type.name»> subtype = getSubtypeOf(«type.lcName»);
 						«getSubtypeCreate(type, type.lcName)»
@@ -330,10 +351,10 @@ class ImplGenerator extends TypeGenerator {
 				}
 			
 				@Override
-				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceRegistry refReg) {
-					AbstractJsonOverlay<?> overlay;
+				public JsonOverlay<«type.name»> _create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
+					JsonOverlay<?> overlay;
 					«IF type.subTypes.empty»
-						overlay = new «type.implType»(json, parent, refReg);
+						overlay = new «type.implType»(json, parent, refMgr);
 					«ELSE»
 						Class<? extends «type.name»> subtype = getSubtypeOf(json);
 						«getSubtypeCreate(type, ".json")»
@@ -397,18 +418,18 @@ class ImplGenerator extends TypeGenerator {
 		val subtypes = t.subTypes
 		if (subtypes.empty) {
 			return '''
-				overlay = new «t.implType»(«t.castArg0(arg0)», parent, refReg);
+				overlay = new «t.implType»(«t.castArg0(arg0)», parent, refMgr);
 			'''
 		} else {
 			return '''
 				switch (subtype != null ? subtype.getSimpleName() : "") {
 					«FOR sub : subtypes»
 						case "«sub.name»":
-							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refReg, null);
+							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refMgr, null);
 							break;
 					«ENDFOR»
 					default:
-						overlay = new «t.implType»(«t.castArg0(arg0)», parent, refReg);
+						overlay = new «t.implType»(«t.castArg0(arg0)», parent, refMgr);
 				}
 			'''
 		}

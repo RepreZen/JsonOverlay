@@ -21,6 +21,7 @@ public class SerializationOptions {
 		KEEP_EMPTY, KEEP_ONE_EMPTY, FOLLOW_REFS;
 	}
 
+	public final static SerializationOptions EMPTY = new SerializationOptions();
 	private final Set<SerializationOptions.Option> options;
 
 	public SerializationOptions(SerializationOptions.Option... options) {

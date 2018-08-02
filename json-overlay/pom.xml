@@ -107,6 +107,11 @@
 			<artifactId>org.eclipse.xtend.lib</artifactId>
 			<version>2.11.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.norconex.commons</groupId>
+			<artifactId>norconex-commons-lang</artifactId>
+			<version>1.15.0</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -247,6 +252,16 @@
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>${nexus.autorelease}</autoReleaseAfterClose>
 					<autoDropAfterRelease>${nexus.autodrop}</autoDropAfterRelease>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.0</version>
+				<configuration>
+					<excludes>
+						<exclude />
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>

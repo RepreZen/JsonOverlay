@@ -151,13 +151,13 @@ class ImplGenerator extends TypeGenerator {
 		val methods = new Members
 		methods.addMember('''
 			public «f.type» get«f.name»() {
-				return («f.type») _get("«f.propertyName»", «f.type».class);
+				return _get("«f.propertyName»", «f.type».class);
 			}
 		''')
 		if (f.structure == Structure.scalar && !f.isScalarType) {
 			methods.addMember('''
 				public «f.type» get«f.name»(boolean elaborate) {
-					return («f.type») _get("«f.propertyName»", elaborate, «f.type».class);
+					return _get("«f.propertyName»", elaborate, «f.type».class);
 				}
 			''')
 		}

@@ -12,6 +12,7 @@ package com.reprezen.jsonoverlay.gen;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,8 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Generated;
-
-import org.apache.commons.io.FileUtils;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,12 +37,12 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.reprezen.jsonoverlay.BooleanOverlay;
 import com.reprezen.jsonoverlay.EnumOverlay;
@@ -102,7 +101,7 @@ public abstract class TypeGenerator {
 		addGeneratedMembers(type, gen);
 		requireTypes(Generated.class);
 		resolveImports(type, gen);
-		FileUtils.write(javaFile, gen.format(), Charsets.UTF_8);
+		Files.write(gen.format(), javaFile, Charset.forName("UTF-8"));
 	}
 
 	protected abstract String getPackage();

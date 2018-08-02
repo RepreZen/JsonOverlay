@@ -195,10 +195,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	/* package */ JsonNode _toJson(SerializationOptions options) {
-		if (_isReference() && (options.isFollowRefs() || refOverlay._getReference().isInvalid())) {
-			ObjectNode obj = _jsonObject();
-			obj.put("$ref", refOverlay._getReference().getRefString());
-			return obj;
+		if (_isReference()) {
+			if (!options.isFollowRefs() || refOverlay._getReference().isInvalid()) {
+				ObjectNode obj = _jsonObject();
+				obj.put("$ref", refOverlay._getReference().getRefString());
+				return obj;
+			} else {
+				return refOverlay.getOverlay()._toJson(options);
+			}
 		} else {
 			return _toJsonInternal(options);
 		}

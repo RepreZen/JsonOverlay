@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -105,6 +106,10 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	/* package */ JsonOverlay<V> _getOverlay(String key) {
 		return overlays.get(key);
+	}
+
+	public Set<String> keySet() {
+		return value.keySet();
 	}
 
 	public void set(String key, V val) {

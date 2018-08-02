@@ -25,6 +25,11 @@ public class ReferenceManager {
 		}
 	}
 
+	public ReferenceManager(URL rootUrl, JsonNode preloadedDoc) {
+		this(rootUrl);
+		this.doc = preloadedDoc;
+	}
+
 	private ReferenceManager(URL baseUrl, ReferenceRegistry registry) {
 		this.docUrl = baseUrl;
 		this.registry = registry;

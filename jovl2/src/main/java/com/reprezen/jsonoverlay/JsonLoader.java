@@ -51,7 +51,7 @@ public class JsonLoader {
 		}
 	}
 
-	private JsonNode loadString(URL url, String json) throws IOException, JsonProcessingException {
+	public JsonNode loadString(URL url, String json) throws IOException, JsonProcessingException {
 		JsonNode tree;
 		if (json.trim().startsWith("{")) {
 			tree = jsonMapper.readTree(json);

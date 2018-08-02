@@ -292,7 +292,7 @@ class ImplGenerator extends TypeGenerator {
 			case scalar: '''_createScalar("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
 			case collection: '''_createList("«f.propertyName»", "«f.parentPath»", «f.implType».factory);'''
 			case map: {
-				val pat = if (f.keyPattern !== null) '''"«f.keyPattern»"''' else "null"
+				val pat = if (f.keyPattern !== null) '''"«f.keyPattern.replaceAll("\\\\","\\\\\\\\")»"''' else "null"
 				'''_createMap("«f.propertyName»", "«f.parentPath»", «f.implType».factory, «pat»);'''
 			}
 		}

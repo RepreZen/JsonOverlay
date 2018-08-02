@@ -1,0 +1,29 @@
+---
+modelType: TestModel
+types:
+  - name: TestModel
+    fields:
+      description: {}
+      width:
+        type: Integer
+      height:
+        type: Integer
+      entries:
+        name: Entry        
+        structure: map
+        plural: Entries
+      items:
+        structure: collection
+        type: Item
+      integers:
+        structure: collection
+        type: Integer
+      namedIntegers:
+        structure: map
+        type: Integer
+  - name: Entry
+    fields:
+      title: {}
+  - name: Item
+    fields:
+      title: {}

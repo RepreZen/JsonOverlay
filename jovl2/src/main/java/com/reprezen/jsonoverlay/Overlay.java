@@ -29,8 +29,8 @@ public class Overlay<V> {
 		return new Overlay<V>(overlay);
 	}
 
-	public static <X> Overlay<Map<String, X>> of(MapOverlay<X> overlay) {
-		return new Overlay<Map<String, X>>(overlay);
+	public static <V> Overlay<Map<String, V>> of(MapOverlay<V> overlay) {
+		return new Overlay<Map<String, V>>(overlay);
 	}
 
 	public static <V> Overlay<Map<String, V>> of(Map<String, V> map) {
@@ -99,6 +99,10 @@ public class Overlay<V> {
 		return overlay._get();
 	}
 
+	public static <V> V get(JsonOverlay<V> overlay) {
+		return overlay._get();
+	}
+
 	public final JsonOverlay<V> getOverlay() {
 		return overlay;
 	}
@@ -122,15 +126,23 @@ public class Overlay<V> {
 		}
 	}
 
-	public static <V> V get(JsonOverlay<V> overlay) {
-		return overlay._get();
+	public static <V> MapOverlay<V> getMapOverlay(Map<String, V> map) {
+		@SuppressWarnings("unchecked")
+		MapOverlay<V> overlay = (MapOverlay<V>) getSidebandOverlay(map);
+		return overlay;
+	}
+
+	public static <V> ListOverlay<V> getListOverlay(List<V> list) {
+		@SuppressWarnings("unchecked")
+		ListOverlay<V> overlay = (ListOverlay<V>) getSidebandOverlay(list);
+		return overlay;
 	}
 
 	public JsonOverlay<?> find(JsonPointer path) {
 		return overlay._find(path);
 	}
 
-	public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, JsonPointer path) {
+	public static JsonOverlay<?> find(JsonOverlay<?> overlay, JsonPointer path) {
 		return overlay._find(path);
 	}
 
@@ -138,7 +150,7 @@ public class Overlay<V> {
 		return overlay._find(path);
 	}
 
-	public static <V> JsonOverlay<?> find(JsonOverlay<V> overlay, String path) {
+	public static <V, OV extends JsonOverlay<V>> JsonOverlay<?> find(OV overlay, String path) {
 		return overlay._find(path);
 	}
 
@@ -210,7 +222,7 @@ public class Overlay<V> {
 		return overlay._getPathInParent();
 	}
 
-	public static <V> String getPathInParent(JsonOverlay<V> overlay) {
+	public static String getPathInParent(JsonOverlay<?> overlay) {
 		return overlay._getPathInParent();
 	}
 
@@ -218,7 +230,7 @@ public class Overlay<V> {
 		return overlay._getRoot();
 	}
 
-	public static <V> JsonOverlay<?> getRoot(JsonOverlay<V> overlay) {
+	public static JsonOverlay<?> getRoot(JsonOverlay<?> overlay) {
 		return overlay._getRoot();
 	}
 
@@ -236,7 +248,7 @@ public class Overlay<V> {
 		return overlay._getPathFromRoot();
 	}
 
-	public static <V> String getPathFromFromRoot(JsonOverlay<V> overlay) {
+	public static String getPathFromFromRoot(JsonOverlay<?> overlay) {
 		return overlay._getPathFromRoot();
 	}
 
@@ -244,15 +256,15 @@ public class Overlay<V> {
 		return overlay._getJsonReference();
 	}
 
+	public static String getJsonReference(JsonOverlay<?> overlay) {
+		return overlay._getJsonReference();
+	}
+
 	public String getJsonReference(boolean forRef) {
 		return overlay._getJsonReference(forRef);
 	}
 
-	public static <V> String getJsonReference(JsonOverlay<V> overlay) {
-		return overlay._getJsonReference();
-	}
-
-	public static <V> String getJsonReference(JsonOverlay<V> overlay, boolean forRef) {
+	public static String getJsonReference(JsonOverlay<?> overlay, boolean forRef) {
 		return overlay._getJsonReference(forRef);
 	}
 
@@ -313,7 +325,6 @@ public class Overlay<V> {
 	private Reference getPropertyReference(String name) {
 		PropertiesOverlay<V> propsOverlay = (PropertiesOverlay<V>) overlay;
 		return getReference(propsOverlay._getOverlay(name));
-
 	}
 
 	private Reference getMapReference(String key) {

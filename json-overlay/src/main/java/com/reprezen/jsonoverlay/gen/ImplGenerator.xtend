@@ -109,12 +109,12 @@ class ImplGenerator extends TypeGenerator {
 		requireTypes(JsonNode, JsonOverlay)
 		members.addMember('''
 			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
-				super(json, parent, factory, refMgr);
+				super(json, parent, «IF type.extensionOf == null»factory, «ENDIF»refMgr);
 			}
 		''')
 		members.addMember('''
 			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
-				super(«type.lcName», parent, factory, refMgr);
+				super(«type.lcName», parent, «IF type.extensionOf == null»factory, «ENDIF»refMgr);
 			}
 		''')
 		return members
@@ -425,7 +425,7 @@ class ImplGenerator extends TypeGenerator {
 				switch (subtype != null ? subtype.getSimpleName() : "") {
 					«FOR sub : subtypes»
 						case "«sub.name»":
-							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refMgr, null);
+							overlay = «sub.implType».factory.create(«sub.castArg0(arg0)», parent, refMgr);
 							break;
 					«ENDFOR»
 					default:

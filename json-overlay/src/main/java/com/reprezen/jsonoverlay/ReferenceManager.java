@@ -68,7 +68,7 @@ public class ReferenceManager {
 		return registry;
 	}
 
-	private URL normalize(URL url, boolean noFrag) {
+	private static URL normalize(URL url, boolean noFrag) {
 		if (url != null) {
 			URLNormalizer normalizer = new URLNormalizer(url.toString()) //
 					.lowerCaseSchemeHost() //

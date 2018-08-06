@@ -43,7 +43,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import com.google.inject.Inject;
 import com.reprezen.jsonoverlay.BooleanOverlay;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
@@ -188,7 +187,6 @@ public abstract class TypeGenerator {
 				PropertiesOverlay.class, //
 				OverlayFactory.class, //
 				ReferenceManager.class, //
-				Inject.class, //
 				StringOverlay.class, //
 				IntegerOverlay.class, //
 				NumberOverlay.class, //

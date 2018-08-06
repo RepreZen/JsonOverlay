@@ -327,7 +327,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	public boolean equals(Object other, boolean sameOrder) {
-		if (getClass() == other.getClass()) {
+		if (other != null && getClass() == other.getClass()) {
 			PropertiesOverlay<?> otherPO = (PropertiesOverlay<?>) other;
 			if (elaborated != otherPO.elaborated) {
 				return false;

@@ -155,6 +155,7 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("stringValue", "stringValue", StringOverlay.factory);
 		_createScalar("intValue", "intValue", IntegerOverlay.factory);
 		_createScalar("numberValue", "numberValue", NumberOverlay.factory);

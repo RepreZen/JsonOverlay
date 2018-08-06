@@ -39,6 +39,7 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("title", "title", StringOverlay.factory);
 	}
 

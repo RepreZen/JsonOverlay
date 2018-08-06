@@ -39,6 +39,7 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("title", "title", StringOverlay.factory);
 	}
 

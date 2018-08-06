@@ -279,6 +279,7 @@ class ImplGenerator extends TypeGenerator {
 	def private Member getElaborateJsonMethod(Type type) {
 		return new Member('''
 			protected void _elaborateJson() {
+				super._elaborateJson();
 				«FOR f : type.fields.values.filter[!it.noImpl]»
 					«f.elaborateStatement»
 				«ENDFOR»

@@ -82,7 +82,7 @@ public class PropertiesTests extends Assert {
 					foo._getOverlay(name) == copy._getOverlay(name));
 		}
 		// foo2 has same content as foo, but numField comes last instead of first
-		Foo foo2 = createFooWithJson(10, LIST, 10, 20, 30, END, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
+		Foo foo2 = createFooWithJson(LIST, 10, 20, 30, END, 10, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
 				END);
 		assertEquals(foo, foo2);
 		assertFalse("Property order difference not detected", foo.equals(foo2, true));

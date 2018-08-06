@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
@@ -179,7 +180,10 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		elaborated = true;
 	}
 
-	protected abstract void _elaborateJson();
+	protected void _elaborateJson() {
+		// need an implemenatation here because subclasses invoke method in super, to
+		// support type extensions
+	}
 
 	private void _elaborateValue() {
 		@SuppressWarnings("unchecked")
@@ -318,22 +322,30 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return equals(obj, false);
+	public boolean equals(Object other) {
+		return equals(other, false);
 	}
 
-	public boolean equals(Object obj, boolean sameOrder) {
-		if (obj instanceof PropertiesOverlay<?>) {
-			PropertiesOverlay<?> castObj = (PropertiesOverlay<?>) obj;
-			return children.equals(castObj.children) && (!sameOrder || childOrder.equals(castObj.childOrder));
+	public boolean equals(Object other, boolean sameOrder) {
+		if (getClass() == other.getClass()) {
+			PropertiesOverlay<?> otherPO = (PropertiesOverlay<?>) other;
+			if (elaborated != otherPO.elaborated) {
+				return false;
+			}
+			if (!Objects.equal(children, otherPO.children)) {
+				return false;
+			}
+			return sameOrder ? Objects.equal(childOrder, otherPO.childOrder) : true;
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return super.hashCode();
+		int hash = 7;
+		hash = 31 * hash + (children != null ? children.hashCode() : 0);
+		hash = 31 * hash + (childOrder != null ? childOrder.hashCode() : 0);
+		return hash;
 	}
 
 	protected static class PropertyLocator implements Comparable<PropertyLocator> {
@@ -408,6 +420,43 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 				return cmp;
 			}
 
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((pointer == null) ? 0 : pointer.hashCode());
+			result = prime * result + ((vector == null) ? 0 : vector.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			PropertyLocator other = (PropertyLocator) obj;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (pointer == null) {
+				if (other.pointer != null)
+					return false;
+			} else if (!pointer.equals(other.pointer))
+				return false;
+			if (vector == null) {
+				if (other.vector != null)
+					return false;
+			} else if (!vector.equals(other.vector))
+				return false;
+			return true;
 		}
 
 		@Override

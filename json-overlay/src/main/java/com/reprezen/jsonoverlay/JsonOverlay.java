@@ -247,7 +247,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.pathInParent = pathInParent;
 	}
 
-	protected abstract OverlayFactory<V> _getFactory();
+	protected abstract OverlayFactory<?> _getFactory();
 
 	@Override
 	public String toString() {

@@ -33,7 +33,7 @@ public abstract class OverlayFactory<V> {
 				overlay = _create((V) null, null, refMgr);
 			}
 			if (overlay != null) {
-				overlay = overlay._getFactory()._create((V) null, null, refMgr);
+				overlay = ((OverlayFactory<V>) overlay._getFactory())._create((V) null, null, refMgr);
 				overlay._setReference(refOverlay);
 			}
 		} else {

@@ -71,6 +71,12 @@ class ImplGenerator extends TypeGenerator {
 				''')
 			}
 		}
+		members.add(new Member('''
+			@Override
+			protected OverlayFactory<«type.name»> _getFactory() {
+				return factory;
+			}
+		'''))
 		return members
 	}
 

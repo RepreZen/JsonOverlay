@@ -26,12 +26,15 @@ public abstract class OverlayFactory<V> {
 	public JsonOverlay<V> create(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
 		JsonOverlay<V> overlay;
 		if (Reference.isReferenceNode(json)) {
-			if (!isExtendedType()) {
-				// set up a reference overlay delegate, but don't resolve until accessed
+			Reference reference = refMgr.getReference(json);
+			RefOverlay<V> refOverlay = new RefOverlay<V>(reference, parent, this, refMgr);
+			overlay = refOverlay.getOverlay();
+			if (overlay == null) {
 				overlay = _create((V) null, null, refMgr);
-				overlay._setReference(refMgr.getReference(json));
-			} else {
-				throw new RuntimeException("ref for extended type");
+			}
+			if (overlay != null) {
+				overlay = overlay._getFactory()._create((V) null, null, refMgr);
+				overlay._setReference(refOverlay);
 			}
 		} else {
 			JsonOverlay<?> existing = refMgr.getRegistry().getOverlay(json, getSignature());
@@ -48,7 +51,6 @@ public abstract class OverlayFactory<V> {
 			}
 		}
 		return overlay;
-
 	}
 
 	public boolean isCompatible(JsonOverlay<?> overlay) {

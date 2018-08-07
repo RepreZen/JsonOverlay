@@ -32,6 +32,11 @@ public final class ObjectOverlay extends ScalarOverlay<Object> {
 		return value != null ? mapper.convertValue(value, JsonNode.class) : _jsonMissing();
 	}
 
+	@Override
+	protected OverlayFactory<Object> _getFactory() {
+		return factory;
+	}
+
 	public static OverlayFactory<Object> factory = new OverlayFactory<Object>() {
 		@Override
 		protected Class<ObjectOverlay> getOverlayClass() {

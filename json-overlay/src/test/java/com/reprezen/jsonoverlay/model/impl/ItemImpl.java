@@ -90,4 +90,10 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 	public Class<?> _getModelType() {
 		return TestModel.class;
 	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<Item> _getFactory() {
+		return factory;
+	}
 }

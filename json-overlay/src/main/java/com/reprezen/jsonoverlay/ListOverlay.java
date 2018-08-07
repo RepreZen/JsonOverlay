@@ -159,6 +159,11 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		return new ListOverlayFactory<V>(itemFactory);
 	}
 
+	@Override
+	protected OverlayFactory<List<V>> _getFactory() {
+		return factory;
+	}
+
 	private static class ListOverlayFactory<V> extends OverlayFactory<List<V>> {
 
 		private final OverlayFactory<V> itemFactory;

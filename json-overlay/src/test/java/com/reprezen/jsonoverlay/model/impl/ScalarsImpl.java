@@ -213,4 +213,10 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 	public Class<?> _getModelType() {
 		return TestModel.class;
 	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<Scalars> _getFactory() {
+		return factory;
+	}
 }

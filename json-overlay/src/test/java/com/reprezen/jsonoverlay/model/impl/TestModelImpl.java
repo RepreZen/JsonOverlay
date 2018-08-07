@@ -407,4 +407,10 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 	public Class<?> _getModelType() {
 		return TestModel.class;
 	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<TestModel> _getFactory() {
+		return factory;
+	}
 }

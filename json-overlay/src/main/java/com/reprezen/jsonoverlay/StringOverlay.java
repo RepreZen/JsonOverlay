@@ -1,5 +1,5 @@
 /*******************************************************************************
-	 *  Copyright (c) 2017 ModelSolv, Inc. and others.
+ *  Copyright (c) 2017 ModelSolv, Inc. and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -30,6 +30,11 @@ public final class StringOverlay extends ScalarOverlay<String> {
 	@Override
 	protected JsonNode _toJsonInternal(SerializationOptions options) {
 		return value != null ? _jsonScalar(value) : _jsonMissing();
+	}
+
+	@Override
+	protected OverlayFactory<String> _getFactory() {
+		return factory;
 	}
 
 	public static OverlayFactory<String> factory = new OverlayFactory<String>() {

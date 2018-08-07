@@ -227,5 +227,10 @@ public class PropertiesTests extends Assert {
 			}
 
 		};
+
+		@Override
+		protected OverlayFactory<Foo> _getFactory() {
+			return factory;
+		}
 	}
 }

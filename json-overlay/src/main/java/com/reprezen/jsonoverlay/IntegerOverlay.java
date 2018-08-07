@@ -32,6 +32,11 @@ public final class IntegerOverlay extends ScalarOverlay<Integer> {
 		return value != null ? _jsonScalar(value) : _jsonMissing();
 	}
 
+	@Override
+	protected OverlayFactory<Integer> _getFactory() {
+		return factory;
+	}
+
 	public static OverlayFactory<Integer> factory = new OverlayFactory<Integer>() {
 		@Override
 		protected Class<IntegerOverlay> getOverlayClass() {

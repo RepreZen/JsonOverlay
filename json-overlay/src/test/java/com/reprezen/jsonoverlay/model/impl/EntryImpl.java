@@ -90,4 +90,10 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 	public Class<?> _getModelType() {
 		return TestModel.class;
 	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<Entry> _getFactory() {
+		return factory;
+	}
 }

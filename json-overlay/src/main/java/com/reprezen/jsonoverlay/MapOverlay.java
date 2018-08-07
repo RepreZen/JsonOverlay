@@ -160,6 +160,11 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		return new MapOverlayFactory<V>(valueFactory, keyPattern);
 	}
 
+	@Override
+	protected OverlayFactory<Map<String, V>> _getFactory() {
+		return factory;
+	}
+
 	private static class MapOverlayFactory<V> extends OverlayFactory<Map<String, V>> {
 		private final OverlayFactory<V> valueFactory;
 		private final String keyPattern;

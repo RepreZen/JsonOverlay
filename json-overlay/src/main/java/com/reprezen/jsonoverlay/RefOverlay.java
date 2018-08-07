@@ -51,9 +51,9 @@ public class RefOverlay<V> {
 		return target;
 	}
 
-	public V _get() {
+	public V _get(boolean elaborate) {
 		getOverlay();
-		return target != null ? target._get() : null;
+		return target != null ? target._get(elaborate) : null;
 	}
 
 	public Reference _getReference() {

@@ -84,6 +84,11 @@ public final class NumberOverlay extends ScalarOverlay<Number> {
 		}
 	}
 
+	@Override
+	protected OverlayFactory<Number> _getFactory() {
+		return factory;
+	}
+
 	public static OverlayFactory<Number> factory = new OverlayFactory<Number>() {
 		@Override
 		protected Class<NumberOverlay> getOverlayClass() {

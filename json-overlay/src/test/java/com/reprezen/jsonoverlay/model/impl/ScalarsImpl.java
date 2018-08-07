@@ -216,7 +216,7 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	protected OverlayFactory<Scalars> _getFactory() {
+	protected OverlayFactory<?> _getFactory() {
 		return factory;
 	}
 }

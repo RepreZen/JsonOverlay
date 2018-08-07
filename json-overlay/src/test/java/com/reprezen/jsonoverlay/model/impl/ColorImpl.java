@@ -47,7 +47,7 @@ public class ColorImpl extends EnumOverlay<Color> {
 
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	protected OverlayFactory<Color> _getFactory() {
+	protected OverlayFactory<?> _getFactory() {
 		return factory;
 	}
 }

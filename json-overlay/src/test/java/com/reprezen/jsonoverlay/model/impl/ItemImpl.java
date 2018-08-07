@@ -93,7 +93,7 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	protected OverlayFactory<Item> _getFactory() {
+	protected OverlayFactory<?> _getFactory() {
 		return factory;
 	}
 }

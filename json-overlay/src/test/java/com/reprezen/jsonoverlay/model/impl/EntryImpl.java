@@ -93,7 +93,7 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	protected OverlayFactory<Entry> _getFactory() {
+	protected OverlayFactory<?> _getFactory() {
 		return factory;
 	}
 }

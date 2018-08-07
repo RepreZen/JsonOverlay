@@ -47,7 +47,9 @@ public abstract class OverlayFactory<V> {
 				overlay = _create(json, parent, refMgr);
 				overlay._setParent(parent);
 				refMgr.getRegistry().register(json, getSignature(), overlay);
-				overlay._elaborate(true);
+				if (!overlay._isElaborated()) {
+					overlay._elaborate(true);
+				}
 			}
 		}
 		return overlay;

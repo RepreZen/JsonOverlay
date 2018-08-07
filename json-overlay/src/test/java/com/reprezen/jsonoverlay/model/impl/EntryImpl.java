@@ -71,7 +71,7 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 
 		@Override
 		protected boolean isExtendedType() {
-			return true;
+			return false;
 		}
 	};
 

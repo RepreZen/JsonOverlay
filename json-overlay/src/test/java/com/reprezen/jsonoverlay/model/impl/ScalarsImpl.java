@@ -194,7 +194,7 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 
 		@Override
 		protected boolean isExtendedType() {
-			return true;
+			return false;
 		}
 	};
 

@@ -71,7 +71,7 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 
 		@Override
 		protected boolean isExtendedType() {
-			return true;
+			return false;
 		}
 	};
 

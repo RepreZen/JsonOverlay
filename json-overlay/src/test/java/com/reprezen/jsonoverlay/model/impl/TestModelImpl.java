@@ -388,7 +388,7 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 
 		@Override
 		protected boolean isExtendedType() {
-			return true;
+			return false;
 		}
 	};
 

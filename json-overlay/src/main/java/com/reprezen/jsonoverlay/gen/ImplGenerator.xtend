@@ -364,7 +364,7 @@ class ImplGenerator extends TypeGenerator {
 					return castOverlay;
 				}
 				
-				«getIsExtendedType(type.subTypes.empty)»
+				«getIsExtendedType(!type.subTypes.empty)»
 			};	
 		''')
 	}

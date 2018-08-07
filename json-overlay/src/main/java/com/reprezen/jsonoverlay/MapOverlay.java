@@ -101,7 +101,8 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	public V get(String key) {
-		return overlays.get(key)._get();
+		JsonOverlay<V> valOverlay = overlays.get(key);
+		return valOverlay != null ? valOverlay._get() : null;
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(String key) {

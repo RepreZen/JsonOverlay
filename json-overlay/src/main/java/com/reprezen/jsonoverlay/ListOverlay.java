@@ -91,7 +91,8 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	public V get(int index) {
-		return overlays.get(index)._get();
+		JsonOverlay<V> valOverlay = overlays.get(index);
+		return valOverlay != null ? valOverlay._get() : null;
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(int index) {

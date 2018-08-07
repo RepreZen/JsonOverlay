@@ -76,6 +76,13 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 		elaborated = true;
 	}
 
+	@Override
+	protected void _elaborateFullyInternal() {
+		for (JsonOverlay<V> overlay : overlays) {
+			overlay._elaborateFully();
+		}
+	}
+
 	private void fillWithJson() {
 		value.clear();
 		overlays.clear();

@@ -239,6 +239,23 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		}
 	}
 
+	protected void _elaborateFully() {
+		if (!_isPresent()) {
+			return;
+		} else if (refOverlay != null) {
+			_ensureElaborated();
+			_elaborateFullyInternal();
+		} else {
+			JsonOverlay<?> target = refOverlay.getOverlay();
+			if (target != null) {
+				target._elaborateFully();
+			}
+		}
+	}
+
+	protected void _elaborateFullyInternal() {
+	}
+
 	/* package */ String _getPathInParent() {
 		return pathInParent;
 	}

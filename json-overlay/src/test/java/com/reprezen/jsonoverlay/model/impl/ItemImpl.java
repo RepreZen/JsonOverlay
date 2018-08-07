@@ -68,6 +68,11 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 			JsonOverlay<Item> castOverlay = (JsonOverlay<Item>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return true;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")

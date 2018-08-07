@@ -191,6 +191,11 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 			JsonOverlay<Scalars> castOverlay = (JsonOverlay<Scalars>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return true;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")

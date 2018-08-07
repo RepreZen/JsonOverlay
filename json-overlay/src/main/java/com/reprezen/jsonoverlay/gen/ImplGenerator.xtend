@@ -26,7 +26,6 @@ import com.reprezen.jsonoverlay.gen.SimpleJavaGenerator.Member
 import com.reprezen.jsonoverlay.gen.TypeData.Field
 import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
-import com.reprezen.jsonoverlay.gen.TypeGenerator
 import java.io.File
 import java.util.Collection
 import java.util.List
@@ -109,12 +108,12 @@ class ImplGenerator extends TypeGenerator {
 		requireTypes(JsonNode, JsonOverlay)
 		members.addMember('''
 			public «type.implType»(JsonNode json, JsonOverlay<?> parent, ReferenceManager refMgr) {
-				super(json, parent, «IF type.extensionOf == null»factory, «ENDIF»refMgr);
+				super(json, parent, «IF type.extensionOf === null»factory, «ENDIF»refMgr);
 			}
 		''')
 		members.addMember('''
 			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
-				super(«type.lcName», parent, «IF type.extensionOf == null»factory, «ENDIF»refMgr);
+				super(«type.lcName», parent, «IF type.extensionOf === null»factory, «ENDIF»refMgr);
 			}
 		''')
 		return members
@@ -324,7 +323,7 @@ class ImplGenerator extends TypeGenerator {
 	def private Members getFactoryMembers(Type type) {
 		val members = new Members
 		members.add(getFactoryMember(type))
-		members.addAll(getSubtypeSelectors(type))
+		members.addAll(getSubtypeMethods(type))
 		return members
 	}
 
@@ -364,11 +363,13 @@ class ImplGenerator extends TypeGenerator {
 					JsonOverlay<«type.name»> castOverlay = (JsonOverlay<«type.name»>) overlay;
 					return castOverlay;
 				}
+				
+				«getIsExtendedType(type.subTypes.empty)»
 			};	
 		''')
 	}
 
-	def private Members getSubtypeSelectors(Type type) {
+	def private Members getSubtypeMethods(Type type) {
 		val members = new Members
 		val subTypes = type.subTypes
 		if (!subTypes.isEmpty() && !type.isAbstract()) {
@@ -377,6 +378,15 @@ class ImplGenerator extends TypeGenerator {
 		members.add(getValueSubtypeSelector(type, subTypes))
 		members.add(getJsonSubtypeSelector(type, subTypes))
 		return members
+	}
+
+	def private getIsExtendedType(boolean isExtended) {
+		'''
+			@Override
+			protected boolean isExtendedType() {
+				return «if (isExtended) "true" else "false"»;
+			}
+		'''
 	}
 
 	def private Member getValueSubtypeSelector(Type t, Collection<Type> subTypes) {

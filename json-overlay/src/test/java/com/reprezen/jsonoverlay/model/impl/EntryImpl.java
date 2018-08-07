@@ -68,6 +68,11 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 			JsonOverlay<Entry> castOverlay = (JsonOverlay<Entry>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return true;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")

@@ -385,6 +385,11 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 			JsonOverlay<TestModel> castOverlay = (JsonOverlay<TestModel>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return true;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")

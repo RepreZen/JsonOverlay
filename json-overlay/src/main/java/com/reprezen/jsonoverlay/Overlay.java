@@ -194,14 +194,6 @@ public class Overlay<V> {
 		return overlay._isElaborated();
 	}
 
-	public void elaborateFully() {
-		overlay._elaborateFully();
-	}
-
-	public static <V> void elaborateFully(JsonOverlay<V> overlay) {
-		overlay._elaborateFully();
-	}
-
 	public JsonOverlay<?> getParent() {
 		return overlay._getParent();
 	}

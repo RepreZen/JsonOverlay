@@ -202,19 +202,6 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 		return elaborated;
 	}
 
-	@Override
-	protected void _elaborateFullyInternal() {
-		for (JsonOverlay<?> overlay : children.values()) {
-			overlay._elaborateFully();
-		}
-	}
-
-	@Override
-	protected OverlayFactory<?> _getFactory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	protected <X> JsonOverlay<X> _createScalar(String name, String path, OverlayFactory<X> factory) {
 		return _addChild(name, path, factory);
 	}

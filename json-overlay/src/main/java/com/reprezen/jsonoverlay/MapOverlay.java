@@ -80,13 +80,6 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 		elaborated = true;
 	}
 
-	@Override
-	protected void _elaborateFullyInternal() {
-		for (JsonOverlay<V> overlay : overlays.values()) {
-			overlay._elaborateFully();
-		}
-	}
-
 	private void fillWithJson() {
 		value.clear();
 		overlays.clear();

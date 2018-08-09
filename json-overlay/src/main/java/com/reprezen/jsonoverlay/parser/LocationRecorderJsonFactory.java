@@ -1,14 +1,16 @@
 package com.reprezen.jsonoverlay.parser;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.io.IOContext;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.io.IOContext;
+
 public final class LocationRecorderJsonFactory extends JsonFactory {
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected JsonParser _createParser(InputStream in, IOContext ctxt) throws IOException {

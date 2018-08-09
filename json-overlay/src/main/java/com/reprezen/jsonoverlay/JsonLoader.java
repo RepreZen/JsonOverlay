@@ -14,17 +14,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.reprezen.jsonoverlay.parser.JsonRegion;
+import com.reprezen.jsonoverlay.parser.PositionInfo;
 import com.reprezen.jsonoverlay.parser.LocationRecorderJsonFactory;
 import com.reprezen.jsonoverlay.parser.LocationRecorderJsonParser;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlFactory;
@@ -37,13 +37,14 @@ public class JsonLoader {
 
 	private static ObjectMapper jsonMapper = new ObjectMapper(jsonFactory);
 	private static ObjectMapper yamlMapper = new ObjectMapper(yamlFactory);
-	private Yaml yaml = new Yaml();
+
 	static {
 		jsonMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
 		yamlMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
 	}
 
 	private Map<String, JsonNode> cache = Maps.newHashMap();
+	private Map<String, Map<JsonPointer, PositionInfo>> positions = Maps.newHashMap();
 
 	public JsonLoader() {
 	}
@@ -62,22 +63,25 @@ public class JsonLoader {
 	}
 
 	public JsonNode loadString(URL url, String json) throws IOException, JsonProcessingException {
-		JsonNode tree;
-		if (json.trim().startsWith("{")) {
-			tree = jsonMapper.readTree(json);
-		} else {
-			Object parsedYaml = yaml.load(json); // this handles aliases - YAMLMapper doesn't
-			tree = yamlMapper.convertValue(parsedYaml, JsonNode.class);
-		}
+		Pair<JsonNode, Map<JsonPointer, PositionInfo>> result = loadWithLocations(json);
 		if (url != null) {
-			cache.put(url.toString(), tree);
+			cache.put(url.toString(), result.getLeft());
+			positions.put(url.toString(), result.getRight());
 		}
-		return tree;
+		return result.getLeft();
 	}
 
-	public Pair<JsonNode, Map<JsonPointer, JsonRegion>> loadWithLocations(String json) throws IOException {
+	public Optional<PositionInfo> getPositionInfo(String url, JsonPointer pointer) {
+		if (positions.containsKey(url)) {
+			return Optional.ofNullable(positions.get(url).get(pointer));
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Pair<JsonNode, Map<JsonPointer, PositionInfo>> loadWithLocations(String json) throws IOException {
 		JsonNode tree;
-		Map<JsonPointer, JsonRegion> regions;
+		Map<JsonPointer, PositionInfo> regions;
 
 		if (json.trim().startsWith("{")) {
 			LocationRecorderJsonParser parser = (LocationRecorderJsonParser) jsonFactory.createParser(json);

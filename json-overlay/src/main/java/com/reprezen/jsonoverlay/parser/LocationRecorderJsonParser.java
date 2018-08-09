@@ -1,12 +1,12 @@
 package com.reprezen.jsonoverlay.parser;
 
+import java.io.IOException;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.util.JsonParserDelegate;
-
-import java.io.IOException;
-import java.util.Map;
 
 public final class LocationRecorderJsonParser extends JsonParserDelegate {
 
@@ -19,12 +19,11 @@ public final class LocationRecorderJsonParser extends JsonParserDelegate {
 	@Override
 	public JsonToken nextToken() throws IOException {
 		JsonToken token = super.nextToken();
-		processor.processTokenLocation(token, getCurrentLocation(), getParsingContext());
-
+		processor.processTokenLocation(token, getTokenLocation(), getCurrentLocation(), getParsingContext());
 		return token;
 	}
 
-	public Map<JsonPointer, JsonRegion> getLocations() {
+	public Map<JsonPointer, PositionInfo> getLocations() {
 		return processor.getLocations();
 	}
 

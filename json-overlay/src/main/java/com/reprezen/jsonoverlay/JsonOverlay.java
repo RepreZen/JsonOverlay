@@ -12,6 +12,7 @@ package com.reprezen.jsonoverlay;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
+import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
@@ -37,6 +39,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	private boolean present;
 	private RefOverlay<V> refOverlay = null;
 	private Reference creatingRef = null;
+	private Optional<PositionInfo> positionInfo = null;
 
 	protected JsonOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
 		this.json = null;
@@ -93,6 +96,10 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	private boolean _isValidRef() {
 		return refOverlay != null ? refOverlay._getReference().isValid() : false;
+	}
+
+	/* package */ RefOverlay<V> _getRefOverlay() {
+		return refOverlay;
 	}
 
 	/* package */ Reference _getReference() {
@@ -164,8 +171,16 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
 
 	/* package */String _getPathFromRoot() {
-		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
-				: "/";
+
+		if (parent != null) {
+			String parentPath = parent._getPathFromRoot();
+			return parentPath != null ? parentPath + "/" + pathInParent : null;
+		} else if (creatingRef != null) {
+			return creatingRef.getFragment();
+
+		} else {
+			return null;
+		}
 	}
 
 	/* package */String _getJsonReference() {
@@ -245,6 +260,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	/* package */ void _setPathInParent(String pathInParent) {
 		this.pathInParent = pathInParent;
+	}
+
+	/* package */ Optional<PositionInfo> _getPositionInfo() {
+		if (positionInfo == null) {
+			JsonPointer ptr = JsonPointer.compile(_getPathFromRoot());
+			positionInfo = refMgr.getPositionInfo(ptr);
+		}
+		return positionInfo;
 	}
 
 	protected abstract OverlayFactory<?> _getFactory();

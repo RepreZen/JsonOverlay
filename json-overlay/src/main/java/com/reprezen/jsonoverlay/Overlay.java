@@ -3,9 +3,12 @@ package com.reprezen.jsonoverlay;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.jsonoverlay.parser.PositionInfo;
+import com.reprezen.jsonoverlay.parser.PositionInfo.PositionEndpoint;
 
 public class Overlay<V> {
 
@@ -268,6 +271,22 @@ public class Overlay<V> {
 		return overlay._getJsonReference(forRef);
 	}
 
+	public Optional<PositionInfo> getPositionInfo() {
+		return overlay._getPositionInfo();
+	}
+
+	public static Optional<PositionInfo> getPositionInfo(JsonOverlay<?> overlay) {
+		return overlay._getPositionInfo();
+	}
+
+	public Optional<PositionEndpoint> getStartPosition() {
+		return overlay._getPositionInfo().map(info -> info.getStart());
+	}
+
+	public static Optional<PositionEndpoint> getStartPosition(JsonOverlay<?> overlay) {
+		return overlay._getPositionInfo().map(info -> info.getStart());
+	}
+
 	public List<String> getPropertyNames() {
 		if (overlay instanceof PropertiesOverlay) {
 			return ((PropertiesOverlay<?>) overlay)._getPropertyNames();
@@ -294,6 +313,15 @@ public class Overlay<V> {
 
 	public static <V> boolean isReference(JsonOverlay<V> overlay, int index) {
 		return new Overlay<V>(overlay).getReference(index) != null;
+	}
+
+	public Overlay<V> getReferenceOverlay() {
+		RefOverlay<V> refOverlay = overlay._getRefOverlay();
+		return refOverlay != null ? new Overlay<V>(refOverlay.getOverlay()) : null;
+	}
+
+	public static <V> Overlay<V> getReferenceOverlay(JsonOverlay<V> overlay) {
+		return Overlay.of(overlay).getReferenceOverlay();
 	}
 
 	public Reference getReference(String key) {

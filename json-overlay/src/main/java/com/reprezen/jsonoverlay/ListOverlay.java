@@ -14,6 +14,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	private final OverlayFactory<V> itemFactory;
 	private List<JsonOverlay<V>> overlays = Lists.newArrayList();
+	private boolean elaborated = false;
 
 	private ListOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
 			ReferenceManager refMgr) {
@@ -60,6 +61,11 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	@Override
+	protected boolean _isElaborated() {
+		return elaborated;
+	}
+
+	@Override
 	protected void _elaborate(boolean atCreation) {
 		if (json != null) {
 			fillWithJson();
@@ -67,6 +73,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 			fillWithValues();
 		}
 		_setChildParentPaths();
+		elaborated = true;
 	}
 
 	private void fillWithJson() {
@@ -91,7 +98,8 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 	}
 
 	public V get(int index) {
-		return overlays.get(index)._get();
+		JsonOverlay<V> valOverlay = overlays.get(index);
+		return valOverlay != null ? valOverlay._get() : null;
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(int index) {
@@ -157,6 +165,11 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	public static <V> OverlayFactory<List<V>> getFactory(OverlayFactory<V> itemFactory) {
 		return new ListOverlayFactory<V>(itemFactory);
+	}
+
+	@Override
+	protected OverlayFactory<List<V>> _getFactory() {
+		return factory;
 	}
 
 	private static class ListOverlayFactory<V> extends OverlayFactory<List<V>> {

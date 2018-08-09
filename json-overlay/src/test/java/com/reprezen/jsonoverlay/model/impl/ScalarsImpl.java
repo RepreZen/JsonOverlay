@@ -155,6 +155,7 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("stringValue", "stringValue", StringOverlay.factory);
 		_createScalar("intValue", "intValue", IntegerOverlay.factory);
 		_createScalar("numberValue", "numberValue", NumberOverlay.factory);
@@ -190,6 +191,11 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 			JsonOverlay<Scalars> castOverlay = (JsonOverlay<Scalars>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return false;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
@@ -206,5 +212,11 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	public Class<?> _getModelType() {
 		return TestModel.class;
+	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<?> _getFactory() {
+		return factory;
 	}
 }

@@ -32,6 +32,11 @@ public final class BooleanOverlay extends ScalarOverlay<Boolean> {
 		return value != null ? _jsonBoolean(value) : _jsonMissing();
 	}
 
+	@Override
+	protected OverlayFactory<Boolean> _getFactory() {
+		return factory;
+	}
+
 	public static OverlayFactory<Boolean> factory = new OverlayFactory<Boolean>() {
 		@Override
 		protected Class<BooleanOverlay> getOverlayClass() {

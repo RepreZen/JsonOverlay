@@ -234,6 +234,11 @@ public class ScalarTests {
 				return XEnum.class;
 			}
 
+			@Override
+			protected OverlayFactory<XEnum> _getFactory() {
+				return factory;
+			}
+
 			public static OverlayFactory<XEnum> factory = new OverlayFactory<XEnum>() {
 				@Override
 				protected Class<? extends JsonOverlay<? super XEnum>> getOverlayClass() {

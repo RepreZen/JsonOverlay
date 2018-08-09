@@ -44,4 +44,10 @@ public class ColorImpl extends EnumOverlay<Color> {
 			return new ColorImpl(json, parent, refMgr);
 		}
 	};
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<?> _getFactory() {
+		return factory;
+	}
 }

@@ -39,6 +39,7 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("title", "title", StringOverlay.factory);
 	}
 
@@ -67,6 +68,11 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 			JsonOverlay<Entry> castOverlay = (JsonOverlay<Entry>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return false;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
@@ -83,5 +89,11 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	public Class<?> _getModelType() {
 		return TestModel.class;
+	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<?> _getFactory() {
+		return factory;
 	}
 }

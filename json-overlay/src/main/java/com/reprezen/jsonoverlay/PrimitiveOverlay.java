@@ -65,6 +65,11 @@ public final class PrimitiveOverlay extends ScalarOverlay<Object> {
 		}
 	}
 
+	@Override
+	protected OverlayFactory<Object> _getFactory() {
+		return factory;
+	}
+
 	public static OverlayFactory<Object> factory = new OverlayFactory<Object>() {
 
 		@Override

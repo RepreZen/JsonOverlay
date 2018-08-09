@@ -66,7 +66,9 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	/* package */ V _get(boolean elaborate) {
 		if (_isValidRef()) {
-			return refOverlay._get();
+			return refOverlay._get(elaborate);
+		} else if (_isReference()) {
+			return null;
 		} else {
 			if (elaborate) {
 				_ensureElaborated();
@@ -97,15 +99,15 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		return refOverlay != null ? refOverlay._getReference() : null;
 	}
 
-	/* package */ void _setReference(Reference reference) {
-		this.refOverlay = new RefOverlay<V>(reference, parent, factory, refMgr);
+	/* package */ void _setReference(RefOverlay<V> refOverlay) {
+		this.refOverlay = refOverlay;
 	}
 
-	/* package */ Reference _getCreatingRef() {
+	public Reference _getCreatingRef() {
 		return creatingRef;
 	}
 
-	/* pakcage */ void _setCreatingRef(Reference creatingRef) {
+	public void _setCreatingRef(Reference creatingRef) {
 		this.creatingRef = creatingRef;
 	}
 
@@ -171,12 +173,13 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	}
 
 	/* package */String _getJsonReference(boolean forRef) {
+		if (creatingRef != null) {
+			return creatingRef.getNormalizedRef();
+		}
 		if (_isReference() && refOverlay._getReference().isValid() && !forRef) {
 			return refOverlay.getOverlay()._getJsonReference(false);
 		}
-		if (creatingRef != null && creatingRef.isValid()) {
-			return creatingRef.getNormalizedRef();
-		} else if (parent != null) {
+		if (parent != null) {
 			String ref = parent._getJsonReference();
 			return ref + (ref.contains("#") ? "" : "#") + "/" + pathInParent;
 		} else {
@@ -243,6 +246,8 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	/* package */ void _setPathInParent(String pathInParent) {
 		this.pathInParent = pathInParent;
 	}
+
+	protected abstract OverlayFactory<?> _getFactory();
 
 	@Override
 	public String toString() {

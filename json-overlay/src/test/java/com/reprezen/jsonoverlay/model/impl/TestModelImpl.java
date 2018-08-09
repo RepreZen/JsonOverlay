@@ -348,6 +348,7 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {
+		super._elaborateJson();
 		_createScalar("description", "description", StringOverlay.factory);
 		_createScalar("width", "width", IntegerOverlay.factory);
 		_createScalar("height", "height", IntegerOverlay.factory);
@@ -384,6 +385,11 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 			JsonOverlay<TestModel> castOverlay = (JsonOverlay<TestModel>) overlay;
 			return castOverlay;
 		}
+
+		@Override
+		protected boolean isExtendedType() {
+			return false;
+		}
 	};
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
@@ -400,5 +406,11 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	public Class<?> _getModelType() {
 		return TestModel.class;
+	}
+
+	@Override
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	protected OverlayFactory<?> _getFactory() {
+		return factory;
 	}
 }

@@ -18,6 +18,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	private final OverlayFactory<V> valueFactory;
 	private final Pattern keyPattern;
 	private Map<String, JsonOverlay<V>> overlays = Maps.newLinkedHashMap();
+	private boolean elaborated = false;
 
 	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
 			ReferenceManager refMgr) {
@@ -65,12 +66,18 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	@Override
+	protected boolean _isElaborated() {
+		return elaborated;
+	}
+
+	@Override
 	protected void _elaborate(boolean atCreation) {
 		if (json != null) {
 			fillWithJson();
 		} else {
 			fillWithValues();
 		}
+		elaborated = true;
 	}
 
 	private void fillWithJson() {
@@ -101,7 +108,8 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 	}
 
 	public V get(String key) {
-		return overlays.get(key)._get();
+		JsonOverlay<V> valOverlay = overlays.get(key);
+		return valOverlay != null ? valOverlay._get() : null;
 	}
 
 	/* package */ JsonOverlay<V> _getOverlay(String key) {
@@ -158,6 +166,11 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	public static <V> OverlayFactory<Map<String, V>> getFactory(OverlayFactory<V> valueFactory, String keyPattern) {
 		return new MapOverlayFactory<V>(valueFactory, keyPattern);
+	}
+
+	@Override
+	protected OverlayFactory<Map<String, V>> _getFactory() {
+		return factory;
 	}
 
 	private static class MapOverlayFactory<V> extends OverlayFactory<Map<String, V>> {

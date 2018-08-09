@@ -35,6 +35,10 @@ public class ReferenceManager {
 		this.registry = registry;
 	}
 
+	public Reference getDocReference() {
+		return getReference(docUrl.toString());
+	}
+
 	public ReferenceManager getManagerFor(URL url) {
 		URL normalized = normalize(url, true);
 		ReferenceManager manager = registry.getManager(normalized);
@@ -47,6 +51,10 @@ public class ReferenceManager {
 
 	public Reference getReference(JsonNode refNode) {
 		String refString = refNode.get("$ref").asText();
+		return getReference(refString);
+	}
+
+	public Reference getReference(String refString) {
 		try {
 			URL url = new URL(docUrl, refString);
 			String fragment = url.getRef();
@@ -68,7 +76,7 @@ public class ReferenceManager {
 		return registry;
 	}
 
-	private URL normalize(URL url, boolean noFrag) {
+	private static URL normalize(URL url, boolean noFrag) {
 		if (url != null) {
 			URLNormalizer normalizer = new URLNormalizer(url.toString()) //
 					.lowerCaseSchemeHost() //

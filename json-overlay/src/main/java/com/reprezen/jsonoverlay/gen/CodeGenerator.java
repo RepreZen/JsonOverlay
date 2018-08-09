@@ -22,15 +22,12 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.reprezen.jsonoverlay.gen.TypeData.Type;
 
 public class CodeGenerator {
 
-	public static void main(String[] args)
-			throws JsonParseException, JsonMappingException, IOException, ParseException {
+	public static void main(String[] args) throws Exception {
 		Opts opts = new Opts(args);
 		Object parsedYaml = new Yaml().load(new FileInputStream(opts.typeDataFile));
 		TypeData typeData = new YAMLMapper().convertValue(parsedYaml, TypeData.class);

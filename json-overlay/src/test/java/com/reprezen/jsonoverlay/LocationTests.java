@@ -69,7 +69,7 @@ public class LocationTests {
 
 	}
 
-	private <T extends IJsonOverlay<?>> void checkPositions(T overlay, int startLine, int startCol, int endLine,
+	private <V, T extends IJsonOverlay<V>> void checkPositions(T overlay, int startLine, int startCol, int endLine,
 			int endCol) {
 		checkPositions(Overlay.of(overlay), startLine, startCol, endLine, endCol);
 	}

@@ -171,16 +171,26 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
 
 	/* package */String _getPathFromRoot() {
-
 		if (parent != null) {
-			String parentPath = parent._getPathFromRoot();
-			return parentPath != null ? parentPath + "/" + pathInParent : null;
+			if (pathInParent.isEmpty()) {
+				return parent._getPathFromRoot();
+			} else {
+				String parentPath = parent._getPathFromRoot();
+				return parentPath != null ? parentPath + "/" + encodePointerPart(pathInParent) : null;
+			}
 		} else if (creatingRef != null) {
 			return creatingRef.getFragment();
-
 		} else {
 			return null;
 		}
+	}
+
+	private String encodePointerPart(String part) {
+		// TODO fix this bogus special case
+		if (part.startsWith("components/")) {
+			return part;
+		}
+		return part.replaceAll("~", "~0").replaceAll("/", "~1");
 	}
 
 	/* package */String _getJsonReference() {

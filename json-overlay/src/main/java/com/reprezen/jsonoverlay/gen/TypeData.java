@@ -33,7 +33,8 @@ public class TypeData {
 	private String modelType = null;
 	private String discriminator = null;
 
-	// Container for "decls" section that is solely used to define reusable anchors
+	// Container for "decls" section that is solely used to define reusable
+	// anchors
 	@JsonProperty
 	private Object decls;
 

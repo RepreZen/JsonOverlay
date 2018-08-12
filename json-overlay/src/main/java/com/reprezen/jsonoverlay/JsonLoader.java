@@ -24,11 +24,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
 import com.reprezen.jsonoverlay.parser.LocationRecorderJsonFactory;
 import com.reprezen.jsonoverlay.parser.LocationRecorderJsonParser;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlFactory;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlParser;
+import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public class JsonLoader {
 

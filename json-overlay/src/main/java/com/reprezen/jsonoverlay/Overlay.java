@@ -37,8 +37,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> Overlay<Map<String, V>> of(Map<String, V> map) {
-		@SuppressWarnings("unchecked")
-		MapOverlay<V> overlay = (MapOverlay<V>) getSidebandOverlay(map);
+		MapOverlay<V> overlay = getSidebandOverlay(map);
 		return overlay != null ? new Overlay<Map<String, V>>(overlay) : null;
 	}
 
@@ -47,8 +46,7 @@ public class Overlay<V> {
 	}
 
 	public static <V> Overlay<List<V>> of(List<V> list) {
-		@SuppressWarnings("unchecked")
-		ListOverlay<V> overlay = (ListOverlay<V>) getSidebandOverlay(list);
+		ListOverlay<V> overlay = getSidebandOverlay(list);
 		return overlay != null ? new Overlay<List<V>>(overlay) : null;
 	}
 
@@ -110,35 +108,22 @@ public class Overlay<V> {
 		return overlay;
 	}
 
-	public final MapOverlay<?> getMapOverlay() {
-		if (overlay instanceof MapOverlay) {
-			MapOverlay<?> castOverlay = (MapOverlay<?>) overlay;
+	public static <X> ListOverlay<X> getListOverlay(Overlay<List<X>> overlay) {
+		if (overlay.getOverlay() instanceof ListOverlay) {
+			ListOverlay<X> castOverlay = getSidebandOverlay(overlay.get());
 			return castOverlay;
 		} else {
 			return null;
 		}
 	}
 
-	public final ListOverlay<V> getListOverlay() {
-		if (overlay instanceof ListOverlay) {
-			@SuppressWarnings("unchecked")
-			ListOverlay<V> castOverlay = (ListOverlay<V>) overlay;
+	public static <X> MapOverlay<X> getMapOverlay(Overlay<Map<String, X>> overlay) {
+		if (overlay.getOverlay() instanceof MapOverlay) {
+			MapOverlay<X> castOverlay = getSidebandOverlay(overlay.get());
 			return castOverlay;
 		} else {
 			return null;
 		}
-	}
-
-	public static <V> MapOverlay<V> getMapOverlay(Map<String, V> map) {
-		@SuppressWarnings("unchecked")
-		MapOverlay<V> overlay = (MapOverlay<V>) getSidebandOverlay(map);
-		return overlay;
-	}
-
-	public static <V> ListOverlay<V> getListOverlay(List<V> list) {
-		@SuppressWarnings("unchecked")
-		ListOverlay<V> overlay = (ListOverlay<V>) getSidebandOverlay(list);
-		return overlay;
 	}
 
 	public JsonOverlay<?> find(JsonPointer path) {
@@ -371,9 +356,22 @@ public class Overlay<V> {
 		return overlay != null ? overlay._getReference() : null;
 	}
 
-	private static JsonOverlay<?> getSidebandOverlay(Object o) {
+	private static <X> ListOverlay<X> getSidebandOverlay(List<X> list) {
 		try {
-			return (JsonOverlay<?>) o.getClass().getMethod("getOverlay").invoke(o);
+			@SuppressWarnings("unchecked")
+			ListOverlay<X> castOverlay = (ListOverlay<X>) list.getClass().getMethod("getOverlay").invoke(list);
+			return castOverlay;
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			return null;
+		}
+	}
+
+	private static <X> MapOverlay<X> getSidebandOverlay(Map<String, X> map) {
+		try {
+			@SuppressWarnings("unchecked")
+			MapOverlay<X> castOverlay = (MapOverlay<X>) map.getClass().getMethod("getOverlay").invoke(map);
+			return castOverlay;
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
 			return null;

@@ -181,7 +181,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	protected void _elaborateJson() {
-		// need an implemenatation here because subclasses invoke method in super, to
+		// need an implemenatation here because subclasses invoke method in
+		// super, to
 		// support type extensions
 	}
 
@@ -268,8 +269,10 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	@Override
 	public V _fromJson(JsonNode json) {
-		// parsing of the json node is expected to be done in the constructor of the
-		// subclass, so nothing is done here. But we do establish this object as its own
+		// parsing of the json node is expected to be done in the constructor of
+		// the
+		// subclass, so nothing is done here. But we do establish this object as
+		// its own
 		// value.
 		@SuppressWarnings("unchecked")
 		V result = (V) this;
@@ -380,7 +383,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 			// case the ordering is irrelevant.
 			JsonNode currentJson = json;
 			List<Integer> result = Lists.newArrayList();
-			// we only consider object nodes and continue until our pointer is fully
+			// we only consider object nodes and continue until our pointer is
+			// fully
 			// consumed
 			while (currentJson instanceof ObjectNode && !pointer.matches()) {
 				String key = pointer.getMatchingProperty();
@@ -396,11 +400,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 					}
 				}
 				if (!found) {
-					// no match at current level, so child is not present - exclude from ordering
+					// no match at current level, so child is not present -
+					// exclude from ordering
 					return null;
 				}
 			}
-			// empty vector means the path was empty and matched the root json object. This
+			// empty vector means the path was empty and matched the root json
+			// object. This
 			// occurs only with maps, which are excluded from ordering.
 			return result.isEmpty() ? null : result;
 		}
@@ -413,7 +419,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 				return -1;
 			} else {
 				int cmp = 0;
-				// first component where paths differ determines relative ordering
+				// first component where paths differ determines relative
+				// ordering
 				for (int i = 0; cmp == 0 && i < vector.size() && i < other.vector.size(); i++) {
 					cmp = vector.get(i) - other.vector.get(i);
 				}

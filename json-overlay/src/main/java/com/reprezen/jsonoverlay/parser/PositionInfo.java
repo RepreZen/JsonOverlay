@@ -43,6 +43,15 @@ public class PositionInfo {
 		return start.getColumn();
 	}
 
+	@Override
+	public String toString() {
+		return String.format("[%s-%s]", start, end);
+	}
+
+	public String toString(boolean startOnly) {
+		return startOnly ? String.format("[%s]", start) : toString();
+	}
+
 	public static class PositionEndpoint {
 		private final long charOffset;
 		private final int line;
@@ -70,5 +79,9 @@ public class PositionInfo {
 			return column;
 		}
 
+		@Override
+		public String toString() {
+			return String.format("%d:%d", line, column);
+		}
 	}
 }

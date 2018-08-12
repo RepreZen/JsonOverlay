@@ -17,7 +17,8 @@ public class ReferenceRegistry {
 	private Map<String, ReferenceManager> managers = Maps.newHashMap();
 	private JsonLoader loader = new JsonLoader();
 	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = Maps.newHashMap();
-	// can't use Pair here because we need to index by JsonNode identity, not using
+	// can't use Pair here because we need to index by JsonNode identity, not
+	// using
 	// its equals impl
 	private Map<JsonNode, Map<String, JsonOverlay<?>>> overlaysByJson = Maps.newIdentityHashMap();
 
@@ -47,7 +48,8 @@ public class ReferenceRegistry {
 	}
 
 	public void register(JsonNode json, String factorySig, JsonOverlay<?> overlay) {
-		// can't share boolean or nulls because they don't have a public constructor,
+		// can't share boolean or nulls because they don't have a public
+		// constructor,
 		// and factory uses shared instances
 		if (!json.isMissingNode() && !json.isBoolean() && !json.isNull()) {
 			if (!overlaysByJson.containsKey(json)) {

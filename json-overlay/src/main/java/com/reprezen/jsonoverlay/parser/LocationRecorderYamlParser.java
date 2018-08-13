@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.core.util.BufferRecycler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
+import com.reprezen.jsonoverlay.PositionInfo;
 
 public class LocationRecorderYamlParser extends YAMLParser {
 

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
@@ -212,6 +211,12 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		}
 	}
 
+	/* package */ String _getDocumentUrl(boolean forRef) {
+		String jsonRef = _getJsonReference(forRef);
+		String docUrl = jsonRef.contains("#") ? jsonRef.substring(0, jsonRef.indexOf("#")) : jsonRef;
+		return docUrl.isEmpty() ? null : docUrl;
+	}
+
 	protected abstract V _fromJson(JsonNode json);
 
 	protected void _setParent(JsonOverlay<?> parent) {
@@ -276,6 +281,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		if (positionInfo == null) {
 			JsonPointer ptr = JsonPointer.compile(_getPathFromRoot());
 			positionInfo = refMgr.getPositionInfo(ptr);
+			positionInfo.ifPresent(info -> info.setDocumentUrl(_getDocumentUrl(true)));
 		}
 		return positionInfo;
 	}

@@ -10,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public class ReferenceRegistry {
 

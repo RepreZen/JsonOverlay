@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.util.JsonParserDelegate;
+import com.reprezen.jsonoverlay.PositionInfo;
 
 public final class LocationRecorderJsonParser extends JsonParserDelegate {
 

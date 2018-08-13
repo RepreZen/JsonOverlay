@@ -17,7 +17,6 @@ import com.google.common.io.Resources;
 import com.reprezen.jsonoverlay.model.TestModelParser;
 import com.reprezen.jsonoverlay.model.intf.Scalars;
 import com.reprezen.jsonoverlay.model.intf.TestModel;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public class LocationTests {
 

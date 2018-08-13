@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.reprezen.jsonoverlay.PositionInfo;
 
 public class LocationProcessor {
 

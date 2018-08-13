@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import com.norconex.commons.lang.url.URLNormalizer;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
 
 public class ReferenceManager {
 

@@ -7,8 +7,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.reprezen.jsonoverlay.parser.PositionInfo;
-import com.reprezen.jsonoverlay.parser.PositionInfo.PositionEndpoint;
+import com.reprezen.jsonoverlay.PositionInfo.PositionEndpoint;
 
 public class Overlay<V> {
 

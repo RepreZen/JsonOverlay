@@ -125,6 +125,14 @@ public class Overlay<V> {
 		}
 	}
 
+	public static PropertiesOverlay<?> getPropertiesOverlay(Overlay<PropertiesOverlay<?>> overlay) {
+		if (overlay.getOverlay() instanceof PropertiesOverlay) {
+			return (PropertiesOverlay<?>) overlay.getOverlay();
+		} else {
+			return null;
+		}
+	}
+
 	public JsonOverlay<?> find(JsonPointer path) {
 		return overlay._find(path);
 	}
@@ -163,6 +171,14 @@ public class Overlay<V> {
 
 	public static <V> JsonNode toJson(JsonOverlay<V> overlay, SerializationOptions.Option... options) {
 		return overlay._toJson(options);
+	}
+
+	public JsonNode getParsedJson() {
+		return overlay._getParsedJson();
+	}
+
+	public static JsonNode getParsedJson(JsonOverlay<?> overlay) {
+		return overlay._getParsedJson();
 	}
 
 	public boolean isPresent() {

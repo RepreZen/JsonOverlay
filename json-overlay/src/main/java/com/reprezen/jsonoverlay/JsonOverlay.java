@@ -247,6 +247,10 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	protected abstract JsonNode _toJsonInternal(SerializationOptions options);
 
+	/* package */ JsonNode _getParsedJson() {
+		return json;
+	}
+
 	private JsonOverlay<V> thisOrRefTarget() {
 		if (refOverlay == null || refOverlay._getReference().isInvalid()) {
 			return this;

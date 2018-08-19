@@ -160,8 +160,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return super.hashCode();
+		return overlays.hashCode();
 	}
 
 	public static <V> OverlayFactory<Map<String, V>> getFactory(OverlayFactory<V> valueFactory, String keyPattern) {

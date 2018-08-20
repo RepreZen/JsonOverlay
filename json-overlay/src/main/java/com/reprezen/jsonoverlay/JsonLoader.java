@@ -24,21 +24,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.reprezen.jsonoverlay.parser.LocationRecorderJsonFactory;
-import com.reprezen.jsonoverlay.parser.LocationRecorderJsonParser;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlFactory;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlParser;
 
 public class JsonLoader {
 
-	private static LocationRecorderJsonFactory jsonFactory = new LocationRecorderJsonFactory();
 	private static LocationRecorderYamlFactory yamlFactory = new LocationRecorderYamlFactory();
 
-	private static ObjectMapper jsonMapper = new ObjectMapper(jsonFactory);
 	private static ObjectMapper yamlMapper = new ObjectMapper(yamlFactory);
 
 	static {
-		jsonMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
 		yamlMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
 	}
 
@@ -81,16 +76,9 @@ public class JsonLoader {
 	public Pair<JsonNode, Map<JsonPointer, PositionInfo>> loadWithLocations(String json) throws IOException {
 		JsonNode tree;
 		Map<JsonPointer, PositionInfo> regions;
-
-		if (json.trim().startsWith("{")) {
-			LocationRecorderJsonParser parser = (LocationRecorderJsonParser) jsonFactory.createParser(json);
-			tree = jsonMapper.readTree(parser);
-			regions = parser.getLocations();
-		} else {
-			LocationRecorderYamlParser parser = (LocationRecorderYamlParser) yamlFactory.createParser(json);
-			tree = yamlMapper.readTree(parser);
-			regions = parser.getLocations();
-		}
+		LocationRecorderYamlParser parser = (LocationRecorderYamlParser) yamlFactory.createParser(json);
+		tree = yamlMapper.readTree(parser);
+		regions = parser.getLocations();
 		return Pair.of(tree, regions);
 	}
 }

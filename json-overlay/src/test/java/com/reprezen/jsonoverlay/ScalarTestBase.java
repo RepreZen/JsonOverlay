@@ -71,7 +71,7 @@ public abstract class ScalarTestBase<V> extends Assert {
 	@Test
 	public void testPathFromRoot() {
 		JsonOverlay<V> ovl = factory.create(value, null, refMgr);
-		assertEquals(Overlay.of(ovl).getPathFromRoot(), "/");
+		assertEquals(null, Overlay.of(ovl).getPathFromRoot());
 	}
 
 	@Test

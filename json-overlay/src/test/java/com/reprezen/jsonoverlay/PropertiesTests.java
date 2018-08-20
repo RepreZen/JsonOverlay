@@ -81,7 +81,8 @@ public class PropertiesTests extends Assert {
 			assertFalse("Copy operation should create copy of each property value",
 					foo._getOverlay(name) == copy._getOverlay(name));
 		}
-		// foo2 has same content as foo, but numField comes last instead of first
+		// foo2 has same content as foo, but numField comes last instead of
+		// first
 		Foo foo2 = createFooWithJson(LIST, 10, 20, 30, END, 10, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
 				END);
 		assertEquals(foo, foo2);

@@ -159,8 +159,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return super.hashCode();
+		return overlays.hashCode();
 	}
 
 	public static <V> OverlayFactory<List<V>> getFactory(OverlayFactory<V> itemFactory) {

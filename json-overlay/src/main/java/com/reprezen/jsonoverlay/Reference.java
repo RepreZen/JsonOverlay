@@ -54,6 +54,10 @@ public class Reference {
 		return refString;
 	}
 
+	public String getFragment() {
+		return pointer != null ? pointer.toString() : "";
+	}
+
 	public boolean isValid() {
 		return isValid(true);
 	}

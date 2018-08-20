@@ -60,6 +60,7 @@ class ImplGenerator extends TypeGenerator {
 			'''))
 			members.add(type.enumFactoryMember)
 		} else {
+			members.addAll(getFieldNameConstants(type))
 			members.add(getElaborateJsonMethod(type))
 			members.addAll(getFactoryMembers(type))
 			if (type.typeData.modelType !== null) {
@@ -279,6 +280,16 @@ class ImplGenerator extends TypeGenerator {
 			}
 		''')
 		return methods
+	}
+
+	def private Members getFieldNameConstants(Type type) {
+		val members = new Members
+		for (f: type.fields.values.filter[!it.noImpl]) {
+			members.add(new Member('''
+				public static final String F_«f.propertyName» = "«f.propertyName»";
+			'''))
+		}
+		return members
 	}
 
 	def private Member getElaborateJsonMethod(Type type) {

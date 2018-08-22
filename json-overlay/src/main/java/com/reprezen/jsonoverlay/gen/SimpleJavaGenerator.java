@@ -10,7 +10,10 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay.gen;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,16 +33,13 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.Expression;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class SimpleJavaGenerator {
 
 	private String pkg;
-	private Set<String> imports = Sets.newHashSet();
+	private Set<String> imports = new HashSet<>();
 	private TypeDeclaration<?> type;
-	private List<Member> members = Lists.newArrayList();
+	private List<Member> members = new ArrayList<>();
 	private String fileComment;
 	private static int indentation = 4;
 
@@ -109,7 +109,7 @@ public class SimpleJavaGenerator {
 	}
 
 	private Collection<Member> gatherFinalMembers(List<Member> members, CompilationUnit cu) {
-		Map<String, Member> memberMap = Maps.newLinkedHashMap();
+		Map<String, Member> memberMap = new LinkedHashMap<>();
 		for (Member member : members) {
 			String key = member.getKey();
 			if (!memberMap.containsKey(key)) {
@@ -175,7 +175,7 @@ public class SimpleJavaGenerator {
 				((MethodDeclaration) declaration).setName(to);
 			} else if (declaration instanceof FieldDeclaration) {
 				for (VariableDeclarator var : ((FieldDeclaration) declaration).getVariables()) {
-					if (var.getName().equals(from)) {
+					if (var.getName().getIdentifier().equals(from)) {
 						var.setName(to);
 						break;
 					}

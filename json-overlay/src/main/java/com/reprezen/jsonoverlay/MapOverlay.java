@@ -10,14 +10,13 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
 public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	private final OverlayFactory<V> valueFactory;
 	private final Pattern keyPattern;
-	private Map<String, JsonOverlay<V>> overlays = Maps.newLinkedHashMap();
+	private Map<String, JsonOverlay<V>> overlays = new LinkedHashMap<>();
 	private boolean elaborated = false;
 
 	private MapOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
@@ -31,7 +30,7 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
 			ReferenceManager refMgr) {
-		super(Maps.newLinkedHashMap(value), parent, factory, refMgr);
+		super(new LinkedHashMap<>(value), parent, factory, refMgr);
 		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
 		this.valueFactory = mapOverlayFactory.getValueFactory();
 		String keyPattern = mapOverlayFactory.getKeyPattern();

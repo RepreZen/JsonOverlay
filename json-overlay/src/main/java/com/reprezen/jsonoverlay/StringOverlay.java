@@ -37,6 +37,13 @@ public final class StringOverlay extends ScalarOverlay<String> {
 		return factory;
 	}
 
+	@Override
+	public String toString() {
+		// we don't want quotes here; the default rendering uses toJson, which does
+		// include them.
+		return value != null ? value : "";
+	}
+
 	public static OverlayFactory<String> factory = new OverlayFactory<String>() {
 
 		@Override

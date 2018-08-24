@@ -12,9 +12,8 @@ package com.reprezen.jsonoverlay;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 public class SerializationOptions {
 	public enum Option {
@@ -25,15 +24,15 @@ public class SerializationOptions {
 	private final Set<SerializationOptions.Option> options;
 
 	public SerializationOptions(SerializationOptions.Option... options) {
-		this.options = Sets.newHashSet(options);
+		this.options = new HashSet<>(Arrays.asList(options));
 	}
 
 	public SerializationOptions(Collection<SerializationOptions.Option> options) {
-		this.options = Sets.newHashSet(options);
+		this.options = new HashSet<>(options);
 	}
 
 	public SerializationOptions plus(Collection<SerializationOptions.Option> addOptions) {
-		Set<SerializationOptions.Option> newOptions = Sets.newHashSet(this.options);
+		Set<SerializationOptions.Option> newOptions = new HashSet<>(this.options);
 		newOptions.addAll(addOptions);
 		return new SerializationOptions(newOptions);
 	}
@@ -43,7 +42,7 @@ public class SerializationOptions {
 	}
 
 	public SerializationOptions minus(Collection<SerializationOptions.Option> removeOptions) {
-		Set<SerializationOptions.Option> newOptions = Sets.newHashSet(this.options);
+		Set<SerializationOptions.Option> newOptions = new HashSet<>(this.options);
 		newOptions.removeAll(removeOptions);
 		return new SerializationOptions(newOptions);
 	}

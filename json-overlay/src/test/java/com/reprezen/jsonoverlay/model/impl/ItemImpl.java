@@ -36,6 +36,9 @@ public class ItemImpl extends PropertiesOverlay<Item> implements Item {
 		_setScalar("title", title, String.class);
 	}
 
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static final String F_title = "title";
+
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {

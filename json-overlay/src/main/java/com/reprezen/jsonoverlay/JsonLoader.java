@@ -13,6 +13,7 @@ package com.reprezen.jsonoverlay;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
@@ -23,7 +24,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlFactory;
 import com.reprezen.jsonoverlay.parser.LocationRecorderYamlParser;
 
@@ -37,8 +37,8 @@ public class JsonLoader {
 		yamlMapper.setNodeFactory(MinSharingJsonNodeFactory.instance);
 	}
 
-	private Map<String, JsonNode> cache = Maps.newHashMap();
-	private Map<String, Map<JsonPointer, PositionInfo>> positions = Maps.newHashMap();
+	private Map<String, JsonNode> cache = new HashMap<>();
+	private Map<String, Map<JsonPointer, PositionInfo>> positions = new HashMap<>();
 
 	public JsonLoader() {
 	}

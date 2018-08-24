@@ -1,18 +1,18 @@
 package com.reprezen.jsonoverlay.parser;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.core.JsonToken;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.PositionInfo;
 
 public class LocationProcessor {
 
-	private final Map<JsonPointer, PositionInfo> locations = Maps.newHashMap();
+	private final Map<JsonPointer, PositionInfo> locations = new HashMap<>();
 
 	private JsonPointer ptr = JsonPointer.compile("");
 	private boolean seenRoot = false;
@@ -21,7 +21,7 @@ public class LocationProcessor {
 	}
 
 	public Map<JsonPointer, PositionInfo> getLocations() {
-		return ImmutableMap.copyOf(locations);
+		return Collections.unmodifiableMap(locations);
 	}
 
 	public void processTokenLocation(JsonToken token, JsonLocation tokenStart, JsonLocation tokenEnd,

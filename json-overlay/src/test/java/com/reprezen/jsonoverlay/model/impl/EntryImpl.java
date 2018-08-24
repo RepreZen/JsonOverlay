@@ -36,6 +36,9 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 		_setScalar("title", title, String.class);
 	}
 
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static final String F_title = "title";
+
 	@Override
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected void _elaborateJson() {

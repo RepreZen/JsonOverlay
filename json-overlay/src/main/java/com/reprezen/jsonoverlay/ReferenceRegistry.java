@@ -2,6 +2,8 @@ package com.reprezen.jsonoverlay;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -9,17 +11,16 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 
 public class ReferenceRegistry {
 
-	private Map<String, ReferenceManager> managers = Maps.newHashMap();
+	private Map<String, ReferenceManager> managers = new HashMap<>();
 	private JsonLoader loader = new JsonLoader();
-	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = Maps.newHashMap();
+	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = new HashMap<>();
 	// can't use Pair here because we need to index by JsonNode identity, not
 	// using
 	// its equals impl
-	private Map<JsonNode, Map<String, JsonOverlay<?>>> overlaysByJson = Maps.newIdentityHashMap();
+	private Map<JsonNode, Map<String, JsonOverlay<?>>> overlaysByJson = new IdentityHashMap<>();
 
 	public ReferenceManager getManager(URL baseUrl) {
 		return managers.get(baseUrl.toString());
@@ -52,7 +53,7 @@ public class ReferenceRegistry {
 		// and factory uses shared instances
 		if (!json.isMissingNode() && !json.isBoolean() && !json.isNull()) {
 			if (!overlaysByJson.containsKey(json)) {
-				overlaysByJson.put(json, Maps.newHashMap());
+				overlaysByJson.put(json, new HashMap<>());
 			}
 			overlaysByJson.get(json).put(factorySig, overlay);
 		}

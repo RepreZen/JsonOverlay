@@ -14,8 +14,6 @@ import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
-import com.google.common.collect.Queues
-import com.google.common.collect.Sets
 import com.reprezen.jsonoverlay.EnumOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
@@ -27,7 +25,9 @@ import com.reprezen.jsonoverlay.gen.TypeData.Field
 import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
+import java.util.ArrayDeque
 import java.util.Collection
+import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.stream.Collectors
@@ -468,8 +468,8 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Collection<Type> getSubTypes(Type type) {
-		val subTypes = Sets.<Type>newHashSet()
-		val todo = Queues.<Type>newArrayDeque()
+		val subTypes = new HashSet<Type>()
+		val todo = new ArrayDeque<Type>()
 		todo.add(type)
 		while (!todo.isEmpty()) {
 			val nextType = todo.remove()

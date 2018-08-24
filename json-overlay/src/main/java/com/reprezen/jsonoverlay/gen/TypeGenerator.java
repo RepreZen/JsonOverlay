@@ -13,14 +13,18 @@ package com.reprezen.jsonoverlay.gen;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -37,12 +41,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import com.reprezen.jsonoverlay.BooleanOverlay;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
@@ -70,7 +68,7 @@ public abstract class TypeGenerator {
 	protected String implPackage;
 	protected String suffix;
 	private boolean preserve;
-	private Set<String> requiredTypes = Sets.newHashSet();
+	private Set<String> requiredTypes = new HashSet<>();
 
 	public TypeGenerator(File dir, String intfPackage, String implPackage, String suffix, boolean preserve) {
 		this.dir = dir;
@@ -100,7 +98,8 @@ public abstract class TypeGenerator {
 		addGeneratedMembers(type, gen);
 		requireTypes(Generated.class);
 		resolveImports(type, gen);
-		Files.write(gen.format(), javaFile, Charset.forName("UTF-8"));
+
+		Files.write(javaFile.toPath(), gen.format().getBytes(Charset.forName("UTF-8")));
 	}
 
 	protected abstract String getPackage();
@@ -112,21 +111,11 @@ public abstract class TypeGenerator {
 	}
 
 	protected void requireTypes(Class<?>... types) {
-		requireTypes(Collections2.transform(Arrays.asList(types), new Function<Class<?>, String>() {
-			@Override
-			public String apply(Class<?> type) {
-				return type.getSimpleName();
-			}
-		}).toArray(new String[types.length]));
+		requireTypes(Stream.of(types).map(Class::getSimpleName).collect(Collectors.toList()));
 	}
 
 	protected void requireTypes(Type... types) {
-		requireTypes(Collections2.transform(Arrays.asList(types), new Function<Type, String>() {
-			@Override
-			public String apply(Type type) {
-				return type.getName();
-			}
-		}));
+		requireTypes(Stream.of(types).map(Type::getName).collect(Collectors.toList()));
 	}
 
 	protected void requireTypes(String... types) {
@@ -134,12 +123,8 @@ public abstract class TypeGenerator {
 	}
 
 	protected void requireTypes(Collection<String> types) {
-		requiredTypes.addAll(Collections2.transform(types, new Function<String, String>() {
-			@Override
-			public String apply(String type) {
-				return type.contains("<") ? type.substring(0, type.indexOf("<")) : type;
-			}
-		}));
+		requiredTypes.addAll(types.stream().map(t -> t.contains("<") ? t.substring(0, t.indexOf("<")) : t)
+				.collect(Collectors.toList()));
 	}
 
 	private void resolveImports(Type type, SimpleJavaGenerator gen) {
@@ -153,8 +138,8 @@ public abstract class TypeGenerator {
 	private static Set<String> autoTypes = getAutoTypes();
 
 	private static Set<String> getAutoTypes() {
-		Set<String> results = Sets.newHashSet();
-		ArrayList<Class<?>> autos = Lists.<Class<?>>newArrayList(//
+		Set<String> results = new HashSet<>();
+		List<Class<?>> autos = Arrays.<Class<?>>asList(//
 				String.class, //
 				Integer.class, //
 				Number.class, //
@@ -170,8 +155,8 @@ public abstract class TypeGenerator {
 	private static Map<String, String> knownTypes = getKnownTypes();
 
 	private static Map<String, String> getKnownTypes() {
-		Map<String, String> results = Maps.newHashMap();
-		ArrayList<Class<?>> overlays = Lists.<Class<?>>newArrayList( //
+		Map<String, String> results = new HashMap<>();
+		List<Class<?>> overlays = Arrays.<Class<?>>asList( //
 				Generated.class, //
 				List.class, //
 				Map.class, //

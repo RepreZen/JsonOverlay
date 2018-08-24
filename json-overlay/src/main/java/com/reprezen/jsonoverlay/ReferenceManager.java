@@ -3,12 +3,12 @@ package com.reprezen.jsonoverlay;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 import com.norconex.commons.lang.url.URLNormalizer;
 
 public class ReferenceManager {
@@ -16,7 +16,7 @@ public class ReferenceManager {
 	private ReferenceRegistry registry;
 	private URL docUrl;
 	private JsonNode doc = null;
-	private Map<JsonPointer, Optional<PositionInfo>> positions = Maps.newHashMap();
+	private Map<JsonPointer, Optional<PositionInfo>> positions = new HashMap<>();
 
 	public ReferenceManager() {
 		this(null);

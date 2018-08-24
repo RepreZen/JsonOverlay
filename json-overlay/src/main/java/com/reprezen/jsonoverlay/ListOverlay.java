@@ -7,13 +7,12 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.Lists;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
 public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	private final OverlayFactory<V> itemFactory;
-	private List<JsonOverlay<V>> overlays = Lists.newArrayList();
+	private List<JsonOverlay<V>> overlays = new ArrayList<>();
 	private boolean elaborated = false;
 
 	private ListOverlay(JsonNode json, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
@@ -24,7 +23,7 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	private ListOverlay(List<V> value, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
 			ReferenceManager refMgr) {
-		super(Lists.newArrayList(value), parent, factory, refMgr);
+		super(new ArrayList<>(value), parent, factory, refMgr);
 		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
 	}
 

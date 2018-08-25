@@ -392,4 +392,9 @@ public class Overlay<V> {
 			return null;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return overlay.toString();
+	}
 }

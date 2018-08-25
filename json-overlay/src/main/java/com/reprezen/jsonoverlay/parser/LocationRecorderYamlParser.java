@@ -1,5 +1,7 @@
 package com.reprezen.jsonoverlay.parser;
 
+import static com.fasterxml.jackson.core.JsonToken.FIELD_NAME;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
@@ -29,10 +31,10 @@ public class LocationRecorderYamlParser extends YAMLParser {
 	@Override
 	public JsonToken nextToken() throws IOException {
 		JsonToken token = super.nextToken();
+		String fieldName = token == FIELD_NAME ? getCurrentName() : null;
 		JsonLocation tokenStart = getTokenLocation();
 		JsonLocation tokenEnd = getCurrentLocation();
-		processor.processTokenLocation(token, tokenStart, tokenEnd, getParsingContext());
-
+		processor.processTokenLocation(token, fieldName, tokenStart, tokenEnd);
 		return token;
 	}
 }

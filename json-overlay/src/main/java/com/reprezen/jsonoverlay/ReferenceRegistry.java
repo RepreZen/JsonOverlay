@@ -15,12 +15,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ReferenceRegistry {
 
 	private Map<String, ReferenceManager> managers = new HashMap<>();
-	private JsonLoader loader = new JsonLoader();
+	private JsonLoader loader;
 	private Map<Pair<String, String>, JsonOverlay<?>> overlaysByRef = new HashMap<>();
 	// can't use Pair here because we need to index by JsonNode identity, not
 	// using
 	// its equals impl
 	private Map<JsonNode, Map<String, JsonOverlay<?>>> overlaysByJson = new IdentityHashMap<>();
+
+	public ReferenceRegistry() {
+		this(null);
+	}
+
+	public ReferenceRegistry(JsonLoader loader) {
+		this.loader = loader != null ? loader : new JsonLoader();
+	}
 
 	public ReferenceManager getManager(URL baseUrl) {
 		return managers.get(baseUrl.toString());

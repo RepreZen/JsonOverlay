@@ -19,19 +19,23 @@ public class ReferenceManager {
 	private Map<JsonPointer, Optional<PositionInfo>> positions = new HashMap<>();
 
 	public ReferenceManager() {
-		this(null);
+		this((URL) null, (JsonLoader) null);
 	}
 
 	public ReferenceManager(URL rootUrl) {
-		this.registry = new ReferenceRegistry();
+		this(rootUrl, (JsonLoader) null);
+	}
+
+	public ReferenceManager(URL rootUrl, JsonLoader loader) {
+		this.registry = new ReferenceRegistry(loader);
 		this.docUrl = rootUrl != null ? normalize(rootUrl, true) : null;
 		if (docUrl != null) {
 			registry.registerManager(docUrl, this);
 		}
 	}
 
-	public ReferenceManager(URL rootUrl, JsonNode preloadedDoc) {
-		this(rootUrl);
+	public ReferenceManager(URL rootUrl, JsonNode preloadedDoc, JsonLoader loader) {
+		this(rootUrl, loader);
 		this.doc = preloadedDoc;
 	}
 

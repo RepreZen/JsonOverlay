@@ -16,6 +16,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.google.common.collect.Queues
 import com.google.common.collect.Sets
+import com.reprezen.jsonoverlay.Builder
 import com.reprezen.jsonoverlay.EnumOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
@@ -77,6 +78,7 @@ class ImplGenerator extends TypeGenerator {
 				return factory;
 			}
 		'''))
+		members.addAll(getBuilderMethods(type))
 		return members
 	}
 
@@ -120,6 +122,22 @@ class ImplGenerator extends TypeGenerator {
 		members.addMember('''
 			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
 				super(«type.lcName», parent, «IF type.extensionOf === null»factory, «ENDIF»refMgr);
+			}
+		''')
+		return members
+	}
+	
+	def private getBuilderMethods(Type type) {
+		val members = new Members
+		requireTypes(Builder, OverlayFactory)
+		members.addMember('''
+			public static Builder<«type.name»> builder(JsonOverlay<?> modelMember) {
+				return new Builder<«type.name»>(factory, modelMember);
+			}
+		''')
+		members.addMember('''
+			public static JsonOverlay<«type.name»> create(JsonOverlay<?> modelMember) {
+				return builder(modelMember).build();
 			}
 		''')
 		return members

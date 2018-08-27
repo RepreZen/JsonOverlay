@@ -3,6 +3,7 @@ package com.reprezen.jsonoverlay.model.impl;
 import javax.annotation.Generated;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.reprezen.jsonoverlay.Builder;
 import com.reprezen.jsonoverlay.JsonOverlay;
 import com.reprezen.jsonoverlay.OverlayFactory;
 import com.reprezen.jsonoverlay.PropertiesOverlay;
@@ -95,5 +96,15 @@ public class EntryImpl extends PropertiesOverlay<Entry> implements Entry {
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected OverlayFactory<?> _getFactory() {
 		return factory;
+	}
+
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static Builder<Entry> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Entry>(factory, modelMember);
+	}
+
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static JsonOverlay<Entry> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
 	}
 }

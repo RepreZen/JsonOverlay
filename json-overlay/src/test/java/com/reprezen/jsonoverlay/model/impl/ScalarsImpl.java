@@ -4,6 +4,7 @@ import javax.annotation.Generated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.jsonoverlay.BooleanOverlay;
+import com.reprezen.jsonoverlay.Builder;
 import com.reprezen.jsonoverlay.IntegerOverlay;
 import com.reprezen.jsonoverlay.JsonOverlay;
 import com.reprezen.jsonoverlay.NumberOverlay;
@@ -218,5 +219,15 @@ public class ScalarsImpl extends PropertiesOverlay<Scalars> implements Scalars {
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
 	protected OverlayFactory<?> _getFactory() {
 		return factory;
+	}
+
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static Builder<Scalars> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Scalars>(factory, modelMember);
+	}
+
+	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
+	public static JsonOverlay<Scalars> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
 	}
 }

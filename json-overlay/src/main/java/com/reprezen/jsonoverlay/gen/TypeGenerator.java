@@ -44,6 +44,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.reprezen.jsonoverlay.BooleanOverlay;
+import com.reprezen.jsonoverlay.Builder;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.jsonoverlay.IModelPart;
@@ -186,6 +187,7 @@ public abstract class TypeGenerator {
 				IModelPart.class, //
 				PropertiesOverlay.class, //
 				OverlayFactory.class, //
+				Builder.class, //
 				ReferenceManager.class, //
 				StringOverlay.class, //
 				IntegerOverlay.class, //

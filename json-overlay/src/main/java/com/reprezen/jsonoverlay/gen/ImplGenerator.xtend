@@ -55,6 +55,7 @@ class ImplGenerator extends TypeGenerator {
 		val members = new Members
 		if (type.isEnum) {
 			members.add(new Member('''
+				@Override
 				protected Class<«type.name»> getEnumClass() {
 					return «type.name».class;
 				}

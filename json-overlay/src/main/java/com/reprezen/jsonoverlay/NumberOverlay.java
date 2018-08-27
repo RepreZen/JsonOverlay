@@ -137,4 +137,18 @@ public final class NumberOverlay extends ScalarOverlay<Number> {
 			}
 		}
 	}
+
+	public static Builder<Number> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Number>(factory, modelMember);
+	}
+
+	public static JsonOverlay<Number> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
+	}
+
+	public static JsonOverlay<Number> create(Number value, JsonOverlay<?> modelMember) {
+		JsonOverlay<Number> result = create(modelMember);
+		result._set(value);
+		return result;
+	}
 }

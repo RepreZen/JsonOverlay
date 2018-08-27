@@ -53,4 +53,18 @@ public final class IntegerOverlay extends ScalarOverlay<Integer> {
 			return new IntegerOverlay(json, parent, refMgr);
 		}
 	};
+
+	public static Builder<Integer> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Integer>(factory, modelMember);
+	}
+
+	public static JsonOverlay<Integer> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
+	}
+
+	public static JsonOverlay<Integer> create(int value, JsonOverlay<?> modelMember) {
+		JsonOverlay<Integer> result = create(modelMember);
+		result._set(value);
+		return result;
+	}
 }

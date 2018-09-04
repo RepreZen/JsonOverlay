@@ -11,11 +11,11 @@
 package com.reprezen.jsonoverlay;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Sets;
 import com.reprezen.jsonoverlay.ResolutionException.ReferenceCycleException;
 
 public class Reference {
@@ -52,6 +52,10 @@ public class Reference {
 
 	public String getRefString() {
 		return refString;
+	}
+
+	public String getFragment() {
+		return pointer != null ? pointer.toString() : "";
 	}
 
 	public boolean isValid() {
@@ -98,7 +102,7 @@ public class Reference {
 	}
 
 	public boolean resolve() {
-		Set<String> visited = Sets.newHashSet();
+		Set<String> visited = new HashSet<>();
 		Reference current = this;
 		while (valid == null) {
 			String normalized = current.getNormalizedRef();

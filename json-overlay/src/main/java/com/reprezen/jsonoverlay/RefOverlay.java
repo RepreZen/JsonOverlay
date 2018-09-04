@@ -43,7 +43,7 @@ public class RefOverlay<V> {
 				this.target = castTarget;
 			}
 			if (target == null) {
-				target = factory.create(reference.getJson(), null, refMgr);
+				target = factory.create(reference.getJson(), null, reference.getManager());
 				target._setCreatingRef(reference);
 				refMgr.getRegistry().register(reference.getNormalizedRef(), factory.getSignature(), target);
 			}

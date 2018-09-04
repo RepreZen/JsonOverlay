@@ -12,10 +12,10 @@ package com.reprezen.jsonoverlay;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Maps;
 
 public final class NumberOverlay extends ScalarOverlay<Number> {
 
@@ -131,7 +131,7 @@ public final class NumberOverlay extends ScalarOverlay<Number> {
 		}
 
 		private static void buildTypeMap() {
-			typeMap = Maps.newHashMap();
+			typeMap = new HashMap<>();
 			for (NumberType type : NumberType.values()) {
 				typeMap.put(type.cls, type);
 			}

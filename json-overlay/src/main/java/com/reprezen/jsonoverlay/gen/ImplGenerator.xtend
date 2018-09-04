@@ -13,7 +13,7 @@ package com.reprezen.jsonoverlay.gen
 import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
-import com.github.javaparser.ast.body.TypeDeclaration
+import com.github.javaparser.ast.body.TypeDeclaratio
 import com.google.common.collect.Queues
 import com.google.common.collect.Sets
 import com.reprezen.jsonoverlay.Builder
@@ -29,7 +29,9 @@ import com.reprezen.jsonoverlay.gen.TypeData.Field
 import com.reprezen.jsonoverlay.gen.TypeData.Structure
 import com.reprezen.jsonoverlay.gen.TypeData.Type
 import java.io.File
+import java.util.ArrayDeque
 import java.util.Collection
+import java.util.HashSet
 import java.util.List
 import java.util.Map
 import java.util.stream.Collectors
@@ -63,6 +65,7 @@ class ImplGenerator extends TypeGenerator {
 			'''))
 			members.add(type.enumFactoryMember)
 		} else {
+			members.addAll(getFieldNameConstants(type))
 			members.add(getElaborateJsonMethod(type))
 			members.addAll(getFactoryMembers(type))
 			if (type.typeData.modelType !== null) {
@@ -302,6 +305,16 @@ class ImplGenerator extends TypeGenerator {
 		return methods
 	}
 
+	def private Members getFieldNameConstants(Type type) {
+		val members = new Members
+		for (f: type.fields.values.filter[!it.noImpl]) {
+			members.add(new Member('''
+				public static final String F_«f.propertyName» = "«f.propertyName»";
+			'''))
+		}
+		return members
+	}
+
 	def private Member getElaborateJsonMethod(Type type) {
 		return new Member('''
 			protected void _elaborateJson() {
@@ -478,8 +491,8 @@ class ImplGenerator extends TypeGenerator {
 	}
 
 	def private Collection<Type> getSubTypes(Type type) {
-		val subTypes = Sets.<Type>newHashSet()
-		val todo = Queues.<Type>newArrayDeque()
+		val subTypes = new HashSet<Type>()
+		val todo = new ArrayDeque<Type>()
 		todo.add(type)
 		while (!todo.isEmpty()) {
 			val nextType = todo.remove()

@@ -10,43 +10,38 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay.gen;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class TypeData {
 
 	private Collection<Type> types;
-	private Map<String, String> imports = Maps.newHashMap();
+	private Map<String, String> imports = new HashMap<>();
 	private List<String> defaultExtendInterfaces = null;
 	private Map<String, Type> typeMap = null;
 	private String modelType = null;
 	private String discriminator = null;
 
-	// Container for "decls" section that is solely used to define reusable anchors
+	// Container for "decls" section that is solely used to define reusable
+	// anchors
 	@JsonProperty
 	private Object decls;
 
 	public void init() {
-		typeMap = Maps.uniqueIndex(types, new Function<Type, String>() {
-			@Override
-			public String apply(Type type) {
-				return type.getName();
-			}
-		});
-		for (Type type : types) {
-			type.init(this);
-		}
+		typeMap = types.stream().collect(Collectors.toMap(Type::getName, t -> t));
+		types.stream().forEach(t -> t.init(this));
 	}
 
 	public String getModelType() {
@@ -80,17 +75,17 @@ public class TypeData {
 	public static class Type {
 
 		private String name;
-		private Map<String, Field> fields = Maps.newLinkedHashMap();
-		private List<String> extendInterfaces = Lists.newArrayList();
-		private Map<String, Collection<String>> imports = Maps.newHashMap();
+		private Map<String, Field> fields = new LinkedHashMap<>();
+		private List<String> extendInterfaces = new ArrayList<>();
+		private Map<String, Collection<String>> imports = new HashMap<>();
 		private boolean noGen = false;
 		private String extensionOf;
-		private Map<String, String> renames = Maps.newHashMap();
+		private Map<String, String> renames = new HashMap<>();
 		@JsonProperty("abstract")
 		private boolean abstractType = false;
 		private String discriminator = null;
 		private String discriminatorValue = null;
-		private List<String> enumValues = Lists.newArrayList();
+		private List<String> enumValues = new ArrayList<>();
 
 		private TypeData typeData;
 
@@ -106,7 +101,7 @@ public class TypeData {
 		}
 
 		public Collection<String> getRequiredImports(String... moduleTypes) {
-			Set<String> results = Sets.newLinkedHashSet();
+			Set<String> results = new LinkedHashSet<>();
 			Collection<String> interfaces = extendInterfaces != null ? extendInterfaces
 					: typeData.defaultExtendInterfaces;
 			if (interfaces != null) {

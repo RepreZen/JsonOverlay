@@ -27,13 +27,13 @@ public abstract class OverlayFactory<V> {
 		JsonOverlay<V> overlay;
 		if (Reference.isReferenceNode(json)) {
 			Reference reference = refMgr.getReference(json);
-			RefOverlay<V> refOverlay = new RefOverlay<V>(reference, parent, this, refMgr);
+			RefOverlay<V> refOverlay = new RefOverlay<V>(reference, null, this, refMgr);
 			overlay = refOverlay.getOverlay();
 			if (overlay == null) {
-				overlay = _create((V) null, null, refMgr);
+				overlay = _create((V) null, parent, refMgr);
 			}
 			if (overlay != null) {
-				overlay = ((OverlayFactory<V>) overlay._getFactory())._create((V) null, null, refMgr);
+				overlay = ((OverlayFactory<V>) overlay._getFactory())._create((V) null, parent, refMgr);
 				overlay._setReference(refOverlay);
 			}
 		} else {

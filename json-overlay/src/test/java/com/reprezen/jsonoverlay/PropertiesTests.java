@@ -2,6 +2,7 @@ package com.reprezen.jsonoverlay;
 
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
@@ -70,7 +70,7 @@ public class PropertiesTests extends Assert {
 				END);
 		assertEquals(Integer.valueOf(10), foo.getNumField());
 		assertEquals("hello", foo.getStringField());
-		assertEquals(Lists.newArrayList(10, 20, 30), foo.getListField());
+		assertEquals(Arrays.asList(10, 20, 30), foo.getListField());
 		assertEquals(Maps.toMap(Arrays.asList("a", "b"), s -> 1), foo.getMapField());
 		assertEquals(Maps.toMap(Arrays.asList("x-a"), s -> 1), foo.getRootMap());
 		checkPropertyNames(foo, "num", "list", "string", "map", "x-a");
@@ -81,7 +81,8 @@ public class PropertiesTests extends Assert {
 			assertFalse("Copy operation should create copy of each property value",
 					foo._getOverlay(name) == copy._getOverlay(name));
 		}
-		// foo2 has same content as foo, but numField comes last instead of first
+		// foo2 has same content as foo, but numField comes last instead of
+		// first
 		Foo foo2 = createFooWithJson(LIST, 10, 20, 30, END, 10, ROOT_MAP, "x-a", 1, END, "hello", MAP, "a", 1, "b", 1,
 				END);
 		assertEquals(foo, foo2);
@@ -109,7 +110,7 @@ public class PropertiesTests extends Assert {
 	@Test
 	public void testPropertyNames() {
 		Foo foo = createFooWithJson();
-		assertEquals(Sets.newHashSet("stringField", "numField", "listField", "mapField", "rootMap"),
+		assertEquals(new HashSet<>(Arrays.asList("stringField", "numField", "listField", "mapField", "rootMap")),
 				Sets.newHashSet(Overlay.of(foo).getPropertyNames()));
 	}
 

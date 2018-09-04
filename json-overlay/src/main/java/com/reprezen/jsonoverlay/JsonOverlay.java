@@ -12,6 +12,7 @@ package com.reprezen.jsonoverlay;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,6 +38,7 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	private boolean present;
 	private RefOverlay<V> refOverlay = null;
 	private Reference creatingRef = null;
+	private Optional<PositionInfo> positionInfo = null;
 
 	protected JsonOverlay(V value, JsonOverlay<?> parent, OverlayFactory<V> factory, ReferenceManager refMgr) {
 		this.json = null;
@@ -101,6 +103,10 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	private boolean _isValidRef() {
 		return refOverlay != null ? refOverlay._getReference().isValid() : false;
+	}
+
+	/* package */ RefOverlay<V> _getRefOverlay() {
+		return refOverlay;
 	}
 
 	/* package */ Reference _getReference() {
@@ -172,8 +178,26 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 	abstract protected JsonOverlay<?> _findInternal(JsonPointer path);
 
 	/* package */String _getPathFromRoot() {
-		return parent != null ? (parent._getParent() != null ? parent._getPathFromRoot() : "") + "/" + pathInParent
-				: "/";
+		if (parent != null) {
+			if (pathInParent.isEmpty()) {
+				return parent._getPathFromRoot();
+			} else {
+				String parentPath = parent._getPathFromRoot();
+				return parentPath != null ? parentPath + "/" + encodePointerPart(pathInParent) : null;
+			}
+		} else if (creatingRef != null) {
+			return creatingRef.getFragment();
+		} else {
+			return null;
+		}
+	}
+
+	private String encodePointerPart(String part) {
+		// TODO fix this bogus special case
+		if (part.startsWith("components/")) {
+			return part;
+		}
+		return part.replaceAll("~", "~0").replaceAll("/", "~1");
 	}
 
 	/* package */String _getJsonReference() {
@@ -193,6 +217,12 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		} else {
 			return "#";
 		}
+	}
+
+	/* package */ String _getDocumentUrl(boolean forRef) {
+		String jsonRef = _getJsonReference(forRef);
+		String docUrl = jsonRef.contains("#") ? jsonRef.substring(0, jsonRef.indexOf("#")) : jsonRef;
+		return docUrl.isEmpty() ? null : docUrl;
 	}
 
 	protected abstract V _fromJson(JsonNode json);
@@ -225,6 +255,10 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	protected abstract JsonNode _toJsonInternal(SerializationOptions options);
 
+	/* package */ JsonNode _getParsedJson() {
+		return json;
+	}
+
 	private JsonOverlay<V> thisOrRefTarget() {
 		if (refOverlay == null || refOverlay._getReference().isInvalid()) {
 			return this;
@@ -253,6 +287,15 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 
 	/* package */ void _setPathInParent(String pathInParent) {
 		this.pathInParent = pathInParent;
+	}
+
+	/* package */ Optional<PositionInfo> _getPositionInfo() {
+		if (positionInfo == null) {
+			JsonPointer ptr = JsonPointer.compile(_getPathFromRoot());
+			positionInfo = refMgr.getPositionInfo(ptr);
+			positionInfo.ifPresent(info -> info.setDocumentUrl(_getDocumentUrl(true)));
+		}
+		return positionInfo;
 	}
 
 	protected abstract OverlayFactory<?> _getFactory();

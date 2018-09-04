@@ -1,6 +1,8 @@
 package com.reprezen.jsonoverlay;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,17 +12,14 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.reprezen.jsonoverlay.SerializationOptions.Option;
 
 public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	// retrieve property values from this map by property name
-	private Map<String, JsonOverlay<?>> children = Maps.newHashMap();
+	private Map<String, JsonOverlay<?>> children = new HashMap<>();
 	// this queue sets ordering for serialization, so it matches parsed JSON
-	private List<PropertyLocator> childOrder = Lists.newArrayList();
+	private List<PropertyLocator> childOrder = new ArrayList<>();
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
 	private V elaborationValue = null;
@@ -181,7 +180,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	}
 
 	protected void _elaborateJson() {
-		// need an implemenatation here because subclasses invoke method in super, to
+		// need an implemenatation here because subclasses invoke method in
+		// super, to
 		// support type extensions
 	}
 
@@ -268,8 +268,10 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 
 	@Override
 	public V _fromJson(JsonNode json) {
-		// parsing of the json node is expected to be done in the constructor of the
-		// subclass, so nothing is done here. But we do establish this object as its own
+		// parsing of the json node is expected to be done in the constructor of
+		// the
+		// subclass, so nothing is done here. But we do establish this object as
+		// its own
 		// value.
 		@SuppressWarnings("unchecked")
 		V result = (V) this;
@@ -332,10 +334,14 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 			if (elaborated != otherPO.elaborated) {
 				return false;
 			}
-			if (!Objects.equal(children, otherPO.children)) {
+			if (children != null ? !children.equals(otherPO.children) : otherPO.children != null) {
 				return false;
 			}
-			return sameOrder ? Objects.equal(childOrder, otherPO.childOrder) : true;
+			if (sameOrder) {
+				return childOrder != null ? childOrder.equals(otherPO.childOrder) : otherPO.childOrder == null;
+			} else {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -379,8 +385,9 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 			// maintain that ordering, or they represent the entire root object, in which
 			// case the ordering is irrelevant.
 			JsonNode currentJson = json;
-			List<Integer> result = Lists.newArrayList();
-			// we only consider object nodes and continue until our pointer is fully
+			List<Integer> result = new ArrayList<>();
+			// we only consider object nodes and continue until our pointer is
+			// fully
 			// consumed
 			while (currentJson instanceof ObjectNode && !pointer.matches()) {
 				String key = pointer.getMatchingProperty();
@@ -396,11 +403,13 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 					}
 				}
 				if (!found) {
-					// no match at current level, so child is not present - exclude from ordering
+					// no match at current level, so child is not present -
+					// exclude from ordering
 					return null;
 				}
 			}
-			// empty vector means the path was empty and matched the root json object. This
+			// empty vector means the path was empty and matched the root json
+			// object. This
 			// occurs only with maps, which are excluded from ordering.
 			return result.isEmpty() ? null : result;
 		}
@@ -413,7 +422,8 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 				return -1;
 			} else {
 				int cmp = 0;
-				// first component where paths differ determines relative ordering
+				// first component where paths differ determines relative
+				// ordering
 				for (int i = 0; cmp == 0 && i < vector.size() && i < other.vector.size(); i++) {
 					cmp = vector.get(i) - other.vector.get(i);
 				}

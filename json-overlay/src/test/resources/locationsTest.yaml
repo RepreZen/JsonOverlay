@@ -1,0 +1,43 @@
+---
+description: Test model for reference tests
+map:
+  a:
+    $ref: "external.yaml#/aObj"
+  bref:
+    $ref: "#/map/b"
+  b:
+    x: hello
+    y: good-bye
+  c:
+    $ref: "#/map/c"
+  x:
+    $ref: "#/map/y"
+  y:
+    $ref: "#/map/z"
+  z:
+    $ref: "#/map/x"
+  missingFile:
+    $ref: "noSuchFile.yaml"
+  badUrl:
+    $ref: "http:://foo.com/test.yaml"
+  missingJson:
+    $ref: "#/blah/blah"
+  badPointer:
+    $ref: "#map/x"
+stringVal:
+  $ref: "#/description"
+intVal: 10
+list:
+  - $ref: "#/map/b"
+  - $ref: "#/map/x"
+  - x: on
+    y: off
+  - $ref: "#/list/0"
+  - $ref: "#/list/4"
+  - $ref: "#/list/6"
+  - $ref: "#/list/7"
+  - $ref: "#/list/5"
+  - $ref: "noSuchFile.yaml"
+  - $ref: "http:://foo.com/test.yaml"
+  - $ref: "#/blah/blah"
+  - $ref: "#map/x"

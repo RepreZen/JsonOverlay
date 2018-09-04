@@ -13,9 +13,7 @@ package com.reprezen.jsonoverlay.gen
 import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
-import com.github.javaparser.ast.body.TypeDeclaratio
-import com.google.common.collect.Queues
-import com.google.common.collect.Sets
+import com.github.javaparser.ast.body.TypeDeclaration
 import com.reprezen.jsonoverlay.Builder
 import com.reprezen.jsonoverlay.EnumOverlay
 import com.reprezen.jsonoverlay.IJsonOverlay

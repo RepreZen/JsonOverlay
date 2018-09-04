@@ -18,6 +18,7 @@ import com.google.common.collect.Queues
 import com.google.common.collect.Sets
 import com.reprezen.jsonoverlay.Builder
 import com.reprezen.jsonoverlay.EnumOverlay
+import com.reprezen.jsonoverlay.IJsonOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
@@ -127,18 +128,19 @@ class ImplGenerator extends TypeGenerator {
 		''')
 		return members
 	}
-	
+
 	def private getBuilderMethods(Type type) {
 		val members = new Members
-		requireTypes(Builder, OverlayFactory)
+		requireTypes(Builder, OverlayFactory, IJsonOverlay)
+		val createType = if (isEnum(type)) '''IJsonOverlay<«type.name»>''' else type.name
 		members.addMember('''
-			public static Builder<«type.name»> builder(JsonOverlay<?> modelMember) {
+			public static <OV extends IJsonOverlay<?>> Builder<«type.name»> builder(OV modelMember) {
 				return new Builder<«type.name»>(factory, modelMember);
 			}
 		''')
 		members.addMember('''
-			public static JsonOverlay<«type.name»> create(JsonOverlay<?> modelMember) {
-				return builder(modelMember).build();
+			public static <OV extends IJsonOverlay<?>> «createType» create(OV modelMember) {
+				return «IF !isEnum(type)»(«type.name») «ENDIF»builder(modelMember).build();
 			}
 		''')
 		return members

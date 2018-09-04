@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.reprezen.jsonoverlay.Builder;
+import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.jsonoverlay.IntegerOverlay;
 import com.reprezen.jsonoverlay.JsonOverlay;
 import com.reprezen.jsonoverlay.OverlayFactory;
@@ -416,12 +417,12 @@ public class TestModelImpl extends PropertiesOverlay<TestModel> implements TestM
 	}
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	public static Builder<TestModel> builder(JsonOverlay<?> modelMember) {
+	public static <OV extends IJsonOverlay<?>> Builder<TestModel> builder(OV modelMember) {
 		return new Builder<TestModel>(factory, modelMember);
 	}
 
 	@Generated("com.reprezen.jsonoverlay.gen.CodeGenerator")
-	public static JsonOverlay<TestModel> create(JsonOverlay<?> modelMember) {
-		return builder(modelMember).build();
+	public static <OV extends IJsonOverlay<?>> TestModel create(OV modelMember) {
+		return (TestModel) builder(modelMember).build();
 	}
 }

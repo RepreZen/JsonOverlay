@@ -10,5 +10,5 @@
  *******************************************************************************/
 package com.reprezen.jsonoverlay;
 
-public interface IModelPart<Model,V> extends IJsonOverlay<V> {
+public interface IModelPart<Model, V> extends IJsonOverlay<V> {
 }

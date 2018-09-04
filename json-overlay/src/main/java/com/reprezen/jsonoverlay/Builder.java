@@ -4,9 +4,9 @@ public class Builder<V> {
 	private OverlayFactory<?> factory;
 	private JsonOverlay<?> modelMember;
 
-	public Builder(OverlayFactory<?> factory, JsonOverlay<?> modelMember) {
+	public <OV extends IJsonOverlay<?>> Builder(OverlayFactory<?> factory, OV modelMember) {
 		this.factory = factory;
-		this.modelMember = modelMember;
+		this.modelMember = (JsonOverlay<?>) modelMember;
 	}
 
 	public JsonOverlay<V> build() {

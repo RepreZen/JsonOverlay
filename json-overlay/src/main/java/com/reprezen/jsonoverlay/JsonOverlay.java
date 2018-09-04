@@ -62,6 +62,14 @@ public abstract class JsonOverlay<V> implements IJsonOverlay<V> {
 		this.present = !json.isMissingNode();
 	}
 
+	public JsonOverlay<V> create() {
+		return builder().build();
+	}
+
+	public Builder<V> builder() {
+		return new Builder<V>(_getFactory(), this);
+	}
+
 	/* package */ V _get() {
 		return _get(true);
 	}

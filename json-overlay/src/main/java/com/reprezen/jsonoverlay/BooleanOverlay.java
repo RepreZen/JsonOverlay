@@ -53,4 +53,18 @@ public final class BooleanOverlay extends ScalarOverlay<Boolean> {
 			return new BooleanOverlay(json, parent, refMgr);
 		}
 	};
+
+	public static Builder<Boolean> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Boolean>(factory, modelMember);
+	}
+
+	public static JsonOverlay<Boolean> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
+	}
+
+	public static JsonOverlay<Boolean> create(boolean value, JsonOverlay<?> modelMember) {
+		JsonOverlay<Boolean> result = create(modelMember);
+		result._set(value);
+		return result;
+	}
 }

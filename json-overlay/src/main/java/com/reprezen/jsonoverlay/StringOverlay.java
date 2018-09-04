@@ -62,4 +62,18 @@ public final class StringOverlay extends ScalarOverlay<String> {
 		}
 
 	};
+
+	public static Builder<String> builder(JsonOverlay<?> modelMember) {
+		return new Builder<String>(factory, modelMember);
+	}
+
+	public static JsonOverlay<String> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
+	}
+
+	public static JsonOverlay<String> create(String value, JsonOverlay<?> modelMember) {
+		JsonOverlay<String> result = create(modelMember);
+		result._set(value);
+		return result;
+	}
 }

@@ -14,7 +14,9 @@ import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
+import com.reprezen.jsonoverlay.Builder
 import com.reprezen.jsonoverlay.EnumOverlay
+import com.reprezen.jsonoverlay.IJsonOverlay
 import com.reprezen.jsonoverlay.JsonOverlay
 import com.reprezen.jsonoverlay.ListOverlay
 import com.reprezen.jsonoverlay.MapOverlay
@@ -54,6 +56,7 @@ class ImplGenerator extends TypeGenerator {
 		val members = new Members
 		if (type.isEnum) {
 			members.add(new Member('''
+				@Override
 				protected Class<«type.name»> getEnumClass() {
 					return «type.name».class;
 				}
@@ -78,6 +81,7 @@ class ImplGenerator extends TypeGenerator {
 				return factory;
 			}
 		'''))
+		members.addAll(getBuilderMethods(type))
 		return members
 	}
 
@@ -121,6 +125,23 @@ class ImplGenerator extends TypeGenerator {
 		members.addMember('''
 			public «type.implType»(«type.name» «type.lcName», JsonOverlay<?> parent, ReferenceManager refMgr) {
 				super(«type.lcName», parent, «IF type.extensionOf === null»factory, «ENDIF»refMgr);
+			}
+		''')
+		return members
+	}
+
+	def private getBuilderMethods(Type type) {
+		val members = new Members
+		requireTypes(Builder, OverlayFactory, IJsonOverlay)
+		val createType = if (isEnum(type)) '''IJsonOverlay<«type.name»>''' else type.name
+		members.addMember('''
+			public static <OV extends IJsonOverlay<?>> Builder<«type.name»> builder(OV modelMember) {
+				return new Builder<«type.name»>(factory, modelMember);
+			}
+		''')
+		members.addMember('''
+			public static <OV extends IJsonOverlay<?>> «createType» create(OV modelMember) {
+				return «IF !isEnum(type)»(«type.name») «ENDIF»builder(modelMember).build();
 			}
 		''')
 		return members

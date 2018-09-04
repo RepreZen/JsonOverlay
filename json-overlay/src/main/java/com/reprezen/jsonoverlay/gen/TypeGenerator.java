@@ -42,6 +42,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.reprezen.jsonoverlay.BooleanOverlay;
+import com.reprezen.jsonoverlay.Builder;
 import com.reprezen.jsonoverlay.EnumOverlay;
 import com.reprezen.jsonoverlay.IJsonOverlay;
 import com.reprezen.jsonoverlay.IModelPart;
@@ -171,6 +172,7 @@ public abstract class TypeGenerator {
 				IModelPart.class, //
 				PropertiesOverlay.class, //
 				OverlayFactory.class, //
+				Builder.class, //
 				ReferenceManager.class, //
 				StringOverlay.class, //
 				IntegerOverlay.class, //

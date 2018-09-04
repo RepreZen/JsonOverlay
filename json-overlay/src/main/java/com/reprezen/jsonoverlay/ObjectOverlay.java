@@ -53,4 +53,18 @@ public final class ObjectOverlay extends ScalarOverlay<Object> {
 			return new ObjectOverlay(json, parent, refMgr);
 		}
 	};
+
+	public static Builder<Object> builder(JsonOverlay<?> modelMember) {
+		return new Builder<Object>(factory, modelMember);
+	}
+
+	public static JsonOverlay<Object> create(JsonOverlay<?> modelMember) {
+		return builder(modelMember).build();
+	}
+
+	public static JsonOverlay<Object> create(Object value, JsonOverlay<?> modelMember) {
+		JsonOverlay<Object> result = create(modelMember);
+		result._set(value);
+		return result;
+	}
 }

@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.reprezen.jsonoverlay</groupId>
 	<artifactId>jsonoverlay</artifactId>
-	<version>4.0.1-SNAPSHOT</version>
+	<version>4.0.1</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JsonOverlay Framework</description>
 	<url>https://github.com/RepreZen/JsonOverlay</url>

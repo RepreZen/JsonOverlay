@@ -2,6 +2,8 @@ package com.reprezen.jsonoverlay;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +11,6 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.norconex.commons.lang.url.URLNormalizer;
 
 public class ReferenceManager {
 
@@ -94,17 +95,17 @@ public class ReferenceManager {
 
 	private static URL normalize(URL url, boolean noFrag) {
 		if (url != null) {
-			URLNormalizer normalizer = new URLNormalizer(url.toString()) //
-					.lowerCaseSchemeHost() //
-					.upperCaseEscapeSequence() //
-					.decodeUnreservedCharacters() //
-					.removeDefaultPort() //
-					.encodeNonURICharacters() //
-					.removeDotSegments();
-			if (noFrag) {
-				normalizer = normalizer.removeFragment();
+			String urlString = url.toString();
+			int fragPos = urlString.indexOf("#");
+			if (noFrag && fragPos >= 0) {
+				urlString = urlString.substring(0, fragPos);
 			}
-			return normalizer.toURL();
+			try {
+				return new URI(urlString).normalize().toURL();
+			} catch (MalformedURLException | URISyntaxException e) {
+				// oh well, we tried...
+				return url;
+			}
 		} else {
 			return null;
 		}

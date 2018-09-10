@@ -13,13 +13,11 @@ package com.reprezen.jsonoverlay.gen;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -85,7 +83,7 @@ public class CodeGenerator {
 	}
 
 	private String getImplPackage() {
-		return StringUtils.join(Arrays.asList(opts.pkg, opts.classPackage), ".");
+		return opts.pkg + "." + opts.classPackage;
 	}
 
 	private File getIntfDir() {
@@ -93,7 +91,7 @@ public class CodeGenerator {
 	}
 
 	private String getIntfPackage() {
-		return StringUtils.join(Arrays.asList(opts.pkg, opts.interfacePackage), ".");
+		return opts.pkg + "." + opts.interfacePackage;
 	}
 
 	private static class Opts {

@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonPointer;

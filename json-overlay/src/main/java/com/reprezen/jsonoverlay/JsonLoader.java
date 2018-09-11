@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,9 +76,20 @@ public class JsonLoader {
 	public Pair<JsonNode, Map<JsonPointer, PositionInfo>> loadWithLocations(String json) throws IOException {
 		JsonNode tree;
 		Map<JsonPointer, PositionInfo> regions;
-		LocationRecorderYamlParser parser = (LocationRecorderYamlParser) yamlFactory.createParser(json);
+		LocationRecorderYamlParser parser = (LocationRecorderYamlParser) yamlFactory.createParser(fixTabs(json));
 		tree = yamlMapper.readTree(parser);
 		regions = parser.getLocations();
 		return Pair.of(tree, regions);
+	}
+
+	private String fixTabs(String json) {
+		Pattern initialTabs = Pattern.compile("^(\\t+)", Pattern.MULTILINE);
+		Matcher m = initialTabs.matcher(json);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			m.appendReplacement(sb, m.group(1).replaceAll("\\t", " "));
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 }

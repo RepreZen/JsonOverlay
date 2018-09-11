@@ -21,8 +21,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TypeData {
@@ -117,7 +115,7 @@ public class TypeData {
 
 		public String getIntfExtendsDecl() {
 			List<String> interfaces = extendInterfaces != null ? extendInterfaces : typeData.defaultExtendInterfaces;
-			return interfaces != null ? " extends " + StringUtils.join(interfaces, ", ") : "";
+			return interfaces != null ? " extends " + interfaces.stream().collect(Collectors.joining(",")) : "";
 		}
 
 		public String getName() {

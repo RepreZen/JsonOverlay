@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonPointer;
@@ -19,7 +20,7 @@ public abstract class PropertiesOverlay<V> extends JsonOverlay<V> {
 	// retrieve property values from this map by property name
 	private Map<String, JsonOverlay<?>> children = new HashMap<>();
 	// this queue sets ordering for serialization, so it matches parsed JSON
-	private List<PropertyLocator> childOrder = new ArrayList<>();
+	private List<PropertyLocator> childOrder = new CopyOnWriteArrayList<>();
 	private boolean elaborated = false;
 	private boolean deferElaboration = false;
 	private V elaborationValue = null;

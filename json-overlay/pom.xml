@@ -3,11 +3,13 @@
 	 terms of the Eclipse Public License v1.0 which accompanies this distribution, 
 	 and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
 	 ModelSolv, Inc. - initial API and implementation and/or initial documentation -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.reprezen.jsonoverlay</groupId>
 	<artifactId>jsonoverlay</artifactId>
-	<version>4.0.2</version>
+	<version>4.0.2-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JsonOverlay Framework</description>
 	<url>https://github.com/RepreZen/JsonOverlay</url>
@@ -41,8 +43,7 @@
 		<connection>scm:git:git://github.com/RepreZen/JsonOverlay.git</connection>
 		<developerConnection>scm:git:git@github.com:RepreZen/JsonOverlay.git</developerConnection>
 		<url>https://github.com/RepreZen/JsonOverlay/tree/master</url>
-	  <tag>v4.0.2</tag>
-  </scm>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

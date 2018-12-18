@@ -41,7 +41,7 @@
 	</developers>
 	<scm>
 		<connection>scm:git:git://github.com/RepreZen/JsonOverlay.git</connection>
-		<developerConnection>scm:git:ssh://github.com:RepreZen/JsonOverlay.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:RepreZen/JsonOverlay.git</developerConnection>
 		<url>https://github.com/RepreZen/JsonOverlay/tree/master</url>
 	</scm>
 	<dependencies>

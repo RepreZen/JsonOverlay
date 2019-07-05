@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.reprezen.jsonoverlay</groupId>
 	<artifactId>jsonoverlay</artifactId>
-	<version>4.0.4</version>
+	<version>4.0.5-SNAPSHOT</version>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>JsonOverlay Framework</description>
 	<url>https://github.com/RepreZen/JsonOverlay</url>
@@ -41,7 +41,7 @@
 		<connection>scm:git:git://github.com/RepreZen/JsonOverlay.git</connection>
 		<developerConnection>scm:git:git@github.com:RepreZen/JsonOverlay.git</developerConnection>
 		<url>https://github.com/RepreZen/JsonOverlay/tree/master</url>
-		<tag>v4.0.4</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<dependencies>
 		<dependency>

@@ -36,8 +36,13 @@ public final class ListOverlay<V> extends JsonOverlay<List<V>> {
 
 	private ListOverlay(List<V> value, JsonOverlay<?> parent, OverlayFactory<List<V>> factory,
 			ReferenceManager refMgr) {
-		super(new ArrayList<>(value), parent, factory, refMgr);
+		super(copyValue(value), parent, factory, refMgr);
 		this.itemFactory = ((ListOverlayFactory<V>) factory).getItemFactory();
+	}
+	static <T> List<T> copyValue(List<T> src) {
+		if (src == null)
+			return null;
+		return new ArrayList<>(src);
 	}
 
 	@Override

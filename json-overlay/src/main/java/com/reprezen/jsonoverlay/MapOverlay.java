@@ -43,11 +43,17 @@ public final class MapOverlay<V> extends JsonOverlay<Map<String, V>> {
 
 	private MapOverlay(Map<String, V> value, JsonOverlay<?> parent, OverlayFactory<Map<String, V>> factory,
 			ReferenceManager refMgr) {
-		super(new LinkedHashMap<>(value), parent, factory, refMgr);
+		super(copyValue(value), parent, factory, refMgr);
 		MapOverlayFactory<V> mapOverlayFactory = (MapOverlayFactory<V>) factory;
 		this.valueFactory = mapOverlayFactory.getValueFactory();
 		String keyPattern = mapOverlayFactory.getKeyPattern();
 		this.keyPattern = keyPattern != null ? Pattern.compile(keyPattern) : null;
+	}
+
+	static <T> Map<String, T> copyValue(Map<String, T> src) {
+		if (src == null)
+			return null;
+		return new LinkedHashMap<>(src);
 	}
 
 	@Override
